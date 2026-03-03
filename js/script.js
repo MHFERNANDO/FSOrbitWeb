@@ -37,7 +37,7 @@ const scrollReveal = () => {
                 // observer.unobserve(entry.target); 
             }
         });
-    }, { 
+    }, {
         threshold: 0.1, // Se activa cuando se ve el 10% del elemento
         rootMargin: "0px 0px -50px 0px" // Se activa un poco antes de llegar para que sea fluido
     });
@@ -50,12 +50,10 @@ const scrollReveal = () => {
 // Asegúrate de llamarlo al cargar
 document.addEventListener('DOMContentLoaded', scrollReveal);
 
-document.querySelector('.btn-primary').addEventListener('click', () => {
-    document.getElementById('chatWrapper').classList.add('active');
-});
+document.addEventListener('DOMContentLoaded', scrollReveal);
 
 const modal = document.getElementById('modalStep');
-const btnHero = document.querySelector('.btn-primary');
+const btnHero = document.querySelector('.hero .btn-primary'); // More specific selector
 const closeModal = document.querySelector('.close-modal');
 const steps = document.querySelectorAll('.step');
 const optBtns = document.querySelectorAll('.opt-btn');
@@ -71,9 +69,9 @@ optBtns.forEach(btn => {
     btn.onclick = (e) => {
         const currentStep = e.target.closest('.step');
         const stepNum = parseInt(currentStep.dataset.step);
-        
-        if(stepNum === 1) seleccion.servicio = e.target.dataset.value;
-        if(stepNum === 2) seleccion.prioridad = e.target.dataset.value;
+
+        if (stepNum === 1) seleccion.servicio = e.target.dataset.value;
+        if (stepNum === 2) seleccion.prioridad = e.target.dataset.value;
 
         currentStep.classList.remove('active');
         steps[stepNum].classList.add('active');
@@ -87,3 +85,60 @@ document.getElementById('sendWhatsapp').onclick = () => {
     window.open(url, '_blank');
     modal.style.display = 'none';
 };
+
+// --- LÓGICA DEL PREVIEW DE PROYECTOS ---
+document.addEventListener('DOMContentLoaded', () => {
+    const previewModal = document.getElementById('projectPreviewModal');
+    const closePreviewBtn = document.getElementById('closePreviewBtn');
+    const projectIframe = document.getElementById('projectIframe');
+    const previewLoader = document.getElementById('previewLoader');
+    const externalLink = document.getElementById('externalProjectLink');
+    const triggers = document.querySelectorAll('.project-trigger');
+
+    // Abrir Modal
+    triggers.forEach(trigger => {
+        trigger.addEventListener('click', (e) => {
+            e.preventDefault();
+            const url = trigger.getAttribute('data-url');
+            if (url) {
+                // Preparar UI
+                previewLoader.style.display = 'flex';
+                projectIframe.classList.remove('loaded');
+                externalLink.href = url;
+
+                // Mostrar Modal
+                previewModal.classList.add('active');
+
+                // Cargar iframe
+                projectIframe.src = url;
+            }
+        });
+    });
+
+    // Evento de carga del iframe para ocultar el loader
+    projectIframe.addEventListener('load', () => {
+        if (projectIframe.src && projectIframe.src !== window.location.href) {
+            previewLoader.style.display = 'none';
+            projectIframe.classList.add('loaded');
+        }
+    });
+
+    // Cerrar Modal
+    const closeModal = () => {
+        previewModal.classList.remove('active');
+        // Pequeño timeout para no ver el iframe en blanco mientras se cierra la animación
+        setTimeout(() => {
+            projectIframe.src = '';
+            projectIframe.classList.remove('loaded');
+        }, 400);
+    };
+
+    closePreviewBtn.addEventListener('click', closeModal);
+
+    // Cerrar al hacer clic fuera del contenido
+    previewModal.addEventListener('click', (e) => {
+        if (e.target === previewModal) {
+            closeModal();
+        }
+    });
+});

@@ -1349,7 +1349,7 @@ h1 {
 
 /* --- Sección Ver Todos los Proyectos --- */
 .view-all-projects {
-    padding: 60px 0 100px;
+    padding: 120px 0 100px;
 }
 
 .cta-projects-wrapper {
@@ -1435,5 +1435,43 @@ h1 {
     .cta-content h2 {
         text-align: center;
         font-size: 1.8rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 0 20px;
+    }
+
+    .hero {
+        padding: 40px 0;
+        gap: 30px;
+    }
+
+    .service-card {
+        padding: 30px 20px;
+    }
+
+    .focus-item {
+        padding: 30px 20px;
+    }
+
+    .work-info {
+        padding: 20px;
+    }
+
+    .cta-projects-wrapper {
+        padding: 30px 20px;
+    }
+
+    .cta-content h2 {
+        font-size: 1.6rem;
+    }
+
+    .btn-primary,
+    .btn-secondary,
+    .btn-main-orbit {
+        padding: 14px 28px;
+        font-size: 0.95rem;
     }
 }

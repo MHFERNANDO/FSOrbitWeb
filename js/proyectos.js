@@ -62,3 +62,21 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
+const navToggle = document.querySelector('.nav-toggle');
+const navLinks = document.querySelector('.nav-links');
+const links = document.querySelectorAll('.nav-links a');
+
+// Abrir/Cerrar menú
+navToggle.addEventListener('click', () => {
+    navToggle.classList.toggle('active');
+    navLinks.classList.toggle('active');
+});
+
+// Cerrar menú automáticamente al hacer click en un link
+links.forEach(link => {
+    link.addEventListener('click', () => {
+        navToggle.classList.remove('active');
+        navLinks.classList.remove('active');
+    });
+});

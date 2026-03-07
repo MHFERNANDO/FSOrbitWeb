@@ -1517,3 +1517,224 @@ h1 {
         font-size: 0.95rem;
     }
 }
+
+/* --- FIX RESPONSIVE FS ORBIT (COPYS & PASTE) --- */
+
+@media (max-width: 992px) {
+    .hero {
+        flex-direction: column;
+        text-align: center;
+        padding-top: 40px;
+        min-height: auto;
+    }
+
+    .hero-text {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .hero-sub {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .hero-btns {
+        flex-direction: column;
+        width: 100%;
+        max-width: 400px;
+    }
+
+    .split-layout {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+
+    .footer-grid {
+        grid-template-columns: 1fr;
+        text-align: center;
+        gap: 40px;
+    }
+
+    .wa-item {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 768px) {
+    /* Navbar móvil */
+    .navbar {
+        height: 75px;
+    }
+    .logo img {
+        height: 65px;
+    }
+    .nav-links {
+        display: none; /* Esconde links para evitar amontonamiento */
+    }
+
+    /* Tipografía */
+    h1 {
+        font-size: 2.2rem !important;
+        letter-spacing: -1px;
+    }
+
+    .section-title {
+        font-size: 2rem;
+        text-align: center;
+    }
+
+    /* Grillas a una columna */
+    .services-grid, 
+    .portfolio-list, 
+    .focus-grid {
+        grid-template-columns: 1fr !important;
+        gap: 20px;
+    }
+
+    /* Portfolio: Info siempre visible en móvil (no hay hover) */
+    .work-info {
+        opacity: 1;
+        background: linear-gradient(to top, rgba(9, 10, 15, 0.95) 10%, transparent 100%);
+    }
+
+    /* Botones Pro */
+    .btn-primary, .btn-secondary, .btn-main-orbit {
+        width: 100%;
+        justify-content: center;
+        padding: 16px;
+        font-size: 0.95rem;
+    }
+
+    /* CTA Proyectos */
+    .cta-projects-wrapper {
+        flex-direction: column;
+        padding: 40px 20px;
+        text-align: center;
+    }
+
+    .cta-content h2 {
+        text-align: center;
+        font-size: 1.6rem;
+    }
+
+    /* Chat móvil */
+    .chat-window {
+        width: calc(100vw - 40px);
+        bottom: 85px;
+        right: 20px;
+    }
+    
+    .chat-trigger {
+        width: 58px;
+        height: 58px;
+    }
+}
+
+/* Evitar scroll horizontal por desbordamiento */
+html, body {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+
+/* --- LÓGICA NAVBAR RESPONSIVE --- */
+
+/* Botón Hamburguesa */
+.nav-toggle {
+    display: none; /* Escondido en PC */
+    flex-direction: column;
+    justify-content: space-between;
+    width: 30px;
+    height: 21px;
+    cursor: pointer;
+    z-index: 1100;
+}
+
+.nav-toggle span {
+    width: 100%;
+    height: 3px;
+    background-color: var(--accent); /* Tu color cian #00f2ff */
+    border-radius: 10px;
+    transition: all 0.3s ease-in-out;
+}
+
+@media (max-width: 768px) {
+    .nav-toggle {
+        display: flex; /* Aparece en móviles */
+    }
+
+    .nav-links {
+        position: fixed;
+        top: 0;
+        right: -100%; /* Menú fuera de pantalla */
+        width: 80%;
+        height: 100vh;
+        background: rgba(9, 10, 15, 0.95); /* Color --bg con transparencia */
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 40px;
+        transition: 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+        z-index: 1050;
+        border-left: 1px solid var(--surface-border);
+        list-style: none;
+    }
+
+    .nav-links.active {
+        right: 0; /* Entra el menú */
+        box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .nav-links li {
+        width: 100%;
+        text-align: center;
+    }
+
+    .nav-links a {
+        font-size: 1.4rem;
+        display: block;
+        width: 100%;
+    }
+
+    /* Animación del icono a X */
+    .nav-toggle.active span:nth-child(1) {
+        transform: translateY(9px) rotate(45deg);
+    }
+    .nav-toggle.active span:nth-child(2) {
+        opacity: 0;
+    }
+    .nav-toggle.active span:nth-child(3) {
+        transform: translateY(-9px) rotate(-45deg);
+    }
+}
+
+@media (max-width: 768px) {
+    .nav-toggle {
+        display: flex !important; /* Forzamos que se vea */
+        z-index: 9999; /* Por encima de todo */
+        position: relative;
+    }
+
+    .nav-links {
+        display: flex !important; /* Para que no lo oculte el display:none anterior */
+        position: fixed;
+        top: 0;
+        right: -100%; /* Escondido */
+        width: 100%; /* Ocupa todo el ancho en móvil */
+        height: 100vh;
+        background: #090a0f; /* Color de fondo sólido para pruebas */
+        z-index: 9998;
+        transition: right 0.4s ease-in-out;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .nav-links.active {
+        right: 0; /* Aparece */
+    }
+}

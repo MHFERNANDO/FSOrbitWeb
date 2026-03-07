@@ -142,3 +142,29 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
+document.addEventListener('DOMContentLoaded', () => {
+    const btn = document.querySelector('.nav-toggle');
+    const menu = document.querySelector('.nav-links');
+    const links = document.querySelectorAll('.nav-links a');
+
+    if (btn && menu) {
+        btn.addEventListener('click', () => {
+            // Esto activa el menú y la animación de la X
+            btn.classList.toggle('active');
+            menu.classList.toggle('active');
+            
+            // Evita que el body se mueva mientras el menú está abierto
+            document.body.style.overflow = menu.classList.contains('active') ? 'hidden' : 'auto';
+        });
+
+        // Cerrar al hacer clic en cualquier link
+        links.forEach(link => {
+            link.addEventListener('click', () => {
+                btn.classList.remove('active');
+                menu.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+        });
+    }
+});

@@ -4,6 +4,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="description" content="FS Orbit | Ingeniería Web de Alto Rendimiento. Especialistas en ecosistemas digitales, arquitecturas escalables y diseño de misión crítica.">
+    <meta name="keywords" content="desarrollo web, software, ingeniería, react, fs orbit, diseño web ecuador, alto rendimiento">
+    <meta name="author" content="FS Orbit">
+    <meta name="robots" content="index, follow">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://fsorbit.com/"> <meta property="og:title" content="FS Orbit | Ingeniería de Alto Rendimiento">
+    <meta property="og:description" content="Transformamos ideas en ecosistemas digitales potentes. Diseño futurista y código optimizado.">
+    <meta property="og:image" content="https://fsorbit.com/assets/og-image.jpg"> <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://fsorbit.com/">
+    <meta property="twitter:title" content="FS Orbit | Ingeniería de Alto Rendimiento">
+    <meta property="twitter:description" content="Desarrollo de software y diseño web con estética futurista y rendimiento superior.">
+    <meta property="twitter:image" content="https://fsorbit.com/assets/og-image.jpg">
+
+    <meta name="theme-color" content="#090a0f">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+
     <title>FS Orbit | Soluciones Digitales a Medida</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,6 +31,11 @@
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
         rel="stylesheet">
     <link rel="icon" href="assets/Logo.png" type="image/png">
+    <link rel="icon" href="assets/Logo.png" type="image/png">
+    <link rel="apple-touch-icon" href="assets/Logo.png">
+    <link rel="manifest" href="manifest.json">
+
+
 </head>
 
 <body>
@@ -426,6 +450,12 @@
     </div>
 
     <script src="js/script.js"></script>
+    <script>
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./sw.js');
+    }
+    </script>
+
 
 </body>
 

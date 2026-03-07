@@ -80,3 +80,25 @@ links.forEach(link => {
         navLinks.classList.remove('active');
     });
 });
+
+window.addEventListener('scroll', () => {
+    const nav = document.querySelector('.navbar');
+    if (window.scrollY > 50) {
+        nav.style.background = 'rgba(9, 10, 15, 0.95)';
+        nav.style.height = '75px';
+        nav.style.boxShadow = '0 10px 30px rgba(0,0,0,0.5)';
+    } else {
+        nav.style.background = 'rgba(9, 10, 15, 0.85)';
+        nav.style.height = '85px';
+        nav.style.boxShadow = 'none';
+    }
+});
+
+// Service Worker básico para habilitar la instalación PWA
+self.addEventListener('install', (e) => {
+  console.log('[Service Worker] Instalado');
+});
+
+self.addEventListener('fetch', (e) => {
+  // Aquí podrías configurar caché offline en el futuro
+});

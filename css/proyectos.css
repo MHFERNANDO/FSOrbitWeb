@@ -330,3 +330,82 @@ html, body {
     overflow-x: hidden;
 }
 
+/* --- NAVEGACIÓN PROYECTOS (ANCLAJE) --- */
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 10000;
+    background: rgba(9, 10, 15, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--surface-border);
+    height: 85px;
+    display: flex;
+    align-items: center;
+}
+
+/* Espaciado para el contenido bajo la nav fixed */
+body {
+    padding-top: 85px;
+}
+
+.nav-content-projects {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.btn-nav-back {
+    color: var(--accent);
+    font-weight: 800;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+    padding: 10px 20px;
+    border: 1px solid rgba(0, 242, 255, 0.2);
+    border-radius: 10px;
+    transition: var(--transition);
+}
+
+.btn-nav-back:hover {
+    background: rgba(0, 242, 255, 0.1);
+    box-shadow: 0 0 15px var(--accent-glow);
+    transform: translateX(-5px);
+}
+
+/* --- RESPONSIVE ESPECÍFICO PROYECTOS --- */
+@media (max-width: 768px) {
+    .navbar {
+        height: 70px;
+    }
+
+    body {
+        padding-top: 70px;
+    }
+
+    .logo img {
+        height: 50px; /* Logo más pequeño en móvil */
+    }
+
+    .btn-nav-back {
+        padding: 8px 12px;
+        font-size: 0.7rem;
+    }
+    
+    /* Ajuste de los bloques de proyectos en móvil */
+    .project-block {
+        flex-direction: column !important; /* Si usas flex-row en desktop */
+        gap: 20px;
+    }
+    
+    .p-visual-container img {
+        border-radius: 15px;
+    }
+
+    .header-projects h1 {
+        font-size: 1.8rem;
+        margin-top: 20px;
+    }
+}

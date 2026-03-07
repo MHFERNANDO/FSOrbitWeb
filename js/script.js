@@ -168,3 +168,19 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+// Service Worker básico para habilitar la instalación PWA
+self.addEventListener('install', (e) => {
+  console.log('[Service Worker] Instalado');
+});
+
+self.addEventListener('fetch', (e) => {
+  // Aquí podrías configurar caché offline en el futuro
+});
+
+const doc = document.documentElement;
+const setHeight = () => {
+    doc.style.setProperty('--doc-height', `${window.innerHeight}px`);
+};
+window.addEventListener('resize', setHeight);
+setHeight();

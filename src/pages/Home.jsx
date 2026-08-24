@@ -1,5 +1,6 @@
 import { useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { motion, useInView } from 'framer-motion';
 import HeroOrbit from '@/components/HeroOrbit';
 import Reveal from '@/components/Reveal';
 import SplitHeading, { Highlight } from '@/components/SplitHeading';
@@ -34,10 +35,10 @@ export default function Home() {
         <HeroOrbit />
 
         <div className="relative grid gap-s5">
-          <Reveal as="span" type="fade" className="inline-flex items-center gap-s2 font-mono text-[length:var(--fs-mono)] uppercase tracking-[var(--tr-mono)] text-text-3">
-            <span className="size-1.5 rounded-full bg-signal" />
+          <AtomReveal>
+            <span className="size-1.5 rounded-full bg-signal" style={{ boxShadow: '0 0 16px var(--signal-a48)' }} />
             Impulsando negocios en la era digital
-          </Reveal>
+          </AtomReveal>
 
           <SplitHeading
             as="h1"
@@ -336,5 +337,22 @@ function WorkCard({ work, index, onOpen }) {
         </span>
       </div>
     </Reveal>
+  );
+}
+
+function AtomReveal({ children }) {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, amount: 0.12 });
+
+  return (
+    <motion.span
+      ref={ref}
+      className="inline-flex items-center gap-s2 font-mono text-[length:var(--fs-mono)] uppercase tracking-[var(--tr-mono)] text-text-3"
+      initial={{ opacity: 0 }}
+      animate={isInView ? { opacity: 1 } : { opacity: 0 }}
+      transition={{ duration: 2.5 }}
+    >
+      {children}
+    </motion.span>
   );
 }

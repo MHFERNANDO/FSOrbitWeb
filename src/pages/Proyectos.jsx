@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import Reveal from '@/components/Reveal';
 import SplitHeading from '@/components/SplitHeading';
 import Icon from '@/components/Icon';
@@ -9,6 +10,10 @@ import { projects } from '@/data/content';
 export default function Proyectos() {
   useDocumentTitle('Proyectos | FS Orbit');
   const preview = useProjectPreview();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   return (
     <main id="main">

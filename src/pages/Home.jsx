@@ -229,8 +229,8 @@ export default function Home() {
                   ref={plan.popular ? storeBtnRef : undefined}
                   className={
                     plan.ctaVariant === 'primary'
-                      ? 'rounded-r2 bg-signal px-s5 py-s4 text-center font-mono text-[length:var(--fs-mono)] font-bold uppercase tracking-[var(--tr-mono)] text-signal-ink'
-                      : 'rounded-r2 border border-[color:var(--line-2)] px-s5 py-s4 text-center font-mono text-[length:var(--fs-mono)] font-bold uppercase tracking-[var(--tr-mono)] text-text'
+                      ? 'rounded-r2 bg-signal px-s5 py-s4 text-center font-mono text-[length:var(--fs-mono)] font-bold uppercase tracking-[var(--tr-mono)] text-signal-ink transition-all duration-200 hover:scale-105 hover:shadow-lg active:scale-95'
+                      : 'rounded-r2 border border-[color:var(--line-2)] px-s5 py-s4 text-center font-mono text-[length:var(--fs-mono)] font-bold uppercase tracking-[var(--tr-mono)] text-text transition-all duration-200 hover:border-signal-a48 hover:bg-signal-a06 active:bg-signal-a12'
                   }
                 >
                   {plan.cta}

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useInView, useReducedMotion } from 'framer-motion';
+import { useInView } from 'framer-motion';
 
 // Puerto de buildOdometer()/runOdometer() en core.js: cada digito es una
 // tira real 0-9 duplicada (dos vueltas) para que haya recorrido que girar
@@ -7,7 +7,6 @@ import { useInView, useReducedMotion } from 'framer-motion';
 export default function Odometer({ value }) {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, amount: 0.6 });
-  const reduceMotion = useReducedMotion();
   const [ran, setRan] = useState(false);
 
   useEffect(() => {
@@ -20,7 +19,7 @@ export default function Odometer({ value }) {
     <span ref={ref} className="odo inline-flex leading-none" aria-label={value}>
       {digits.map((digit, i) => {
         const target = Number(digit);
-        const dist = ran ? (reduceMotion ? target : 10 + target) : 0;
+        const dist = ran ? 10 + target : 0;
         return (
           <span key={i} className="block h-[1em] overflow-hidden">
             <span

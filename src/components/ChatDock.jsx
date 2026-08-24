@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import Icon from './Icon';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { contact } from '@/data/content';
@@ -77,7 +77,6 @@ export default function ChatDock() {
   const [open, setOpen] = useState(false);
   const dockRef = useRef(null);
   const panelRef = useRef(null);
-  const reduceMotion = useReducedMotion();
   useFocusTrap(panelRef, open);
 
   useEffect(() => {
@@ -98,31 +97,23 @@ export default function ChatDock() {
 
   return (
     <div ref={dockRef} className="fixed bottom-s6 right-s6 z-[var(--z-dock)]">
-      {reduceMotion ? (
-        open && (
-          <div ref={panelRef} role="dialog" aria-label="Chat FS Orbit" className={PANEL_CLASS} style={{ boxShadow: 'var(--shadow-panel)' }}>
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            ref={panelRef}
+            role="dialog"
+            aria-label="Chat FS Orbit"
+            initial={{ opacity: 0, y: 16, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 16, scale: 0.96 }}
+            transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+            className={PANEL_CLASS}
+            style={{ boxShadow: 'var(--shadow-panel)' }}
+          >
             <ChatPanel panelRef={panelRef} setOpen={setOpen} />
-          </div>
-        )
-      ) : (
-        <AnimatePresence>
-          {open && (
-            <motion.div
-              ref={panelRef}
-              role="dialog"
-              aria-label="Chat FS Orbit"
-              initial={{ opacity: 0, y: 16, scale: 0.96 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 16, scale: 0.96 }}
-              transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-              className={PANEL_CLASS}
-              style={{ boxShadow: 'var(--shadow-panel)' }}
-            >
-              <ChatPanel panelRef={panelRef} setOpen={setOpen} />
-            </motion.div>
-          )}
-        </AnimatePresence>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <button
         type="button"

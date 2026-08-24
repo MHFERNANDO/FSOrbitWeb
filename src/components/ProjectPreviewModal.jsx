@@ -1,5 +1,5 @@
 import { createContext, useContext, useRef, useState } from 'react';
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import Icon from './Icon';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { useEscapeKey } from '@/hooks/useEscapeKey';
@@ -13,7 +13,6 @@ export function ProjectPreviewProvider({ children }) {
   const [url, setUrl] = useState(null);
   const [loaded, setLoaded] = useState(false);
   const modalRef = useRef(null);
-  const reduceMotion = useReducedMotion();
   useFocusTrap(modalRef, Boolean(url));
 
   const open = (targetUrl) => {
@@ -74,45 +73,29 @@ export function ProjectPreviewProvider({ children }) {
     <PreviewContext.Provider value={{ open }}>
       {children}
 
-      {/* Ver AdvisorModal.jsx: bajo movimiento reducido se salta
-          AnimatePresence/motion por completo, no solo se acorta. */}
-      {reduceMotion ? (
-        url && (
-          <div
+      <AnimatePresence>
+        {url && (
+          <motion.div
             className="fixed inset-0 z-[var(--z-modal)] grid place-items-center bg-black/80 p-s5"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             onClick={(e) => e.target === e.currentTarget && close()}
             role="dialog"
             aria-modal="true"
             aria-label="Vista previa del proyecto"
           >
-            {body}
-          </div>
-        )
-      ) : (
-        <AnimatePresence>
-          {url && (
             <motion.div
-              className="fixed inset-0 z-[var(--z-modal)] grid place-items-center bg-black/80 p-s5"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={(e) => e.target === e.currentTarget && close()}
-              role="dialog"
-              aria-modal="true"
-              aria-label="Vista previa del proyecto"
+              initial={{ opacity: 0, scale: 0.96 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.96 }}
+              transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
             >
-              <motion.div
-                initial={{ opacity: 0, scale: 0.96 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.96 }}
-                transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
-              >
-                {body}
-              </motion.div>
+              {body}
             </motion.div>
-          )}
-        </AnimatePresence>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </PreviewContext.Provider>
   );
 }

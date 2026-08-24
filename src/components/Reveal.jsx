@@ -1,5 +1,4 @@
-import { createElement } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 // Reemplaza el motor [data-reveal] + IntersectionObserver a mano de
 // legacy-static/js/core.js. whileInView + viewport.once ya resuelve el
@@ -22,18 +21,6 @@ const EASE_OUT = [0.22, 1, 0.36, 1];
 // falta forwardRef para que useMagnetic/useCursorTag puedan engancharse
 // al nodo real que monta motion[as].
 export default function Reveal({ as = 'div', type = 'rise', index = 0, className, children, ref, ...props }) {
-  const reduceMotion = useReducedMotion();
-
-  // Con movimiento reducido, algunos navegadores/SO se niegan a correr
-  // animaciones de transform/opacity via WAAPI y se quedan pegadas en el
-  // estado inicial para siempre (ver aviso de Framer Motion en consola:
-  // motion.dev/troubleshooting/reduced-motion-disabled). En vez de pedir
-  // una animacion mas corta, directamente no se anima: se entrega el
-  // elemento ya en su estado final.
-  if (reduceMotion) {
-    return createElement(as, { ref, className, ...props }, children);
-  }
-
   const MotionTag = motion[as] ?? motion.div;
   const v = variants[type] ?? variants.rise;
 

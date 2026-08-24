@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react';
-import { useReducedMotion } from 'framer-motion';
 
 const SESSION_KEY = 'fsorbit-booted';
 const STATUS_MESSAGES = ['Inicializando sistema', 'Cargando activos', 'Compilando interfaz', 'Listo'];
@@ -11,7 +10,6 @@ const STATUS_MESSAGES = ['Inicializando sistema', 'Cargando activos', 'Compiland
 // 2) Solo la primera visita de la sesion dura los 2s completos; las
 //    navegaciones internas usan un pase de 700ms.
 export default function Preloader({ onDone }) {
-  const reduceMotion = useReducedMotion();
   const [progress, setProgress] = useState(0);
   const [status, setStatus] = useState(STATUS_MESSAGES[0]);
   const [done, setDone] = useState(false);
@@ -21,8 +19,8 @@ export default function Preloader({ onDone }) {
     document.body.classList.add('is-loading');
 
     const returning = sessionStorage.getItem(SESSION_KEY) === 'true';
-    const duration = returning || reduceMotion ? 700 : 2000;
-    const messages = returning || reduceMotion ? [STATUS_MESSAGES[0], STATUS_MESSAGES[3]] : STATUS_MESSAGES;
+    const duration = returning ? 700 : 2000;
+    const messages = returning ? [STATUS_MESSAGES[0], STATUS_MESSAGES[3]] : STATUS_MESSAGES;
 
     const start = performance.now();
     let raf;
@@ -48,7 +46,7 @@ export default function Preloader({ onDone }) {
         finishedRef.current = true;
         document.body.classList.remove('is-loading');
         onDone();
-      }, reduceMotion ? 280 : 1350);
+      }, 1350);
     };
 
     raf = requestAnimationFrame(tick);

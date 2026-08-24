@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import Icon from './Icon';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
 
@@ -50,7 +50,6 @@ export default function Navbar() {
   const [progress, setProgress] = useState(0);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const drawerRef = useRef(null);
-  const reduceMotion = useReducedMotion();
 
   useFocusTrap(drawerRef, drawerOpen);
 
@@ -178,39 +177,22 @@ export default function Navbar() {
               </li>
             </ul>
 
-            {/* Portal a document.body: el backdrop-filter de <nav> crea un
-                bloque contenedor para descendientes position:fixed (mismo
-                problema ya documentado en legacy-static/css/style.css),
-                asi que un cajon fixed dentro de <nav> queda encerrado en
-                la altura de la barra en vez de cubrir la pantalla. */}
             {createPortal(
-              reduceMotion ? (
-                drawerOpen && (
-                  <ul
+              <AnimatePresence>
+                {drawerOpen && (
+                  <motion.ul
                     ref={drawerRef}
                     className={DRAWER_CLASS}
                     style={{ paddingTop: 'calc(var(--nav-h) + var(--spacing-s7))', paddingBottom: 'var(--gutter)' }}
+                    initial={{ clipPath: 'circle(0% at calc(100% - 40px) 32px)' }}
+                    animate={{ clipPath: 'circle(150% at calc(100% - 40px) 32px)' }}
+                    exit={{ clipPath: 'circle(0% at calc(100% - 40px) 32px)' }}
+                    transition={{ duration: 1.3, ease: [0.76, 0, 0.24, 1] }}
                   >
                     <DrawerLinks onNavigate={() => setDrawerOpen(false)} onHablemos={goHablemos} />
-                  </ul>
-                )
-              ) : (
-                <AnimatePresence>
-                  {drawerOpen && (
-                    <motion.ul
-                      ref={drawerRef}
-                      className={DRAWER_CLASS}
-                      style={{ paddingTop: 'calc(var(--nav-h) + var(--spacing-s7))', paddingBottom: 'var(--gutter)' }}
-                      initial={{ clipPath: 'circle(0% at calc(100% - 40px) 32px)' }}
-                      animate={{ clipPath: 'circle(150% at calc(100% - 40px) 32px)' }}
-                      exit={{ clipPath: 'circle(0% at calc(100% - 40px) 32px)' }}
-                      transition={{ duration: 1.3, ease: [0.76, 0, 0.24, 1] }}
-                    >
-                      <DrawerLinks onNavigate={() => setDrawerOpen(false)} onHablemos={goHablemos} />
-                    </motion.ul>
-                  )}
-                </AnimatePresence>
-              ),
+                  </motion.ul>
+                )}
+              </AnimatePresence>,
               document.body,
             )}
           </>

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useInView, useReducedMotion } from 'framer-motion';
+import { useInView } from 'framer-motion';
 
 // Cada linea, ya tokenizada: [{ text, cls }]. cls referencia los mismos
 // nombres que .keyword/.variable/.string/.boolean/.function/.punct de la
@@ -29,13 +29,12 @@ const scramble = (text) => text.replace(/\S/g, () => GLYPHS[(Math.random() * GLY
 export default function CodeWindow() {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, amount: 0.4 });
-  const reduceMotion = useReducedMotion();
-  const [revealedChars, setRevealedChars] = useState(reduceMotion ? Infinity : 0);
+  const [revealedChars, setRevealedChars] = useState(0);
 
   const totalChars = LINES.reduce((sum, line) => sum + line.reduce((s, tok) => s + tok.t.length, 0), 0);
 
   useEffect(() => {
-    if (!inView || reduceMotion) return undefined;
+    if (!inView) return undefined;
     const duration = 1100;
     const start = performance.now();
     let raf;
@@ -55,7 +54,7 @@ export default function CodeWindow() {
       clearTimeout(timeout);
       if (raf) cancelAnimationFrame(raf);
     };
-  }, [inView, reduceMotion, totalChars]);
+  }, [inView, totalChars]);
 
   let consumed = 0;
 

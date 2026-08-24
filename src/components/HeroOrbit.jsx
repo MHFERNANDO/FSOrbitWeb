@@ -1,5 +1,4 @@
 import { useEffect, useRef } from 'react';
-import { useReducedMotion } from 'framer-motion';
 
 const TAU = Math.PI * 2;
 
@@ -8,7 +7,6 @@ const TAU = Math.PI * 2;
 // media pantalla en cada frame, y ademas es el fondo mas clonado que existe.
 export default function HeroOrbit() {
   const hostRef = useRef(null);
-  const reduceMotion = useReducedMotion();
 
   useEffect(() => {
     const host = hostRef.current;
@@ -150,7 +148,7 @@ export default function HeroOrbit() {
     };
 
     const start = () => {
-      if (rafId !== null || reduceMotion) return;
+      if (rafId !== null) return;
       rafId = window.requestAnimationFrame(loop);
     };
 
@@ -162,10 +160,6 @@ export default function HeroOrbit() {
 
     resize();
     render(0);
-
-    if (reduceMotion) {
-      return () => canvas.remove();
-    }
 
     let resizeObserver;
     let onWindowResize;
@@ -222,7 +216,7 @@ export default function HeroOrbit() {
       if (onPointerMove) window.removeEventListener('pointermove', onPointerMove);
       canvas.remove();
     };
-  }, [reduceMotion]);
+  }, []);
 
   return <div ref={hostRef} className="absolute z-[-1] pointer-events-none [mask-image:radial-gradient(ellipse_62%_62%_at_62%_46%,#000_24%,transparent_72%)] [-webkit-mask-image:radial-gradient(ellipse_62%_62%_at_62%_46%,#000_24%,transparent_72%)]" style={{ inset: '-18% -6% -8% 38%' }} />;
 }

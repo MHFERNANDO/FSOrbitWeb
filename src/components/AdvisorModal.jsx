@@ -1,5 +1,5 @@
 import { createContext, useContext, useRef, useState } from 'react';
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import Icon from './Icon';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { useEscapeKey } from '@/hooks/useEscapeKey';
@@ -15,7 +15,6 @@ export function AdvisorProvider({ children }) {
   const [step, setStep] = useState(0);
   const [choice, setChoice] = useState({ servicio: '', prioridad: '' });
   const modalRef = useRef(null);
-  const reduceMotion = useReducedMotion();
   useFocusTrap(modalRef, open);
   useEscapeKey(open, () => setOpen(false));
 
@@ -73,46 +72,29 @@ export function AdvisorProvider({ children }) {
     <AdvisorContext.Provider value={{ openModal }}>
       {children}
 
-      {/* Movimiento reducido: sin AnimatePresence/motion — ver nota en
-          Reveal.jsx sobre transform/opacity via WAAPI quedandose pegado
-          en el estado inicial. Aqui el riesgo es peor: si la salida
-          nunca "termina", el modal queda huerfano y bloquea la pagina. */}
-      {reduceMotion ? (
-        open && (
-          <div
+      <AnimatePresence>
+        {open && (
+          <motion.div
             className="fixed inset-0 z-[var(--z-modal)] grid place-items-center bg-black/70 p-s5"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             onClick={(e) => e.target === e.currentTarget && setOpen(false)}
             role="dialog"
             aria-modal="true"
           >
-            <div ref={modalRef}>{body}</div>
-          </div>
-        )
-      ) : (
-        <AnimatePresence>
-          {open && (
             <motion.div
-              className="fixed inset-0 z-[var(--z-modal)] grid place-items-center bg-black/70 p-s5"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={(e) => e.target === e.currentTarget && setOpen(false)}
-              role="dialog"
-              aria-modal="true"
+              ref={modalRef}
+              initial={{ opacity: 0, scale: 0.94, y: 12 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.94, y: 12 }}
+              transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
             >
-              <motion.div
-                ref={modalRef}
-                initial={{ opacity: 0, scale: 0.94, y: 12 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.94, y: 12 }}
-                transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
-              >
-                {body}
-              </motion.div>
+              {body}
             </motion.div>
-          )}
-        </AnimatePresence>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </AdvisorContext.Provider>
   );
 }

@@ -1,18 +1,9 @@
-import { motion, useReducedMotion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 const EASE_OUT = [0.22, 1, 0.36, 1];
 
 function Word({ index, children }) {
-  const reduceMotion = useReducedMotion();
-
-  // Ver Reveal.jsx: bajo movimiento reducido, transform via WAAPI puede
-  // quedarse pegado en el estado inicial en vez de saltar al final. Se
-  // entrega la palabra ya visible, sin intentar animarla.
-  if (reduceMotion) {
-    return <span className="inline-block">{children}</span>;
-  }
-
   return (
     <span className="mb-[-0.14em] inline-block overflow-hidden pb-[0.14em] align-bottom">
       <motion.span
@@ -28,23 +19,12 @@ function Word({ index, children }) {
   );
 }
 
-// Exportado aparte para headings que llevan el subrayado pero no el
-// split por palabras (ej. el h2 de la seccion CTA final).
 export function Highlight({ children }) {
-  const reduceMotion = useReducedMotion();
   const baseStyle = {
     backgroundImage: 'linear-gradient(var(--signal-a48), var(--signal-a48))',
     backgroundRepeat: 'no-repeat',
     backgroundPosition: '0 calc(100% - .04em)',
   };
-
-  if (reduceMotion) {
-    return (
-      <span className="text-signal" style={{ ...baseStyle, backgroundSize: '100% .055em' }}>
-        {children}
-      </span>
-    );
-  }
 
   return (
     <motion.span
@@ -60,9 +40,6 @@ export function Highlight({ children }) {
   );
 }
 
-// segments: [{ text }, { text, highlight: true }, { break: true }]
-// Puerto de splitHeadings() en core.js + el subrayado .highlight de
-// style.css, ahora explicito por segmentos en vez de caminar el DOM.
 export default function SplitHeading({ as: Tag = 'h2', segments, className }) {
   let wordIndex = 0;
 

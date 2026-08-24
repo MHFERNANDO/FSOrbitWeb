@@ -1,0 +1,112 @@
+import Reveal from '@/components/Reveal';
+import SplitHeading from '@/components/SplitHeading';
+import Icon from '@/components/Icon';
+import { useParallax } from '@/hooks/useParallax';
+import { useProjectPreview } from '@/components/ProjectPreviewModal';
+import { useDocumentTitle } from '@/hooks/useDocumentTitle';
+import { projects } from '@/data/content';
+
+export default function Proyectos() {
+  useDocumentTitle('Proyectos | FS Orbit');
+  const preview = useProjectPreview();
+
+  return (
+    <main id="main">
+      <header className="mx-auto max-w-(--maxw) px-(--gutter) pb-[clamp(56px,7vw,104px)] pt-[clamp(72px,11vw,168px)]">
+        <Reveal
+          as="span"
+          type="fade"
+          className="mb-s5 inline-flex items-center font-mono text-[length:var(--fs-mono)] tracking-[.1em] text-signal after:ml-1.5 after:h-[1.05em] after:w-[7px] after:animate-[caret_1.05s_steps(2)_infinite] after:bg-signal"
+        >
+          &gt; fs_orbit --fetch-projects --active
+        </Reveal>
+        <SplitHeading
+          as="h1"
+          className="max-w-[16ch] font-display text-[length:var(--fs-h1)] font-extrabold leading-[var(--lh-tight)] tracking-[var(--tr-display)]"
+          segments={[{ text: 'Ingeniería de' }, { text: 'Alto Rendimiento', highlight: true }]}
+        />
+      </header>
+
+      <section className="mx-auto max-w-(--maxw) px-(--gutter)">
+        {projects.map((project, i) => (
+          <ProjectBlock key={project.title} project={project} even={i % 2 === 1} onOpen={preview?.open} />
+        ))}
+      </section>
+    </main>
+  );
+}
+
+function ProjectBlock({ project, even, onOpen }) {
+  const parallaxRef = useParallax();
+
+  const visual = (
+    <div
+      ref={parallaxRef}
+      className="group relative aspect-[16/9.6] overflow-hidden rounded-r3 border border-[color:var(--line)] bg-ink-850"
+    >
+      <picture>
+        <source srcSet={`/assets/${project.img}.webp`} type="image/webp" />
+        <img
+          src={`/assets/${project.img}.png`}
+          alt={project.alt}
+          loading="lazy"
+          decoding="async"
+          className="h-[106%] w-full object-cover object-top saturate-[.7] contrast-[1.03] brightness-[.94] transition-[transform,filter] duration-1000 group-hover:scale-[1.04] group-hover:saturate-100 group-hover:contrast-100 group-hover:brightness-100"
+          style={{ translate: '0 var(--shift, 0px)' }}
+        />
+      </picture>
+    </div>
+  );
+
+  const content = (
+    <div className="grid items-start gap-s4 justify-items-start">
+      <span className="font-mono text-[length:var(--fs-mono)] tracking-[.12em] text-text-3">{project.code}</span>
+      <h2 className="font-display text-[length:var(--fs-h2)] leading-[1.02] font-extrabold">{project.title}</h2>
+      <p className="max-w-[44ch] text-[length:var(--fs-small)] text-text-2">{project.description}</p>
+      <ul className="mt-s1 flex flex-wrap gap-s2">
+        {project.tags.map((tag) => (
+          <li
+            key={tag}
+            className="rounded-r2 border border-[color:var(--line)] px-s3 py-1.5 font-mono text-[length:var(--fs-micro)] tracking-[.1em] text-text-3"
+          >
+            {tag}
+          </li>
+        ))}
+      </ul>
+      <a
+        href={project.url}
+        target="_blank"
+        rel="noopener"
+        onClick={(e) => {
+          e.preventDefault();
+          onOpen?.(project.url);
+        }}
+        className="mt-s3 inline-flex items-center gap-s2 rounded-r2 bg-signal px-s5 py-s4 font-mono text-[length:var(--fs-mono)] font-bold uppercase tracking-[var(--tr-mono)] text-signal-ink"
+      >
+        Ejecutar Proyecto
+        <Icon name="arrow-ur" />
+      </a>
+    </div>
+  );
+
+  return (
+    <Reveal
+      as="article"
+      type="rise"
+      className="grid items-center gap-[clamp(32px,5vw,80px)] border-b border-[color:var(--line)] py-[clamp(56px,7vw,104px)] lg:grid-cols-[1.35fr_1fr]"
+      style={even ? { gridTemplateColumns: '1fr 1.35fr' } : undefined}
+    >
+      {even ? (
+        <>
+          <div className="order-2 lg:order-2">{visual}</div>
+          <div className="order-1 lg:order-1">{content}</div>
+        </>
+      ) : (
+        <>
+          {visual}
+          {content}
+        </>
+      )}
+    </Reveal>
+  );
+}

@@ -1,0 +1,399 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+/* El sitio es siempre oscuro, sin toggle de tema — <html class="dark">
+   se deja fijo en index.html solo para que cualquier componente de
+   21st.dev/shadcn que use variantes dark: (en vez de los tokens
+   semanticos de abajo) tambien caiga del lado correcto. */
+@custom-variant dark (&:is(.dark *));
+
+/* ==========================================================================
+   FS ORBIT · tema de Tailwind v4
+   --------------------------------------------------------------------------
+   Los mismos tokens que ya se probaron y ajustaron en la version estatica
+   (legacy-static/css/style.css), ahora expuestos via @theme para que
+   generen utilidades (bg-ink-900, text-signal, font-display...) y, a la
+   vez, sigan disponibles como variables CSS crudas para el canvas del
+   hero, el odometro y cualquier animacion que no pueda expresarse con
+   clases de Tailwind.
+   ========================================================================== */
+@theme {
+  /* --- Superficies: tinta azulada, nunca negro puro --- */
+  --color-ink-1000: #050609;
+  --color-ink-900: #07080c;
+  --color-ink-850: #0a0b10;
+  --color-ink-800: #0d0f15;
+  --color-ink-750: #11141b;
+  --color-ink-700: #161a23;
+  --color-ink-600: #1e232e;
+
+  /* --- Texto --- */
+  --color-text: #edf0f6;
+  --color-text-2: #a3acbc;
+  --color-text-3: #7b8494;
+  --color-text-4: #575f6e;
+
+  /* --- Senal: se usa en ~5% de la superficie. Nunca como relleno --- */
+  --color-signal: #c6f24e;
+  --color-signal-2: #a9d638;
+  --color-signal-ink: #090c03;
+  --color-warn: #ff7a4d;
+
+  /* --- Tipografia --- */
+  --font-display: "Archivo", "Archivo Fallback", system-ui, sans-serif;
+  --font-text: "Instrument Sans", "Instrument Fallback", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* --- Radios: casi rectos. El futurismo aqui no es redondez --- */
+  --radius-r1: 2px;
+  --radius-r2: 4px;
+  --radius-r3: 8px;
+  --radius-r4: 14px;
+
+  /* --- Espacio (base 4), ademas de la escala default de Tailwind --- */
+  --spacing-s1: 4px;
+  --spacing-s2: 8px;
+  --spacing-s3: 12px;
+  --spacing-s4: 16px;
+  --spacing-s5: 24px;
+  --spacing-s6: 32px;
+  --spacing-s7: 48px;
+  --spacing-s8: 64px;
+  --spacing-s9: 96px;
+  --spacing-s10: 128px;
+}
+
+/* --------------------------------------------------------------------------
+   Tokens que Tailwind v4 no modela vía @theme (hairlines con alpha,
+   sombras, curvas de easing, breakpoints propios de layout) se quedan
+   como variables CSS planas — igual que en la version estatica.
+   -------------------------------------------------------------------------- */
+:root {
+  --line: rgba(255, 255, 255, .075);
+  --line-2: rgba(255, 255, 255, .13);
+  --line-3: rgba(255, 255, 255, .24);
+
+  --signal-a06: rgba(198, 242, 78, .06);
+  --signal-a12: rgba(198, 242, 78, .12);
+  --signal-a24: rgba(198, 242, 78, .24);
+  --signal-a48: rgba(198, 242, 78, .48);
+  --warn-a12: rgba(255, 122, 77, .12);
+
+  --fs-micro: .625rem;
+  --fs-mono: .6875rem;
+  --fs-small: .8125rem;
+  --fs-body: 1.0625rem;
+  --fs-lead: clamp(1.0625rem, .96rem + .45vw, 1.3125rem);
+  --fs-h4: clamp(1.0625rem, 1rem + .3vw, 1.25rem);
+  --fs-h3: clamp(1.375rem, 1.15rem + .95vw, 2rem);
+  --fs-h2: clamp(2.125rem, 1.45rem + 2.9vw, 4rem);
+  --fs-h1: clamp(2.75rem, 1.5rem + 5.4vw, 6.25rem);
+
+  --lh-tight: .96;
+  --lh-snug: 1.12;
+  --lh-body: 1.62;
+  --tr-display: -.042em;
+  --tr-title: -.03em;
+  --tr-mono: .16em;
+
+  /* Ancho de contenido y margenes: version corregida y ya verificada
+     visualmente (la version estatica se habia quedado en un valor mas
+     angosto por un desfase de commits — este es el valor bueno). */
+  --gutter: clamp(16px, 3.5vw, 48px);
+  --maxw: 1480px;
+  --section-y: clamp(88px, 9.5vw, 168px);
+  --nav-h: 74px;
+
+  /* --- Movimiento: pausado a proposito, ver sesion de ajuste anterior --- */
+  --d1: 170ms;
+  --d2: 280ms;
+  --d3: 480ms;
+  --d4: 780ms;
+  --d5: 1300ms;
+  --e-out: cubic-bezier(.22, 1, .36, 1);
+  --e-io: cubic-bezier(.76, 0, .24, 1);
+  --e-spring: cubic-bezier(.34, 1.4, .5, 1);
+
+  --z-bg: 0;
+  --z-body: 1;
+  --z-nav: 100;
+  --z-dock: 200;
+  --z-modal: 300;
+  --z-grain: 400;
+  --z-preloader: 900;
+
+  --shadow-lift: 0 24px 60px -20px rgba(0, 0, 0, .8);
+  --shadow-panel: 0 40px 120px -32px rgba(0, 0, 0, .9);
+
+  /* Tokens semanticos de shadcn, remapeados a la paleta FS Orbit en vez
+     de a los grises OKLCH genericos que trae el CLI. Cualquier
+     componente instalado desde 21st.dev que use bg-background,
+     text-foreground, bg-primary, etc. cae automaticamente en tinta +
+     lima, sin retocar cada componente a mano uno por uno. */
+  --background: var(--color-ink-1000);
+  --foreground: var(--color-text);
+  --card: var(--color-ink-900);
+  --card-foreground: var(--color-text);
+  --popover: var(--color-ink-900);
+  --popover-foreground: var(--color-text);
+  --primary: var(--color-signal);
+  --primary-foreground: var(--color-signal-ink);
+  --secondary: var(--color-ink-800);
+  --secondary-foreground: var(--color-text);
+  --muted: var(--color-ink-800);
+  --muted-foreground: var(--color-text-3);
+  --accent: var(--color-ink-700);
+  --accent-foreground: var(--color-text);
+  --destructive: var(--color-warn);
+  --destructive-foreground: var(--color-ink-1000);
+  --border: var(--line-2);
+  --input: var(--line-2);
+  --ring: var(--color-signal);
+  --radius: var(--radius-r3);
+}
+
+/* Todo lo de aqui abajo vive en @layer base a proposito: asi cualquier
+   utilidad de Tailwind (bg-ink-800, text-signal...) escrita en un
+   componente sigue pudiendo pisar estos estilos globales, que es el
+   comportamiento normal que se espera de Tailwind. La unica excepcion
+   real es el bloque de movimiento reducido al final de este archivo,
+   que se deja fuera de cualquier @layer justamente para que nada pueda
+   ganarle sin necesidad de !important — igual que en la version
+   estatica, solo que alli el truco era "ultima capa declarada" y aqui
+   es "sin capa alguna", que en cascade layers siempre gana. */
+@layer base {
+
+/* Metricas de respaldo: evitan el salto de layout mientras cargan las
+   fuentes variables (el navegador reserva el mismo alto). */
+@font-face {
+  font-family: "Archivo Fallback";
+  src: local("Arial"), local("Helvetica"), local("Segoe UI");
+  size-adjust: 97%;
+  ascent-override: 92%;
+  descent-override: 24%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: "Instrument Fallback";
+  src: local("Arial"), local("Helvetica"), local("Segoe UI");
+  size-adjust: 101%;
+  ascent-override: 95%;
+  descent-override: 25%;
+  line-gap-override: 0%;
+}
+
+html {
+  overflow-x: clip;
+  scroll-behavior: smooth;
+  scroll-padding-top: calc(var(--nav-h) + var(--spacing-s5));
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-text);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  font-synthesis-weight: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: clip;
+  min-height: 100svh;
+}
+
+body.is-loading {
+  overflow: hidden;
+  height: 100svh;
+}
+
+/* Grano de pelicula: rompe el degradado plano que delata al render
+   generado. */
+body::after {
+  content: "";
+  position: fixed;
+  inset: -200%;
+  z-index: var(--z-grain);
+  pointer-events: none;
+  opacity: .038;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: grainShift 6s steps(6) infinite;
+  will-change: transform;
+}
+
+@keyframes grainShift {
+
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+
+  20% {
+    transform: translate(-2%, 3%);
+  }
+
+  40% {
+    transform: translate(3%, -2%);
+  }
+
+  60% {
+    transform: translate(-3%, -3%);
+  }
+
+  80% {
+    transform: translate(2%, 2%);
+  }
+}
+
+/* Anillo del preloader (src/components/Preloader.jsx) */
+@keyframes preloaderTrack {
+  0% {
+    transform: rotate(0deg);
+    stroke-dashoffset: 126;
+  }
+
+  50% {
+    stroke-dashoffset: 34;
+  }
+
+  100% {
+    transform: rotate(360deg);
+    stroke-dashoffset: 126;
+  }
+}
+
+@keyframes preloaderCore {
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.6);
+  }
+}
+
+/* Cursor de terminal parpadeante (src/pages/Proyectos.jsx) */
+@keyframes caret {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0;
+  }
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: var(--tr-title);
+  line-height: var(--lh-snug);
+  text-wrap: balance;
+}
+
+::selection {
+  background: var(--signal-a24);
+  color: var(--color-text);
+}
+
+* {
+  @apply border-border outline-ring/50;
+}
+
+} /* fin @layer base */
+
+/* Igual que en la version estatica: se acorta el movimiento, nunca se
+   borra del todo. Framer Motion respeta esto via useReducedMotion() en
+   cada componente animado; este bloque cubre lo que queda en CSS puro
+   (grano, transiciones de hover simples) y va sin @layer para ganarle
+   a cualquier utilidad de Tailwind sin necesidad de !important. */
+@media (prefers-reduced-motion: reduce) {
+
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 240ms;
+    animation-iteration-count: 1;
+    transition-duration: 240ms;
+    scroll-behavior: auto;
+  }
+
+  body::after {
+    animation: none;
+  }
+}
+
+/* Mapea los tokens semanticos (ya remapeados arriba a la paleta FS Orbit)
+   a utilidades de Tailwind: bg-background, text-foreground, bg-primary,
+   border-border, rounded-lg... Sin bloque .dark aparte — el sitio no
+   tiene modo claro, asi que :root ya es el unico estado que existe. */
+@theme inline {
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+/* ==========================================================================
+   TRANSICION ENTRE PAGINAS (/ <-> /proyectos)
+   --------------------------------------------------------------------------
+   Ya no es navegacion MPA — React Router dispara document.startViewTransition()
+   via el prop `viewTransition` en <Link>, pero las pseudo-clases de salida
+   y entrada son las mismas que en la version estatica.
+   ========================================================================== */
+::view-transition-old(root) {
+  animation: vtOut 340ms cubic-bezier(.76, 0, .24, 1) both;
+}
+
+::view-transition-new(root) {
+  animation: vtIn 560ms cubic-bezier(.22, 1, .36, 1) both;
+}
+
+@keyframes vtOut {
+  to {
+    opacity: 0;
+    transform: translateY(-14px);
+  }
+}
+
+@keyframes vtIn {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+}

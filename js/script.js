@@ -1,186 +1,190 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const chatTrigger = document.getElementById('chatTrigger');
-    const closeChat = document.getElementById('closeChat');
-    const chatWindow = document.querySelector('.chat-window');
-    const chatWrapper = document.getElementById('chatWrapper');
+/* ==========================================================================
+   FS ORBIT · script.js — punto de entrada de index.html
+   ========================================================================== */
 
-    // Función para abrir/cerrar
-    if (chatTrigger && chatWindow) {
-        chatTrigger.addEventListener('click', () => {
-            chatWindow.classList.toggle('active');
-        });
-    }
+import { boot, trapFocus, reduceMotion } from './core.js';
+import { initHero } from './hero.js';
+import { initPreloader } from './preloader.js';
 
-    if (closeChat) {
-        closeChat.addEventListener('click', () => {
-            chatWindow.classList.remove('active');
-        });
-    }
+/* --------------------------------------------------------------------------
+   Chat acoplado
+   -------------------------------------------------------------------------- */
+function initChat() {
+    const dock = document.getElementById('chatDock');
+    if (!dock) return;
 
-    // Cerrar al hacer clic fuera del chat
+    const trigger = document.getElementById('chatTrigger');
+    const panel = dock.querySelector('.chat-window');
+    const closeBtn = document.getElementById('closeChat');
+
+    const setOpen = (open) => {
+        panel.classList.toggle('active', open);
+        trigger.setAttribute('aria-expanded', String(open));
+        panel.setAttribute('aria-hidden', String(!open));
+        if (open) window.setTimeout(() => closeBtn.focus(), 80);
+    };
+
+    trigger.addEventListener('click', () => setOpen(!panel.classList.contains('active')));
+    closeBtn.addEventListener('click', () => {
+        setOpen(false);
+        trigger.focus();
+    });
+
     document.addEventListener('click', (e) => {
-        if (chatWindow.classList.contains('active')) {
-            if (!chatWrapper.contains(e.target)) {
-                chatWindow.classList.remove('active');
-            }
+        if (panel.classList.contains('active') && !dock.contains(e.target)) setOpen(false);
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && panel.classList.contains('active')) {
+            setOpen(false);
+            trigger.focus();
         }
     });
-});
+}
 
+/* --------------------------------------------------------------------------
+   Asesor por pasos
+   -------------------------------------------------------------------------- */
+function initAdvisor() {
+    const modal = document.getElementById('modalStep');
+    if (!modal) return;
 
-const scrollReveal = () => {
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('active');
-                // Si quieres que la animación ocurra cada vez que haces scroll (opcional):
-                // observer.unobserve(entry.target); 
-            }
-        });
-    }, {
-        threshold: 0.1, // Se activa cuando se ve el 10% del elemento
-        rootMargin: "0px 0px -50px 0px" // Se activa un poco antes de llegar para que sea fluido
-    });
+    const openers = document.querySelectorAll('[data-open-advisor]');
+    const closeBtn = modal.querySelector('.close-modal');
+    const steps = [...modal.querySelectorAll('.step')];
+    const options = modal.querySelectorAll('.opt-btn');
+    const sendBtn = document.getElementById('sendWhatsapp');
 
-    // Buscamos TODOS los elementos que tengan clases de revelación
-    const elements = document.querySelectorAll('.reveal, .reveal-left');
-    elements.forEach(el => observer.observe(el));
-};
+    const choice = { servicio: '', prioridad: '' };
+    let releaseFocus = null;
+    let lastOpener = null;
 
-// Asegúrate de llamarlo al cargar
-document.addEventListener('DOMContentLoaded', scrollReveal);
-
-document.addEventListener('DOMContentLoaded', scrollReveal);
-
-const modal = document.getElementById('modalStep');
-const btnHero = document.querySelector('.hero .btn-primary'); // More specific selector
-const closeModal = document.querySelector('.close-modal');
-const steps = document.querySelectorAll('.step');
-const optBtns = document.querySelectorAll('.opt-btn');
-
-let seleccion = { servicio: '', prioridad: '' };
-
-// Abrir/Cerrar
-btnHero.onclick = () => { modal.style.display = 'flex'; };
-closeModal.onclick = () => { modal.style.display = 'none'; };
-
-// Lógica de clics
-optBtns.forEach(btn => {
-    btn.onclick = (e) => {
-        const currentStep = e.target.closest('.step');
-        const stepNum = parseInt(currentStep.dataset.step);
-
-        if (stepNum === 1) seleccion.servicio = e.target.dataset.value;
-        if (stepNum === 2) seleccion.prioridad = e.target.dataset.value;
-
-        currentStep.classList.remove('active');
-        steps[stepNum].classList.add('active');
-    };
-});
-
-// Botón Final de WhatsApp
-document.getElementById('sendWhatsapp').onclick = () => {
-    const msj = `¡Hola FS Orbit! 👋 Me interesa el servicio de *${seleccion.servicio}*. Mi prioridad principal es *${seleccion.prioridad}*. ¿Me podrían dar más info?`;
-    const url = `https://wa.me/593983113942?text=${encodeURIComponent(msj)}`;
-    window.open(url, '_blank');
-    modal.style.display = 'none';
-};
-
-// --- LÓGICA DEL PREVIEW DE PROYECTOS ---
-document.addEventListener('DOMContentLoaded', () => {
-    const previewModal = document.getElementById('projectPreviewModal');
-    const closePreviewBtn = document.getElementById('closePreviewBtn');
-    const projectIframe = document.getElementById('projectIframe');
-    const previewLoader = document.getElementById('previewLoader');
-    const externalLink = document.getElementById('externalProjectLink');
-    const triggers = document.querySelectorAll('.project-trigger');
-
-    // Abrir Modal
-    triggers.forEach(trigger => {
-        trigger.addEventListener('click', (e) => {
-            e.preventDefault();
-            const url = trigger.getAttribute('data-url');
-            if (url) {
-                // Preparar UI
-                previewLoader.style.display = 'flex';
-                projectIframe.classList.remove('loaded');
-                externalLink.href = url;
-
-                // Mostrar Modal
-                previewModal.classList.add('active');
-
-                // Cargar iframe
-                projectIframe.src = url;
-            }
-        });
-    });
-
-    // Evento de carga del iframe para ocultar el loader
-    projectIframe.addEventListener('load', () => {
-        if (projectIframe.src && projectIframe.src !== window.location.href) {
-            previewLoader.style.display = 'none';
-            projectIframe.classList.add('loaded');
-        }
-    });
-
-    // Cerrar Modal
-    const closeModal = () => {
-        previewModal.classList.remove('active');
-        // Pequeño timeout para no ver el iframe en blanco mientras se cierra la animación
-        setTimeout(() => {
-            projectIframe.src = '';
-            projectIframe.classList.remove('loaded');
-        }, 400);
+    const showStep = (index) => {
+        steps.forEach((step, i) => step.classList.toggle('active', i === index));
     };
 
-    closePreviewBtn.addEventListener('click', closeModal);
+    const open = (opener) => {
+        lastOpener = opener || null;
+        modal.classList.add('active');
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+        showStep(0);
+        releaseFocus = trapFocus(modal);
+        window.setTimeout(() => modal.querySelector('.step.active .opt-btn')?.focus(), 120);
+    };
 
-    // Cerrar al hacer clic fuera del contenido
-    previewModal.addEventListener('click', (e) => {
-        if (e.target === previewModal) {
-            closeModal();
-        }
-    });
-});
+    const close = () => {
+        if (!modal.classList.contains('active')) return;
+        modal.classList.remove('active');
+        modal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+        if (releaseFocus) { releaseFocus(); releaseFocus = null; }
+        if (lastOpener) lastOpener.focus();
+    };
 
-document.addEventListener('DOMContentLoaded', () => {
-    const btn = document.querySelector('.nav-toggle');
-    const menu = document.querySelector('.nav-links');
-    const links = document.querySelectorAll('.nav-links a');
+    openers.forEach((btn) => btn.addEventListener('click', () => open(btn)));
+    closeBtn.addEventListener('click', close);
+    modal.addEventListener('click', (e) => { if (e.target === modal) close(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
 
-    if (btn && menu) {
+    options.forEach((btn) => {
         btn.addEventListener('click', () => {
-            // Esto activa el menú y la animación de la X
-            btn.classList.toggle('active');
-            menu.classList.toggle('active');
-            
-            // Evita que el body se mueva mientras el menú está abierto
-            document.body.style.overflow = menu.classList.contains('active') ? 'hidden' : 'auto';
-        });
+            const step = btn.closest('.step');
+            const num = Number(step.dataset.step);
 
-        // Cerrar al hacer clic en cualquier link
-        links.forEach(link => {
-            link.addEventListener('click', () => {
-                btn.classList.remove('active');
-                menu.classList.remove('active');
-                document.body.style.overflow = 'auto';
-            });
+            if (num === 1) choice.servicio = btn.dataset.value;
+            if (num === 2) choice.prioridad = btn.dataset.value;
+
+            showStep(num);
+            window.setTimeout(() => {
+                modal.querySelector('.step.active .opt-btn, .step.active .btn')?.focus();
+            }, 220);
         });
+    });
+
+    sendBtn?.addEventListener('click', () => {
+        const text = `¡Hola FS Orbit! 👋 Me interesa el servicio de *${choice.servicio}*. Mi prioridad principal es *${choice.prioridad}*. ¿Me podrían dar más info?`;
+        window.open(`https://wa.me/593983113942?text=${encodeURIComponent(text)}`, '_blank', 'noopener');
+        close();
+    });
+}
+
+/* --------------------------------------------------------------------------
+   Descifrado del bloque de código
+   --------------------------------------------------------------------------
+   Al entrar en viewport el texto se resuelve de izquierda a derecha desde
+   caracteres aleatorios. El contenido original se guarda antes y se restaura
+   entero al final, así que el DOM acaba exactamente como estaba.
+   -------------------------------------------------------------------------- */
+function initCodeDecrypt() {
+    const block = document.querySelector('.code-content code');
+    if (!block || reduceMotion.matches || !('IntersectionObserver' in window)) return;
+
+    const glyphs = '01<>{}[]/\\|=+*#$%&_-';
+    const nodes = [];
+    const walker = document.createTreeWalker(block, NodeFilter.SHOW_TEXT);
+
+    while (walker.nextNode()) {
+        const node = walker.currentNode;
+        if (node.textContent.trim()) nodes.push({ node, text: node.textContent });
     }
+    if (!nodes.length) return;
+
+    const total = nodes.reduce((sum, n) => sum + n.text.length, 0);
+
+    const run = () => {
+        const duration = 1100;
+        const start = performance.now();
+
+        const tick = (now) => {
+            const p = Math.min((now - start) / duration, 1);
+            // easeOutCubic: rápido al principio, se asienta al final
+            const eased = 1 - Math.pow(1 - p, 3);
+            let revealed = Math.round(eased * total);
+
+            nodes.forEach(({ node, text }) => {
+                if (revealed >= text.length) {
+                    node.textContent = text;
+                    revealed -= text.length;
+                    return;
+                }
+                if (revealed <= 0) {
+                    node.textContent = text.replace(/\S/g, () => glyphs[(Math.random() * glyphs.length) | 0]);
+                    return;
+                }
+                const head = text.slice(0, revealed);
+                const tail = text.slice(revealed).replace(/\S/g, () => glyphs[(Math.random() * glyphs.length) | 0]);
+                node.textContent = head + tail;
+                revealed = 0;
+            });
+
+            if (p < 1) window.requestAnimationFrame(tick);
+            else nodes.forEach(({ node, text }) => { node.textContent = text; });
+        };
+
+        window.requestAnimationFrame(tick);
+    };
+
+    const observer = new IntersectionObserver(([entry]) => {
+        if (!entry.isIntersecting) return;
+        observer.disconnect();
+        window.setTimeout(run, 220);
+    }, { threshold: 0.4 });
+
+    observer.observe(block);
+}
+
+/* --------------------------------------------------------------------------
+   Arranque
+   -------------------------------------------------------------------------- */
+initPreloader().then(() => {
+    boot();
+    initHero();
+    initChat();
+    initAdvisor();
+    initCodeDecrypt();
 });
 
-// Service Worker básico para habilitar la instalación PWA
-self.addEventListener('install', (e) => {
-  console.log('[Service Worker] Instalado');
-});
-
-self.addEventListener('fetch', (e) => {
-  // Aquí podrías configurar caché offline en el futuro
-});
-
-const doc = document.documentElement;
-const setHeight = () => {
-    doc.style.setProperty('--doc-height', `${window.innerHeight}px`);
-};
-window.addEventListener('resize', setHeight);
-setHeight();
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js'));
+}

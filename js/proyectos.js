@@ -1,104 +1,64 @@
-const scrollReveal = () => {
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('active');
-            }
+/* ==========================================================================
+   FS ORBIT · proyectos.js — punto de entrada de proyectos.html
+   Toda la lógica compartida vive en core.js; aquí solo queda lo propio de
+   la galería.
+   ========================================================================== */
+
+import { boot, reduceMotion } from './core.js';
+import { initPreloader } from './preloader.js';
+
+/* --------------------------------------------------------------------------
+   Parallax vertical de las capturas
+   --------------------------------------------------------------------------
+   La imagen se mueve más despacio que su contenedor mientras el bloque cruza
+   la pantalla. Se escribe una custom property y el desplazamiento lo hace el
+   compositor, así que no dispara layout.
+   -------------------------------------------------------------------------- */
+function initParallax() {
+    const frames = [...document.querySelectorAll('.p-visual-container')];
+    if (!frames.length || reduceMotion.matches) return;
+
+    let ticking = false;
+    let active = new Set();
+
+    const update = () => {
+        ticking = false;
+        const vh = window.innerHeight;
+
+        active.forEach((frame) => {
+            const rect = frame.getBoundingClientRect();
+            // -1 cuando el bloque entra por abajo, +1 cuando sale por arriba
+            const progress = (rect.top + rect.height / 2 - vh / 2) / (vh / 2);
+            frame.style.setProperty('--shift', `${(progress * -18).toFixed(2)}px`);
         });
-    }, {
-        threshold: 0.1,
-        rootMargin: "0px 0px -50px 0px"
-    });
-
-    const elements = document.querySelectorAll('.reveal, .reveal-left');
-    elements.forEach(el => observer.observe(el));
-};
-
-document.addEventListener('DOMContentLoaded', scrollReveal);
-
-// --- LÓGICA DEL PREVIEW DE PROYECTOS ---
-document.addEventListener('DOMContentLoaded', () => {
-    const previewModal = document.getElementById('projectPreviewModal');
-    const closePreviewBtn = document.getElementById('closePreviewBtn');
-    const projectIframe = document.getElementById('projectIframe');
-    const previewLoader = document.getElementById('previewLoader');
-    const externalLink = document.getElementById('externalProjectLink');
-    const triggers = document.querySelectorAll('.project-trigger');
-
-    triggers.forEach(trigger => {
-        trigger.addEventListener('click', (e) => {
-            e.preventDefault();
-            const url = trigger.getAttribute('data-url');
-            if (url) {
-                previewLoader.style.display = 'flex';
-                projectIframe.classList.remove('loaded');
-                externalLink.href = url;
-                previewModal.classList.add('active');
-                projectIframe.src = url;
-            }
-        });
-    });
-
-    projectIframe.addEventListener('load', () => {
-        if (projectIframe.src && projectIframe.src !== window.location.href) {
-            previewLoader.style.display = 'none';
-            projectIframe.classList.add('loaded');
-        }
-    });
-
-    const closeModal = () => {
-        previewModal.classList.remove('active');
-        setTimeout(() => {
-            projectIframe.src = '';
-            projectIframe.classList.remove('loaded');
-        }, 400);
     };
 
-    if (closePreviewBtn) closePreviewBtn.addEventListener('click', closeModal);
+    const onScroll = () => {
+        if (ticking || !active.size) return;
+        ticking = true;
+        window.requestAnimationFrame(update);
+    };
 
-    previewModal.addEventListener('click', (e) => {
-        if (e.target === previewModal) {
-            closeModal();
-        }
-    });
-});
+    if ('IntersectionObserver' in window) {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) active.add(entry.target);
+                else active.delete(entry.target);
+            });
+            onScroll();
+        }, { rootMargin: '120px 0px' });
 
-const navToggle = document.querySelector('.nav-toggle');
-const navLinks = document.querySelector('.nav-links');
-const links = document.querySelectorAll('.nav-links a');
-
-// Abrir/Cerrar menú
-navToggle.addEventListener('click', () => {
-    navToggle.classList.toggle('active');
-    navLinks.classList.toggle('active');
-});
-
-// Cerrar menú automáticamente al hacer click en un link
-links.forEach(link => {
-    link.addEventListener('click', () => {
-        navToggle.classList.remove('active');
-        navLinks.classList.remove('active');
-    });
-});
-
-window.addEventListener('scroll', () => {
-    const nav = document.querySelector('.navbar');
-    if (window.scrollY > 50) {
-        nav.style.background = 'rgba(9, 10, 15, 0.95)';
-        nav.style.height = '75px';
-        nav.style.boxShadow = '0 10px 30px rgba(0,0,0,0.5)';
+        frames.forEach((frame) => observer.observe(frame));
     } else {
-        nav.style.background = 'rgba(9, 10, 15, 0.85)';
-        nav.style.height = '85px';
-        nav.style.boxShadow = 'none';
+        active = new Set(frames);
     }
-});
 
-// Service Worker básico para habilitar la instalación PWA
-self.addEventListener('install', (e) => {
-  console.log('[Service Worker] Instalado');
-});
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+    update();
+}
 
-self.addEventListener('fetch', (e) => {
-  // Aquí podrías configurar caché offline en el futuro
+initPreloader().then(() => {
+    boot();
+    initParallax();
 });

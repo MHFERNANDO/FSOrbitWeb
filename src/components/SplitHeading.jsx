@@ -14,7 +14,7 @@ function Word({ index, children }) {
         className="inline-block"
         initial={{ y: '110%' }}
         animate={isInView ? { y: 0 } : { y: '110%' }}
-        transition={{ duration: 1.6, delay: index * 0.1, ease: EASE_OUT }}
+        transition={{ duration: 0.9, delay: index * 0.15, ease: EASE_OUT }}
       >
         {children}
       </motion.span>

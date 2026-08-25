@@ -201,7 +201,11 @@ export default function Navbar() {
 
       <span
         className="absolute inset-x-0 -bottom-px h-px origin-left bg-signal"
-        style={{ transform: `scaleX(${progress})`, boxShadow: '0 0 12px var(--signal-a48)' }}
+        style={{
+          width: `${progress * 100}%`,
+          boxShadow: progress > 0 ? '0 0 12px var(--signal-a48)' : 'none',
+          transition: 'none'
+        }}
         aria-hidden="true"
       />
     </nav>

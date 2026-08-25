@@ -51,23 +51,22 @@ export default function Home() {
             experiencia digital única.
           </Reveal>
 
-          <Reveal as="div" type="rise" className="mt-s2 flex flex-wrap gap-s4">
-            <button
+          <div className="mt-s2 flex flex-wrap gap-s4">
+            <Reveal as="button" type="rise" index={0}
               ref={primaryBtnRef}
-              type="button"
               onClick={advisor?.openModal}
               className="rounded-r2 bg-signal px-s6 py-s4 font-mono text-[length:var(--fs-mono)] font-bold uppercase tracking-[var(--tr-mono)] text-signal-ink transition-all duration-300 hover:scale-115 hover:shadow-xl hover:bg-signal-2 active:scale-95"
               style={{ boxShadow: '0 0 16px var(--signal-a48)' }}
             >
               Empezar ahora
-            </button>
-            <a
+            </Reveal>
+            <Reveal as="a" type="rise" index={1}
               href="#proyectos"
               className="rounded-r2 border border-[color:var(--line-2)] px-s6 py-s4 font-mono text-[length:var(--fs-mono)] font-bold uppercase tracking-[var(--tr-mono)] text-text transition-all duration-300 hover:border-signal hover:bg-signal-a12 hover:text-signal active:bg-signal-a24"
             >
               Ver trabajos
-            </a>
-          </Reveal>
+            </Reveal>
+          </div>
         </div>
 
         <a href="#superioridad" className="mt-s9 hidden items-center gap-s3 text-text-3 md:flex" aria-hidden="true">
@@ -350,7 +349,7 @@ function AtomReveal({ children }) {
       className="inline-flex items-center gap-s2 font-mono text-[length:var(--fs-mono)] uppercase tracking-[var(--tr-mono)] text-text-3"
       initial={{ opacity: 0 }}
       animate={isInView ? { opacity: 1 } : { opacity: 0 }}
-      transition={{ duration: 5 }}
+      transition={{ duration: 100 }}
     >
       {children}
     </motion.span>

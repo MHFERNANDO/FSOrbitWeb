@@ -226,7 +226,6 @@ body {
   background: var(--color-signal-2);
   background-clip: padding-box;
 }
-}
 
 body.is-loading {
   overflow: hidden;

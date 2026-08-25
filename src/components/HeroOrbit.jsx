@@ -30,10 +30,10 @@ export default function HeroOrbit() {
     const pointer = { tx: 0, ty: 0, x: 0, y: 0 };
 
     const orbits = [
-      { r: 0.34, tilt: -0.42, ratio: 0.3, speed: 0.00042, glow: true },
-      { r: 0.52, tilt: 0.24, ratio: 0.46, speed: -0.00027, glow: false },
-      { r: 0.72, tilt: -0.18, ratio: 0.34, speed: 0.00017, glow: false },
-      { r: 0.95, tilt: 0.52, ratio: 0.52, speed: -0.00011, glow: true },
+      { r: 0.34, tilt: -0.42, ratio: 0.3, speed: 0.00021, glow: true },
+      { r: 0.52, tilt: 0.24, ratio: 0.46, speed: -0.000135, glow: false },
+      { r: 0.72, tilt: -0.18, ratio: 0.34, speed: 0.000085, glow: false },
+      { r: 0.95, tilt: 0.52, ratio: 0.52, speed: -0.000055, glow: true },
     ];
 
     const stars = Array.from({ length: 90 }, () => ({
@@ -41,7 +41,7 @@ export default function HeroOrbit() {
       d: 0.12 + Math.random() * 1.05,
       z: 0.35 + Math.random() * 0.65,
       phase: Math.random() * TAU,
-      blink: 0.4 + Math.random() * 1.6,
+      blink: 0.8 + Math.random() * 3.2,
     }));
 
     const resize = () => {

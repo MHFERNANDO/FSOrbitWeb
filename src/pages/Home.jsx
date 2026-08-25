@@ -17,6 +17,19 @@ import { services, pricingPlans, featuredWork } from '@/data/content';
 
 const WA_BASE = 'https://wa.me/593983113942?text=';
 
+function AtomReveal({ children }) {
+  return (
+    <motion.span
+      className="inline-flex items-center gap-s2 font-mono text-[length:var(--fs-mono)] uppercase tracking-[var(--tr-mono)] text-text-3"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 120, delay: 0 }}
+    >
+      {children}
+    </motion.span>
+  );
+}
+
 export default function Home() {
   useDocumentTitle('FS Orbit | Soluciones Digitales a Medida');
   const advisor = useAdvisor();
@@ -336,18 +349,5 @@ function WorkCard({ work, index, onOpen }) {
         </span>
       </div>
     </Reveal>
-  );
-}
-
-function AtomReveal({ children }) {
-  return (
-    <motion.span
-      className="inline-flex items-center gap-s2 font-mono text-[length:var(--fs-mono)] uppercase tracking-[var(--tr-mono)] text-text-3"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 120, delay: 0 }}
-    >
-      {children}
-    </motion.span>
   );
 }

@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { motion } from 'framer-motion';
 import Reveal from '@/components/Reveal';
 import SplitHeading from '@/components/SplitHeading';
 import Icon from '@/components/Icon';
@@ -6,6 +7,8 @@ import { useParallax } from '@/hooks/useParallax';
 import { useProjectPreview } from '@/components/ProjectPreviewModal';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import { projects } from '@/data/content';
+
+const EASE_OUT = [0.22, 1, 0.36, 1];
 
 export default function Proyectos() {
   useDocumentTitle('Proyectos | FS Orbit');
@@ -78,7 +81,7 @@ function ProjectBlock({ project, even, onOpen }) {
           </li>
         ))}
       </ul>
-      <a
+      <motion.a
         href={project.url}
         target="_blank"
         rel="noopener"
@@ -87,10 +90,13 @@ function ProjectBlock({ project, even, onOpen }) {
           onOpen?.(project.url);
         }}
         className="mt-s3 inline-flex items-center gap-s2 rounded-r2 bg-signal px-s5 py-s4 font-mono text-[length:var(--fs-mono)] font-bold uppercase tracking-[var(--tr-mono)] text-signal-ink"
+        whileHover={{ scale: 1.06, boxShadow: '0 8px 32px rgba(198, 242, 78, 0.24)' }}
+        whileTap={{ scale: 0.98 }}
+        transition={{ duration: 0.3, ease: EASE_OUT }}
       >
         Ejecutar Proyecto
         <Icon name="arrow-ur" />
-      </a>
+      </motion.a>
     </div>
   );
 

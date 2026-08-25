@@ -5,6 +5,8 @@ import { AnimatePresence, motion } from 'framer-motion';
 import Icon from './Icon';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
 
+const EASE_OUT = [0.22, 1, 0.36, 1];
+
 const NAV_LINKS = [
   { href: '/#servicios', label: 'Servicios' },
   { href: '/proyectos', label: 'Proyectos' },
@@ -28,13 +30,16 @@ function DrawerLinks({ onNavigate, onHablemos }) {
         </li>
       ))}
       <li>
-        <a
+        <motion.a
           href="/#contacto"
           onClick={onHablemos}
-          className="rounded-r2 bg-signal px-5 py-[11px] font-mono text-[length:var(--fs-mono)] font-bold uppercase tracking-[var(--tr-mono)] text-signal-ink"
+          className="inline-flex rounded-r2 bg-signal px-5 py-[11px] font-mono text-[length:var(--fs-mono)] font-bold uppercase tracking-[var(--tr-mono)] text-signal-ink"
+          whileHover={{ scale: 1.06, boxShadow: '0 8px 32px rgba(198, 242, 78, 0.24)' }}
+          whileTap={{ scale: 0.98 }}
+          transition={{ duration: 0.3, ease: EASE_OUT }}
         >
           Hablemos
-        </a>
+        </motion.a>
       </li>
     </>
   );
@@ -167,13 +172,16 @@ export default function Navbar() {
                 </li>
               ))}
               <li>
-                <a
+                <motion.a
                   href="/#contacto"
                   onClick={goHablemos}
-                  className="rounded-r2 bg-signal px-5 py-[11px] font-mono text-[length:var(--fs-mono)] font-bold uppercase tracking-[var(--tr-mono)] text-signal-ink transition-transform hover:scale-[1.03]"
+                  className="rounded-r2 bg-signal px-5 py-[11px] font-mono text-[length:var(--fs-mono)] font-bold uppercase tracking-[var(--tr-mono)] text-signal-ink"
+                  whileHover={{ scale: 1.06, boxShadow: '0 8px 32px rgba(198, 242, 78, 0.24)' }}
+                  whileTap={{ scale: 0.98 }}
+                  transition={{ duration: 0.3, ease: EASE_OUT }}
                 >
                   Hablemos
-                </a>
+                </motion.a>
               </li>
             </ul>
 

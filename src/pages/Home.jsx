@@ -56,14 +56,14 @@ export default function Home() {
               ref={primaryBtnRef}
               type="button"
               onClick={advisor?.openModal}
-              className="rounded-r2 bg-signal px-s6 py-s4 font-mono text-[length:var(--fs-mono)] font-bold uppercase tracking-[var(--tr-mono)] text-signal-ink transition-all duration-200 hover:scale-105 hover:shadow-lg active:scale-95"
-              style={{ boxShadow: 'var(--shadow-sm)' }}
+              className="rounded-r2 bg-signal px-s6 py-s4 font-mono text-[length:var(--fs-mono)] font-bold uppercase tracking-[var(--tr-mono)] text-signal-ink transition-all duration-300 hover:scale-115 hover:shadow-xl hover:bg-signal-2 active:scale-95"
+              style={{ boxShadow: '0 0 16px var(--signal-a48)' }}
             >
               Empezar ahora
             </button>
             <a
               href="#proyectos"
-              className="rounded-r2 border border-[color:var(--line-2)] px-s6 py-s4 font-mono text-[length:var(--fs-mono)] font-bold uppercase tracking-[var(--tr-mono)] text-text transition-all duration-200 hover:border-signal-a48 hover:bg-signal-a06 active:bg-signal-a12"
+              className="rounded-r2 border border-[color:var(--line-2)] px-s6 py-s4 font-mono text-[length:var(--fs-mono)] font-bold uppercase tracking-[var(--tr-mono)] text-text transition-all duration-300 hover:border-signal hover:bg-signal-a12 hover:text-signal active:bg-signal-a24"
             >
               Ver trabajos
             </a>
@@ -230,8 +230,8 @@ export default function Home() {
                   ref={plan.popular ? storeBtnRef : undefined}
                   className={
                     plan.ctaVariant === 'primary'
-                      ? 'rounded-r2 bg-signal px-s5 py-s4 text-center font-mono text-[length:var(--fs-mono)] font-bold uppercase tracking-[var(--tr-mono)] text-signal-ink transition-all duration-200 hover:scale-105 hover:shadow-lg active:scale-95'
-                      : 'rounded-r2 border border-[color:var(--line-2)] px-s5 py-s4 text-center font-mono text-[length:var(--fs-mono)] font-bold uppercase tracking-[var(--tr-mono)] text-text transition-all duration-200 hover:border-signal-a48 hover:bg-signal-a06 active:bg-signal-a12'
+                      ? 'rounded-r2 bg-signal px-s5 py-s4 text-center font-mono text-[length:var(--fs-mono)] font-bold uppercase tracking-[var(--tr-mono)] text-signal-ink transition-all duration-300 hover:scale-115 hover:shadow-xl hover:bg-signal-2 active:scale-95'
+                      : 'rounded-r2 border border-[color:var(--line-2)] px-s5 py-s4 text-center font-mono text-[length:var(--fs-mono)] font-bold uppercase tracking-[var(--tr-mono)] text-text transition-all duration-300 hover:border-signal hover:bg-signal-a12 hover:text-signal active:bg-signal-a24'
                   }
                 >
                   {plan.cta}
@@ -350,7 +350,7 @@ function AtomReveal({ children }) {
       className="inline-flex items-center gap-s2 font-mono text-[length:var(--fs-mono)] uppercase tracking-[var(--tr-mono)] text-text-3"
       initial={{ opacity: 0 }}
       animate={isInView ? { opacity: 1 } : { opacity: 0 }}
-      transition={{ duration: 2.5 }}
+      transition={{ duration: 5 }}
     >
       {children}
     </motion.span>

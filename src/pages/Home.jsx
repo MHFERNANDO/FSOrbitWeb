@@ -340,16 +340,12 @@ function WorkCard({ work, index, onOpen }) {
 }
 
 function AtomReveal({ children }) {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, amount: 0.12 });
-
   return (
     <motion.span
-      ref={ref}
       className="inline-flex items-center gap-s2 font-mono text-[length:var(--fs-mono)] uppercase tracking-[var(--tr-mono)] text-text-3"
       initial={{ opacity: 0 }}
-      animate={isInView ? { opacity: 1 } : { opacity: 0 }}
-      transition={{ duration: 100 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 120, delay: 0 }}
     >
       {children}
     </motion.span>

@@ -202,9 +202,12 @@ export default function Navbar() {
       <span
         className="absolute inset-x-0 -bottom-px h-px origin-left bg-signal"
         style={{
-          width: `${progress * 100}%`,
-          boxShadow: progress > 0 ? '0 0 12px var(--signal-a48)' : 'none',
-          transition: 'none'
+          transform: `scaleX(${progress})`,
+          opacity: progress > 0.001 ? 1 : 0,
+          boxShadow: progress > 0.001 ? '0 0 12px var(--signal-a48)' : 'none',
+          transitionProperty: 'opacity, box-shadow',
+          transitionDuration: '0ms',
+          transitionTimingFunction: 'ease-out'
         }}
         aria-hidden="true"
       />

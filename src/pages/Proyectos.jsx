@@ -81,22 +81,29 @@ function ProjectBlock({ project, even, onOpen }) {
           </li>
         ))}
       </ul>
-      <motion.a
-        href={project.url}
-        target="_blank"
-        rel="noopener"
-        onClick={(e) => {
-          e.preventDefault();
-          onOpen?.(project.url);
-        }}
-        className="mt-s3 inline-flex items-center gap-s2 rounded-r2 bg-signal px-s5 py-s4 font-mono text-[length:var(--fs-mono)] font-bold uppercase tracking-[var(--tr-mono)] text-signal-ink"
-        whileHover={{ scale: 1.06, boxShadow: '0 8px 32px rgba(198, 242, 78, 0.24)' }}
+      <motion.div
+        className="mt-s3 inline-block"
+        whileHover={{ scale: 1.06 }}
         whileTap={{ scale: 0.98 }}
         transition={{ duration: 0.3, ease: EASE_OUT }}
       >
-        Ejecutar Proyecto
-        <Icon name="arrow-ur" />
-      </motion.a>
+        <a
+          href={project.url}
+          target="_blank"
+          rel="noopener"
+          onClick={(e) => {
+            e.preventDefault();
+            onOpen?.(project.url);
+          }}
+          className="inline-flex items-center gap-s2 rounded-r2 bg-signal px-s5 py-s4 font-mono text-[length:var(--fs-mono)] font-bold uppercase tracking-[var(--tr-mono)] text-signal-ink"
+          style={{ display: 'inline-flex', boxShadow: 'none', transition: 'box-shadow 300ms ease-out' }}
+          onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 8px 32px rgba(198, 242, 78, 0.24)'}
+          onMouseLeave={(e) => e.currentTarget.style.boxShadow = 'none'}
+        >
+          Ejecutar Proyecto
+          <Icon name="arrow-ur" />
+        </a>
+      </motion.div>
     </div>
   );
 

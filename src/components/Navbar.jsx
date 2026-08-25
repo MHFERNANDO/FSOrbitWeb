@@ -30,16 +30,23 @@ function DrawerLinks({ onNavigate, onHablemos }) {
         </li>
       ))}
       <li>
-        <motion.a
-          href="/#contacto"
-          onClick={onHablemos}
-          className="inline-flex rounded-r2 bg-signal px-5 py-[11px] font-mono text-[length:var(--fs-mono)] font-bold uppercase tracking-[var(--tr-mono)] text-signal-ink"
-          whileHover={{ scale: 1.06, boxShadow: '0 8px 32px rgba(198, 242, 78, 0.24)' }}
+        <motion.div
+          className="inline-block"
+          whileHover={{ scale: 1.06 }}
           whileTap={{ scale: 0.98 }}
           transition={{ duration: 0.3, ease: EASE_OUT }}
         >
-          Hablemos
-        </motion.a>
+          <a
+            href="/#contacto"
+            onClick={onHablemos}
+            className="inline-flex rounded-r2 bg-signal px-5 py-[11px] font-mono text-[length:var(--fs-mono)] font-bold uppercase tracking-[var(--tr-mono)] text-signal-ink"
+            style={{ display: 'inline-flex', boxShadow: 'none', transition: 'box-shadow 300ms ease-out' }}
+            onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 8px 32px rgba(198, 242, 78, 0.24)'}
+            onMouseLeave={(e) => e.currentTarget.style.boxShadow = 'none'}
+          >
+            Hablemos
+          </a>
+        </motion.div>
       </li>
     </>
   );
@@ -172,16 +179,23 @@ export default function Navbar() {
                 </li>
               ))}
               <li>
-                <motion.a
-                  href="/#contacto"
-                  onClick={goHablemos}
-                  className="rounded-r2 bg-signal px-5 py-[11px] font-mono text-[length:var(--fs-mono)] font-bold uppercase tracking-[var(--tr-mono)] text-signal-ink"
-                  whileHover={{ scale: 1.06, boxShadow: '0 8px 32px rgba(198, 242, 78, 0.24)' }}
+                <motion.div
+                  className="inline-block"
+                  whileHover={{ scale: 1.06 }}
                   whileTap={{ scale: 0.98 }}
                   transition={{ duration: 0.3, ease: EASE_OUT }}
                 >
-                  Hablemos
-                </motion.a>
+                  <a
+                    href="/#contacto"
+                    onClick={goHablemos}
+                    className="inline-flex rounded-r2 bg-signal px-5 py-[11px] font-mono text-[length:var(--fs-mono)] font-bold uppercase tracking-[var(--tr-mono)] text-signal-ink"
+                    style={{ display: 'inline-flex', boxShadow: 'none', transition: 'box-shadow 300ms ease-out' }}
+                    onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 8px 32px rgba(198, 242, 78, 0.24)'}
+                    onMouseLeave={(e) => e.currentTarget.style.boxShadow = 'none'}
+                  >
+                    Hablemos
+                  </a>
+                </motion.div>
               </li>
             </ul>
 

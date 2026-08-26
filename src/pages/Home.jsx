@@ -1,6 +1,6 @@
 import { useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { motion, useInView } from 'framer-motion';
+import { motion } from 'framer-motion';
 import HeroOrbit from '@/components/HeroOrbit';
 import Reveal from '@/components/Reveal';
 import SplitHeading, { Highlight } from '@/components/SplitHeading';
@@ -12,18 +12,20 @@ import { useAdvisor } from '@/components/AdvisorModal';
 import { useProjectPreview } from '@/components/ProjectPreviewModal';
 import { useMagnetic } from '@/hooks/useMagnetic';
 import { useCursorTag } from '@/hooks/useCursorTag';
-import { useDocumentTitle } from '@/hooks/useDocumentTitle';
+import { useSeo } from '@/hooks/useSeo';
 import { services, pricingPlans, featuredWork } from '@/data/content';
 
 const WA_BASE = 'https://wa.me/593983113942?text=';
 
+// Linea de entrada del hero (punto lima + tagline). Aparece con el resto
+// del bloque, no en scroll: es lo primero que se lee al abrir el sitio.
 function AtomReveal({ children }) {
   return (
     <motion.span
       className="inline-flex items-center gap-s2 font-mono text-[length:var(--fs-mono)] uppercase tracking-[var(--tr-mono)] text-text-3"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 120, delay: 0 }}
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.85, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
     >
       {children}
     </motion.span>
@@ -31,7 +33,12 @@ function AtomReveal({ children }) {
 }
 
 export default function Home() {
-  useDocumentTitle('FS Orbit | Soluciones Digitales a Medida');
+  useSeo({
+    title: 'FS Orbit | Soluciones Digitales a Medida',
+    description:
+      'FS Orbit | Desarrollo web de alto rendimiento en Ecuador. Ingeniería digital, arquitecturas escalables, diseño moderno. Servicios: Landing Pages, E-commerce, Aplicaciones web, Optimización, Soluciones custom.',
+    path: '/',
+  });
   const advisor = useAdvisor();
   const preview = useProjectPreview();
   const primaryBtnRef = useRef(null);

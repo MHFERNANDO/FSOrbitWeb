@@ -334,30 +334,29 @@ h4 {
 
 } /* fin @layer base */
 
-/* Igual que en la version estatica: se acorta el movimiento, nunca se
-   borra del todo. Framer Motion respeta esto via useReducedMotion() en
-   cada componente animado; este bloque cubre lo que queda en CSS puro
-   (grano, transiciones de hover simples) y va sin @layer para ganarle
-   a cualquier utilidad de Tailwind sin necesidad de !important. */
-@media (prefers-reduced-motion: reduce) {
+/* DECISION DEL CLIENTE — no volver a poner el bloque de movimiento
+   reducido sin hablarlo antes.
+   --------------------------------------------------------------------
+   Aqui vivia un @media (prefers-reduced-motion: reduce) que acortaba las
+   animaciones a 240ms, cortaba los loops (animation-iteration-count: 1)
+   y apagaba el grano. En paralelo, cada componente animado consultaba
+   useReducedMotion() de Framer Motion y renderizaba una version estatica.
 
-  html {
-    scroll-behavior: auto;
-  }
+   El cliente revisa el sitio en un Windows que tiene "reducir movimiento"
+   activado a nivel de sistema, asi que veia la pagina completamente
+   plana — sin reveals, sin shine en los CTA, sin parallax, sin efecto
+   magnetico — y pidio de forma explicita y repetida que las animaciones
+   no se apaguen nunca, en ningun caso. Por eso se quitaron tanto este
+   bloque como todos los useReducedMotion() del arbol (Reveal, hero,
+   modales, ShinyButton, useMagnetic, useCursorTag, useParallax).
 
-  *,
-  *::before,
-  *::after {
-    animation-duration: 240ms;
-    animation-iteration-count: 1;
-    transition-duration: 240ms;
-    scroll-behavior: auto;
-  }
-
-  body::after {
-    animation: none;
-  }
-}
+   Contrapartida asumida a conciencia: un visitante con sensibilidad
+   vestibular ve el sitio con todo el movimiento, incluido el
+   scroll-behavior: smooth de los anclas. Si algun dia se quiere
+   recuperar el respeto a la preferencia, el punto de entrada minimo y
+   menos invasivo es volver a poner solo:
+       @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto } }
+   que quita el mareo mas fuerte sin apagar nada visual. */
 
 /* Mapea los tokens semanticos (ya remapeados arriba a la paleta FS Orbit)
    a utilidades de Tailwind: bg-background, text-foreground, bg-primary,

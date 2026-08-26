@@ -1,15 +1,15 @@
 import { useEffect, useRef } from 'react';
-import { useReducedMotion } from 'framer-motion';
 
 // Etiqueta que sigue al cursor sobre los proyectos ("Ver preview").
-// Puerto de initCursorTag() en core.js.
+// Puerto de initCursorTag() en core.js. Solo con mouse fino (no touch);
+// sin gate de reduced-motion a peticion del cliente, ver el comentario
+// del bloque @media en index.css.
 export function useCursorTag(label) {
   const zoneRef = useRef(null);
-  const reduceMotion = useReducedMotion();
 
   useEffect(() => {
     const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-    if (!zoneRef.current || !finePointer || reduceMotion) return undefined;
+    if (!zoneRef.current || !finePointer) return undefined;
     const zone = zoneRef.current;
 
     const tag = document.createElement('div');
@@ -58,7 +58,7 @@ export function useCursorTag(label) {
       zone.removeEventListener('pointerleave', onLeave);
       tag.remove();
     };
-  }, [label, reduceMotion]);
+  }, [label]);
 
   return zoneRef;
 }

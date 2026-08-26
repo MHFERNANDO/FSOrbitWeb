@@ -1,15 +1,14 @@
 import { useEffect, useRef } from 'react';
-import { useReducedMotion } from 'framer-motion';
 
 // Parallax vertical de las capturas en /proyectos. Puerto de initParallax()
 // en legacy-static/js/proyectos.js: escribe --shift, el compositor mueve
-// la imagen sin disparar layout.
+// la imagen sin disparar layout. Sin gate de reduced-motion a peticion del
+// cliente, ver el comentario del bloque @media en index.css.
 export function useParallax() {
   const ref = useRef(null);
-  const reduceMotion = useReducedMotion();
 
   useEffect(() => {
-    if (!ref.current || reduceMotion) return undefined;
+    if (!ref.current) return undefined;
     const frame = ref.current;
     let active = false;
     let ticking = false;
@@ -43,7 +42,7 @@ export function useParallax() {
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onScroll);
     };
-  }, [reduceMotion]);
+  }, []);
 
   return ref;
 }

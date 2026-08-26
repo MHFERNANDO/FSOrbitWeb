@@ -5,13 +5,18 @@ import SplitHeading from '@/components/SplitHeading';
 import Icon from '@/components/Icon';
 import { useParallax } from '@/hooks/useParallax';
 import { useProjectPreview } from '@/components/ProjectPreviewModal';
-import { useDocumentTitle } from '@/hooks/useDocumentTitle';
+import { useSeo } from '@/hooks/useSeo';
 import { projects } from '@/data/content';
 
 const EASE_OUT = [0.22, 1, 0.36, 1];
 
 export default function Proyectos() {
-  useDocumentTitle('Proyectos | FS Orbit');
+  useSeo({
+    title: 'Proyectos | FS Orbit — Casos de Ingeniería Web',
+    description:
+      'Portafolio de FS Orbit: landing pages, e-commerce y aplicaciones web desarrolladas a medida en Ecuador. Casos reales con arquitectura escalable y rendimiento optimizado.',
+    path: '/proyectos',
+  });
   const preview = useProjectPreview();
 
   useEffect(() => {

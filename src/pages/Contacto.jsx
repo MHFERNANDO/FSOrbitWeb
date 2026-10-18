@@ -5,6 +5,7 @@ import Icon from '@/components/Icon';
 import { useSeo } from '@/hooks/useSeo';
 import { breadcrumbs } from '@/seo/jsonld';
 import { contact } from '@/data/content';
+import { trackClick, trackFormSubmit } from '@/lib/analytics';
 
 const WA_BASE = 'https://wa.me/593983113942?text=';
 
@@ -47,9 +48,11 @@ export default function Contacto() {
       });
       if (!res.ok) throw new Error('request_failed');
       setStatus('sent');
+      trackFormSubmit('sent');
       form.reset();
     } catch {
       setStatus('error');
+      trackFormSubmit('error');
     }
   }
 
@@ -76,6 +79,7 @@ export default function Contacto() {
               href={`${WA_BASE}${encodeURIComponent('Hola, quiero cotizar un proyecto web')}`}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => trackClick('whatsapp', { source: 'contacto_page' })}
               className="group flex items-center gap-s4 rounded-r3 border border-[color:var(--line)] p-s5 transition-colors hover:border-[color:var(--line-2)]"
             >
               <span className="grid size-12 place-items-center rounded-r2 border border-[color:var(--line-2)] text-text-2">
@@ -87,7 +91,7 @@ export default function Contacto() {
               </span>
             </a>
 
-            <a href={`tel:${contact.tel}`} className="group flex items-center gap-s4 rounded-r3 border border-[color:var(--line)] p-s5 transition-colors hover:border-[color:var(--line-2)]">
+            <a href={`tel:${contact.tel}`} onClick={() => trackClick('tel', { source: 'contacto_page' })} className="group flex items-center gap-s4 rounded-r3 border border-[color:var(--line)] p-s5 transition-colors hover:border-[color:var(--line-2)]">
               <span className="grid size-12 place-items-center rounded-r2 border border-[color:var(--line-2)] text-text-2">
                 <Icon name="phone" className="text-xl" />
               </span>
@@ -97,7 +101,7 @@ export default function Contacto() {
               </span>
             </a>
 
-            <a href={`mailto:${contact.email}`} className="group flex items-center gap-s4 rounded-r3 border border-[color:var(--line)] p-s5 transition-colors hover:border-[color:var(--line-2)]">
+            <a href={`mailto:${contact.email}`} onClick={() => trackClick('email', { source: 'contacto_page' })} className="group flex items-center gap-s4 rounded-r3 border border-[color:var(--line)] p-s5 transition-colors hover:border-[color:var(--line-2)]">
               <span className="grid size-12 place-items-center rounded-r2 border border-[color:var(--line-2)] text-text-2">
                 <Icon name="mail" className="text-xl" />
               </span>

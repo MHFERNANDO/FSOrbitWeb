@@ -4,6 +4,7 @@ import Icon from './Icon';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { useEscapeKey } from '@/hooks/useEscapeKey';
 import { advisorSteps, contact } from '@/data/content';
+import { trackClick } from '@/lib/analytics';
 
 const AdvisorContext = createContext(null);
 export const useAdvisor = () => useContext(AdvisorContext);
@@ -31,6 +32,7 @@ export function AdvisorProvider({ children }) {
 
   const send = () => {
     const text = `¡Hola FS Orbit! 👋 Me interesa el servicio de *${choice.servicio}*. Mi prioridad principal es *${choice.prioridad}*. ¿Me podrían dar más info?`;
+    trackClick('whatsapp', { source: 'advisor_modal', servicio: choice.servicio, prioridad: choice.prioridad });
     window.open(`https://wa.me/${contact.whatsappSales}?text=${encodeURIComponent(text)}`, '_blank', 'noopener');
     setOpen(false);
   };

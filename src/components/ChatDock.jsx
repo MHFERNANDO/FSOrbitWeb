@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import Icon from './Icon';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { contact } from '@/data/content';
+import { trackClick } from '@/lib/analytics';
 
 const OPTIONS = [
   {
@@ -55,6 +56,7 @@ function ChatPanel({ panelRef, setOpen }) {
               href={opt.href}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => trackClick('whatsapp', { source: 'chat_dock', department: opt.title })}
               className="flex items-center gap-s3 rounded-r3 border border-[color:var(--line)] p-s4 transition-colors hover:border-[color:var(--line-2)]"
             >
               <Icon name={opt.icon} className="text-text-2" />

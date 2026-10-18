@@ -14,6 +14,7 @@ import { useMagnetic } from '@/hooks/useMagnetic';
 import { useCursorTag } from '@/hooks/useCursorTag';
 import { useSeo } from '@/hooks/useSeo';
 import { breadcrumbs, website } from '@/seo/jsonld';
+import { trackClick } from '@/lib/analytics';
 import { services, pricingPlans, featuredWork } from '@/data/content';
 
 const WA_BASE = 'https://wa.me/593983113942?text=';
@@ -250,6 +251,7 @@ export default function Home() {
                   href={`${WA_BASE}${encodeURIComponent(plan.whatsappText)}`}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={() => trackClick('whatsapp', { source: 'home_pricing', plan: plan.name })}
                   ref={plan.popular ? storeBtnRef : undefined}
                   className={
                     plan.ctaVariant === 'primary'

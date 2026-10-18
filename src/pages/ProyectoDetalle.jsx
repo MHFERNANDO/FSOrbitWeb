@@ -3,6 +3,7 @@ import Reveal from '@/components/Reveal';
 import Icon from '@/components/Icon';
 import { useSeo } from '@/hooks/useSeo';
 import { breadcrumbs, creativeWork } from '@/seo/jsonld';
+import { trackClick } from '@/lib/analytics';
 import { projects } from '@/data/content';
 
 export default function ProyectoDetalle() {
@@ -103,6 +104,7 @@ export default function ProyectoDetalle() {
               href={`https://wa.me/593983113942?text=${encodeURIComponent(`Vi el proyecto ${project.title} y quiero algo similar`)}`}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => trackClick('whatsapp', { source: 'proyecto_detalle', project: project.slug })}
               className="inline-flex items-center gap-s3 rounded-r2 bg-signal px-s6 py-s4 font-mono text-[length:var(--fs-mono)] font-bold uppercase tracking-[var(--tr-mono)] text-signal-ink"
             >
               Cotizar por WhatsApp

@@ -4,6 +4,7 @@ import SplitHeading from '@/components/SplitHeading';
 import Icon from '@/components/Icon';
 import { useSeo } from '@/hooks/useSeo';
 import { breadcrumbs, service, faqPage } from '@/seo/jsonld';
+import { trackClick } from '@/lib/analytics';
 
 const WA_BASE = 'https://wa.me/593983113942?text=';
 
@@ -56,6 +57,7 @@ export default function ServicePage({
             href={`${WA_BASE}${encodeURIComponent(ctaWhatsappText)}`}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => trackClick('whatsapp', { source: 'service_page', path })}
             className="rounded-r2 bg-signal px-s6 py-s4 font-mono text-[length:var(--fs-mono)] font-bold uppercase tracking-[var(--tr-mono)] text-signal-ink transition-all duration-300 hover:scale-105 active:scale-95"
           >
             Cotiza por WhatsApp
@@ -119,6 +121,7 @@ export default function ServicePage({
             href={`${WA_BASE}${encodeURIComponent(ctaWhatsappText)}`}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => trackClick('whatsapp', { source: 'service_page_footer_cta', path })}
             className="inline-flex shrink-0 items-center gap-s3 rounded-r2 bg-signal px-s6 py-s4 font-mono text-[length:var(--fs-mono)] font-bold uppercase tracking-[var(--tr-mono)] text-signal-ink"
           >
             Escríbenos ahora

@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import Icon from './Icon';
 import Reveal from './Reveal';
 import { contact } from '@/data/content';
+import { trackClick } from '@/lib/analytics';
 
 const FOOTER_LINKS = [
   { to: '/servicios/diseno-web-cuenca', label: 'Diseño Web en Cuenca' },
@@ -43,6 +44,7 @@ export default function Footer() {
                 href={`https://wa.me/${wa.number}`}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => trackClick('whatsapp', { source: 'footer' })}
                 className="group flex items-center gap-s4 transition-transform duration-(--d3) hover:translate-x-1"
               >
                 <span className="grid size-10 place-items-center rounded-r2 border border-[color:var(--line-2)] text-text-2 transition-colors group-hover:text-signal">
@@ -60,10 +62,10 @@ export default function Footer() {
         <Reveal as="div" type="rise" index={3} className="grid gap-s4">
           <h4 className="font-display text-[length:var(--fs-h4)] font-extrabold">Escríbenos</h4>
           <p className="text-text-2">¿Prefieres el correo o una llamada?</p>
-          <a href={`mailto:${contact.email}`} className="text-text-2 underline-offset-4 transition-colors hover:text-signal hover:underline">
+          <a href={`mailto:${contact.email}`} onClick={() => trackClick('email', { source: 'footer' })} className="text-text-2 underline-offset-4 transition-colors hover:text-signal hover:underline">
             {contact.email}
           </a>
-          <a href={`tel:${contact.tel}`} className="text-text-2 underline-offset-4 transition-colors hover:text-signal hover:underline">
+          <a href={`tel:${contact.tel}`} onClick={() => trackClick('tel', { source: 'footer' })} className="text-text-2 underline-offset-4 transition-colors hover:text-signal hover:underline">
             {contact.telDisplay}
           </a>
           <a

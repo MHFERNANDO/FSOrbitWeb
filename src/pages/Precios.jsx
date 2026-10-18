@@ -4,6 +4,7 @@ import Icon from '@/components/Icon';
 import { useSeo } from '@/hooks/useSeo';
 import { breadcrumbs, faqPage } from '@/seo/jsonld';
 import { pricingPlans } from '@/data/content';
+import { trackClick } from '@/lib/analytics';
 
 const WA_BASE = 'https://wa.me/593983113942?text=';
 
@@ -96,6 +97,7 @@ export default function Precios() {
                   href={`${WA_BASE}${encodeURIComponent(plan.whatsappText)}`}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={() => trackClick('whatsapp', { source: 'precios_page', plan: plan.name })}
                   className={
                     plan.ctaVariant === 'primary'
                       ? 'rounded-r2 bg-signal px-s5 py-s4 text-center font-mono text-[length:var(--fs-mono)] font-bold uppercase tracking-[var(--tr-mono)] text-signal-ink transition-all duration-300 hover:scale-105 active:scale-95'

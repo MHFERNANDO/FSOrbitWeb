@@ -70,6 +70,8 @@ function ProjectBlock({ project, even, onOpen }) {
         <img
           src={`/assets/${project.img}.png`}
           alt={project.alt}
+          width={project.w}
+          height={project.h}
           loading="lazy"
           decoding="async"
           className="h-[106%] w-full object-cover object-top saturate-[.7] contrast-[1.03] brightness-[.94] transition-[transform,filter] duration-1000 group-hover:scale-[1.04] group-hover:saturate-100 group-hover:contrast-100 group-hover:brightness-100"

@@ -115,12 +115,24 @@ export const pricingPlans = [
   },
 ];
 
+// Dimensiones reales de cada PNG en public/assets (leidas del header del
+// archivo) — se usan como width/height en <img> para que el navegador
+// reserve el espacio antes de que cargue la imagen y no haya salto de
+// layout (CLS), ademas de lo que ya hace aspect-* en las clases.
+const IMG_SIZE = {
+  GravityPreview: { w: 1918, h: 927 },
+  AccuLabPreview: { w: 1902, h: 930 },
+  JFVapesPreview: { w: 1893, h: 885 },
+  LabDieselPreview: { w: 1896, h: 908 },
+};
+
 // Portada (index) — solo los dos destacados
 export const featuredWork = [
   {
     title: 'Acculab',
     tag: 'Plataforma de Análisis Clínicos',
     img: 'AccuLabPreview',
+    ...IMG_SIZE.AccuLabPreview,
     alt: 'Acculab - Plataforma Médica',
     url: 'https://acculab.bio',
   },
@@ -128,6 +140,7 @@ export const featuredWork = [
     title: 'Gravity Studio',
     tag: 'Landing Page',
     img: 'GravityPreview',
+    ...IMG_SIZE.GravityPreview,
     alt: 'Gravity Studio - Landing Page',
     url: 'https://gravityestudiocreativo.com',
   },
@@ -142,6 +155,7 @@ export const projects = [
     description: 'Landing Page',
     tags: ['JS_ENGINE', 'MARKETING'],
     img: 'GravityPreview',
+    ...IMG_SIZE.GravityPreview,
     alt: 'Gravity Studio',
     url: 'https://gravityestudiocreativo.com',
   },
@@ -152,6 +166,7 @@ export const projects = [
     description: 'Arquitectura médica de misión crítica optimizada para datos en tiempo real.',
     tags: ['JS_ENGINE', 'HEALTH_TECH'],
     img: 'AccuLabPreview',
+    ...IMG_SIZE.AccuLabPreview,
     alt: 'Acculab',
     url: 'https://acculab.bio',
   },
@@ -162,6 +177,7 @@ export const projects = [
     description: 'E-commerce de alto impacto diseñado para la máxima conversión móvil.',
     tags: ['ECOMMERCE', 'UI_PRECISION'],
     img: 'JFVapesPreview',
+    ...IMG_SIZE.JFVapesPreview,
     alt: 'JF Vapes',
     url: 'https://jf-vapes-pagina-web-w6bo.vercel.app',
   },
@@ -172,6 +188,7 @@ export const projects = [
     description: 'Plataforma web especializada para servicios de laboratorio e inyección diésel.',
     tags: ['CORPORATIVE', 'AUTOMOTIVE'],
     img: 'LabDieselPreview',
+    ...IMG_SIZE.LabDieselPreview,
     alt: 'Laboratorio Diesel MG',
     url: 'https://laboratorio-diesel-mg.vercel.app/',
   },

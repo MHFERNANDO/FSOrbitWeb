@@ -345,6 +345,8 @@ function WorkCard({ work, index, onOpen }) {
           <img
             src={`/assets/${work.img}.png`}
             alt={work.alt}
+            width={work.w}
+            height={work.h}
             loading="lazy"
             decoding="async"
             className="h-full w-full object-cover transition-transform duration-(--d4) group-hover:scale-105"

@@ -64,6 +64,8 @@ export default function ProyectoDetalle() {
             <img
               src={`/assets/${project.img}.png`}
               alt={project.alt}
+              width={project.w}
+              height={project.h}
               loading="eager"
               fetchPriority="high"
               decoding="async"

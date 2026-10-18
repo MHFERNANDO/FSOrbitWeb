@@ -56,7 +56,7 @@ export default function Home() {
 
         <div className="relative grid gap-s5">
           <AtomReveal>
-            <span className="size-1.5 rounded-full bg-signal" style={{ boxShadow: '0 0 16px var(--signal-a48)' }} />
+            <span className="size-1.5 rounded-full bg-signal" style={{ boxShadow: '0 0 6px var(--signal-a24)' }} />
             Impulsando negocios en la era digital
           </AtomReveal>
 
@@ -76,7 +76,7 @@ export default function Home() {
               ref={primaryBtnRef}
               onClick={advisor?.openModal}
               className="rounded-r2 bg-signal px-s6 py-s4 font-mono text-[length:var(--fs-mono)] font-bold uppercase tracking-[var(--tr-mono)] text-signal-ink transition-all duration-300 hover:scale-115 hover:shadow-xl hover:bg-signal-2 active:scale-95"
-              style={{ boxShadow: '0 0 16px var(--signal-a48)' }}
+              style={{ boxShadow: '0 0 8px var(--signal-a24)' }}
             >
               Empezar ahora
             </Reveal>

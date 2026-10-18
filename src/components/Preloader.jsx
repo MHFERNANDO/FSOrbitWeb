@@ -97,7 +97,7 @@ export default function Preloader({ onDone }) {
             strokeDasharray="126"
             strokeDashoffset="126"
             className="origin-[30px_30px] animate-[preloaderTrack_1.6s_var(--e-io)_infinite]"
-            style={{ filter: 'drop-shadow(0 0 6px var(--signal-a48))' }}
+            style={{ filter: 'drop-shadow(0 0 3px var(--signal-a24))' }}
           />
           <circle
             cx="30"
@@ -105,7 +105,7 @@ export default function Preloader({ onDone }) {
             r="2.6"
             fill="var(--color-signal)"
             className="origin-[30px_10px] animate-[preloaderCore_1.6s_var(--e-io)_infinite]"
-            style={{ filter: 'drop-shadow(0 0 8px var(--signal-a48))' }}
+            style={{ filter: 'drop-shadow(0 0 4px var(--signal-a24))' }}
           />
         </svg>
 
@@ -122,7 +122,7 @@ export default function Preloader({ onDone }) {
         <div className="h-px w-[min(220px,42vw)] overflow-hidden bg-[color:var(--line)]">
           <span
             className="block h-full origin-left bg-signal"
-            style={{ transform: `scaleX(${progress})`, boxShadow: '0 0 8px var(--signal-a48)' }}
+            style={{ transform: `scaleX(${progress})`, boxShadow: '0 0 4px var(--signal-a24)' }}
           />
         </div>
       </div>

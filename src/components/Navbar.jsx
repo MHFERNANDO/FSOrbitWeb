@@ -41,7 +41,7 @@ function DrawerLinks({ onNavigate, onHablemos }) {
             onClick={onHablemos}
             className="inline-flex rounded-r2 bg-signal px-5 py-[11px] font-mono text-[length:var(--fs-mono)] font-bold uppercase tracking-[var(--tr-mono)] text-signal-ink"
             style={{ display: 'inline-flex', boxShadow: 'none', transition: 'box-shadow 300ms ease-out' }}
-            onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 8px 32px rgba(34, 228, 245, 0.24)'}
+            onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 6px 16px rgba(34, 228, 245, 0.14)'}
             onMouseLeave={(e) => e.currentTarget.style.boxShadow = 'none'}
           >
             Hablemos
@@ -190,7 +190,7 @@ export default function Navbar() {
                     onClick={goHablemos}
                     className="inline-flex rounded-r2 bg-signal px-5 py-[11px] font-mono text-[length:var(--fs-mono)] font-bold uppercase tracking-[var(--tr-mono)] text-signal-ink"
                     style={{ display: 'inline-flex', boxShadow: 'none', transition: 'box-shadow 300ms ease-out' }}
-                    onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 8px 32px rgba(34, 228, 245, 0.24)'}
+                    onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 6px 16px rgba(34, 228, 245, 0.14)'}
                     onMouseLeave={(e) => e.currentTarget.style.boxShadow = 'none'}
                   >
                     Hablemos
@@ -226,7 +226,7 @@ export default function Navbar() {
         style={{
           transform: `scaleX(${progress})`,
           opacity: progress > 0.001 ? 1 : 0,
-          boxShadow: progress > 0.001 ? '0 0 12px var(--signal-a48)' : 'none',
+          boxShadow: progress > 0.001 ? '0 0 6px var(--signal-a24)' : 'none',
           transitionProperty: 'opacity, box-shadow',
           transitionDuration: '0ms',
           transitionTimingFunction: 'ease-out'

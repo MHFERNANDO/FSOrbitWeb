@@ -62,7 +62,7 @@ export default function Footer() {
       <div className="mx-auto flex max-w-(--maxw) flex-col items-center justify-between gap-s4 border-t border-[color:var(--line)] px-(--gutter) py-s5 text-[length:var(--fs-small)] text-text-3 sm:flex-row">
         <p>&copy; 2026 FS Orbit. Todos los derechos reservados.</p>
         <div className="flex items-center gap-s2">
-          <span className="size-1.5 rounded-full bg-signal" style={{ boxShadow: '0 0 8px var(--signal-a48)' }} />
+          <span className="size-1.5 rounded-full bg-signal" style={{ boxShadow: '0 0 4px var(--signal-a24)' }} />
           Sistemas Operativos Online
         </div>
       </div>

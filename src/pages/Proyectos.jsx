@@ -102,7 +102,7 @@ function ProjectBlock({ project, even, onOpen }) {
           }}
           className="inline-flex items-center gap-s2 rounded-r2 bg-signal px-s5 py-s4 font-mono text-[length:var(--fs-mono)] font-bold uppercase tracking-[var(--tr-mono)] text-signal-ink"
           style={{ display: 'inline-flex', boxShadow: 'none', transition: 'box-shadow 300ms ease-out' }}
-          onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 8px 32px rgba(34, 228, 245, 0.24)'}
+          onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 6px 16px rgba(34, 228, 245, 0.14)'}
           onMouseLeave={(e) => e.currentTarget.style.boxShadow = 'none'}
         >
           Ejecutar Proyecto

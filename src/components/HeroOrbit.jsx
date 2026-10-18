@@ -90,8 +90,8 @@ export default function HeroOrbit() {
       ctx.beginPath();
       ctx.arc(px, py, orbit.glow ? 2.6 : 1.8, 0, TAU);
       ctx.fillStyle = orbit.glow ? '#22E4F5' : '#EDF0F6';
-      ctx.shadowBlur = 12;
-      ctx.shadowColor = orbit.glow ? 'rgba(34, 228, 245, .8)' : 'rgba(237, 240, 246, .5)';
+      ctx.shadowBlur = 6;
+      ctx.shadowColor = orbit.glow ? 'rgba(34, 228, 245, .45)' : 'rgba(237, 240, 246, .35)';
       ctx.fill();
 
       ctx.restore();
@@ -122,8 +122,8 @@ export default function HeroOrbit() {
       ctx.beginPath();
       ctx.arc(cx, cy, unit * 0.02, 0, TAU);
       ctx.fillStyle = 'rgba(34, 228, 245, .95)';
-      ctx.shadowBlur = 14;
-      ctx.shadowColor = 'rgba(34, 228, 245, .6)';
+      ctx.shadowBlur = 7;
+      ctx.shadowColor = 'rgba(34, 228, 245, .35)';
       ctx.fill();
       ctx.shadowBlur = 0;
 

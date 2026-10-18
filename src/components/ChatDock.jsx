@@ -31,7 +31,7 @@ function ChatPanel({ panelRef, setOpen }) {
     <>
       <div className="flex items-center justify-between gap-s3 border-b border-[color:var(--line)] p-s5">
         <div className="flex items-center gap-s3">
-          <span className="size-2 rounded-full bg-signal" style={{ boxShadow: '0 0 8px var(--signal-a48)' }} />
+          <span className="size-2 rounded-full bg-signal" style={{ boxShadow: '0 0 4px var(--signal-a24)' }} />
           <div>
             <p className="font-display text-sm font-bold text-text">FS Orbit Assistant</p>
             <p className="text-[length:var(--fs-small)] text-text-3">Online • Respuesta inmediata</p>
@@ -121,7 +121,7 @@ export default function ChatDock() {
         aria-label={open ? 'Cerrar chat' : 'Abrir chat'}
         aria-expanded={open}
         className="relative grid size-14 place-items-center rounded-full bg-signal text-signal-ink transition-transform hover:scale-105"
-        style={{ boxShadow: '0 0 24px var(--signal-a48)' }}
+        style={{ boxShadow: '0 0 12px var(--signal-a24)' }}
       >
         <Icon name="chat" className="text-xl" />
         {!open && (

@@ -11,12 +11,36 @@
 // version mayor solo para encajar con el prerender era mas riesgo que
 // este script. Ver AUDITORIA.md.
 import { preview } from 'vite';
-import puppeteer from 'puppeteer';
 import { writeFile, mkdir } from 'node:fs/promises';
 import path from 'node:path';
 import { routes } from '../src/seo/routes.js';
 
 const PORT = 4321;
+
+// En Vercel (process.env.VERCEL) el contenedor de build no tiene las
+// librerias de sistema que el Chromium que trae `puppeteer` necesita
+// (fallaba incluso con --no-sandbox: "No usable sandbox" primero,
+// y la causa real detras era esta). `puppeteer-core` + el binario de
+// `@sparticuz/chromium` resuelve esto: es el mismo Chromium pero
+// compilado estatico para entornos tipo Lambda/build de Vercel, sin
+// depender de libs del sistema. En local (Windows, con privilegios)
+// se sigue usando el `puppeteer` normal con su propio Chromium.
+async function launchBrowser() {
+  if (process.env.VERCEL) {
+    const [{ default: puppeteer }, { default: chromium }] = await Promise.all([
+      import('puppeteer-core'),
+      import('@sparticuz/chromium'),
+    ]);
+    return puppeteer.launch({
+      args: chromium.args,
+      executablePath: await chromium.executablePath(),
+      headless: true,
+    });
+  }
+
+  const { default: puppeteer } = await import('puppeteer');
+  return puppeteer.launch({ headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox'] });
+}
 
 async function waitForBoot(page) {
   // Espera a que el preloader (src/components/Preloader.jsx) termine su
@@ -33,15 +57,7 @@ async function main() {
   const server = await preview({ preview: { port: PORT, strictPort: true, host: '127.0.0.1' } });
   const base = `http://127.0.0.1:${PORT}`;
 
-  // --no-sandbox/--disable-setuid-sandbox: el contenedor de build de
-  // Vercel corre como usuario sin privilegios y sin el namespace de
-  // kernel que el sandbox de Chromium necesita — sin estos flags
-  // puppeteer.launch() falla ahi con "No usable sandbox" aunque en
-  // local (Windows/con privilegios) funcione sin problema.
-  const browser = await puppeteer.launch({
-    headless: true,
-    args: ['--no-sandbox', '--disable-setuid-sandbox'],
-  });
+  const browser = await launchBrowser();
 
   try {
     const page = await browser.newPage();

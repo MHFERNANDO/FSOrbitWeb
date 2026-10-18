@@ -1,17 +1,20 @@
 User-agent: *
 Allow: /
-Disallow: /admin
-Disallow: *.pdf
-Disallow: /private
+Disallow: /*.pdf$
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
 
 Sitemap: https://fsorbit.com/sitemap.xml
-
-# Google-specific directives
-User-agent: Googlebot
-Allow: /
-Crawl-delay: 0
-
-# Bing-specific directives
-User-agent: Bingbot
-Allow: /
-Crawl-delay: 1

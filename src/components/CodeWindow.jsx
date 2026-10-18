@@ -16,7 +16,7 @@ const LINES = [
 const CLASS_COLOR = {
   keyword: 'text-[#C792EA]',
   variable: 'text-text',
-  string: 'text-signal',
+  string: 'text-[#8FD6A8]',
   boolean: 'text-[#7FB3FF]',
   function: 'text-[#FFD479]',
   punct: 'text-text-3',
@@ -70,7 +70,7 @@ export default function CodeWindow() {
       <pre className="overflow-x-auto p-s6 font-mono text-[length:var(--fs-small)] leading-[1.7]">
         <code style={{ counterReset: 'line' }}>
           {LINES.map((line, li) => (
-            <span key={li} className="relative block whitespace-pre pl-[62px] before:absolute before:left-0 before:w-11 before:text-right before:text-text-4 before:content-[counter(line,decimal-leading-zero)]" style={{ counterIncrement: 'line' }}>
+            <span key={li} className="relative block whitespace-pre pl-[62px] before:absolute before:left-0 before:w-11 before:text-right before:text-text-3 before:content-[counter(line,decimal-leading-zero)]" style={{ counterIncrement: 'line' }}>
               {line.map((tok, ti) => {
                 const start = consumed;
                 consumed += tok.t.length;

@@ -4,8 +4,17 @@
 export const contact = {
   whatsappSales: '593983113942',
   whatsappSupport: '593987582463',
+  // Mismo numero de ventas, para el link tel: del header/footer (el
+  // cliente confirmo que no hay otra linea fija).
+  tel: '+593983113942',
+  telDisplay: '+593 98 311 3942',
   email: 'fsorbitt@gmail.com',
   instagram: 'https://www.instagram.com/fs_orbit/',
+  // Base en Cuenca, pero el cliente atiende cualquier ubicacion (no solo
+  // Azuay/Cuenca) — confirmado, no hay direccion publica de oficina.
+  city: 'Cuenca',
+  region: 'Azuay',
+  country: 'Ecuador',
 };
 
 export const services = [
@@ -106,19 +115,32 @@ export const pricingPlans = [
   },
 ];
 
+// Dimensiones reales de cada PNG en public/assets (leidas del header del
+// archivo) — se usan como width/height en <img> para que el navegador
+// reserve el espacio antes de que cargue la imagen y no haya salto de
+// layout (CLS), ademas de lo que ya hace aspect-* en las clases.
+const IMG_SIZE = {
+  GravityPreview: { w: 1918, h: 927 },
+  AccuLabPreview: { w: 1902, h: 930 },
+  JFVapesPreview: { w: 1893, h: 885 },
+  LabDieselPreview: { w: 1896, h: 908 },
+};
+
 // Portada (index) — solo los dos destacados
 export const featuredWork = [
   {
     title: 'Acculab',
     tag: 'Plataforma de Análisis Clínicos',
     img: 'AccuLabPreview',
+    ...IMG_SIZE.AccuLabPreview,
     alt: 'Acculab - Plataforma Médica',
-    url: 'https://acculab.vercel.app/index.html',
+    url: 'https://acculab.bio',
   },
   {
     title: 'Gravity Studio',
     tag: 'Landing Page',
     img: 'GravityPreview',
+    ...IMG_SIZE.GravityPreview,
     alt: 'Gravity Studio - Landing Page',
     url: 'https://gravityestudiocreativo.com',
   },
@@ -127,38 +149,46 @@ export const featuredWork = [
 // Galeria completa (proyectos) — orden y datos identicos al HTML original
 export const projects = [
   {
+    slug: 'gravity-studio',
     code: '// 01_GRAVITY_STUDIO',
     title: 'Gravity Studio',
     description: 'Landing Page',
     tags: ['JS_ENGINE', 'MARKETING'],
     img: 'GravityPreview',
+    ...IMG_SIZE.GravityPreview,
     alt: 'Gravity Studio',
     url: 'https://gravityestudiocreativo.com',
   },
   {
+    slug: 'acculab-system',
     code: '// 02_ACCULAB_SYSTEM',
     title: 'Acculab System',
     description: 'Arquitectura médica de misión crítica optimizada para datos en tiempo real.',
     tags: ['JS_ENGINE', 'HEALTH_TECH'],
     img: 'AccuLabPreview',
+    ...IMG_SIZE.AccuLabPreview,
     alt: 'Acculab',
-    url: 'https://acculab.vercel.app/index.html',
+    url: 'https://acculab.bio',
   },
   {
+    slug: 'jf-vapes-store',
     code: '// 03_JF_VAPES_STORE',
     title: 'JF Vapes Store',
     description: 'E-commerce de alto impacto diseñado para la máxima conversión móvil.',
     tags: ['ECOMMERCE', 'UI_PRECISION'],
     img: 'JFVapesPreview',
+    ...IMG_SIZE.JFVapesPreview,
     alt: 'JF Vapes',
     url: 'https://jf-vapes-pagina-web-w6bo.vercel.app',
   },
   {
+    slug: 'laboratorio-diesel-mg',
     code: '// 04_LAB_DIESEL_MG',
     title: 'Laboratorio Diesel MG',
     description: 'Plataforma web especializada para servicios de laboratorio e inyección diésel.',
     tags: ['CORPORATIVE', 'AUTOMOTIVE'],
     img: 'LabDieselPreview',
+    ...IMG_SIZE.LabDieselPreview,
     alt: 'Laboratorio Diesel MG',
     url: 'https://laboratorio-diesel-mg.vercel.app/',
   },

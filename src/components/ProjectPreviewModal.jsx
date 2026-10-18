@@ -59,7 +59,7 @@ export function ProjectPreviewProvider({ children }) {
         <a
           href={url}
           target="_blank"
-          rel="noopener"
+          rel="noopener noreferrer"
           className="inline-flex items-center gap-s2 rounded-r2 bg-signal px-s5 py-s3 font-mono text-[length:var(--fs-mono)] font-bold uppercase tracking-[var(--tr-mono)] text-signal-ink"
         >
           Visitar Web Oficial

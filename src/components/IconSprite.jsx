@@ -68,6 +68,17 @@ export default function IconSprite() {
         <rect x="2.5" y="5" width="19" height="14" rx="1.5" />
         <path d="m3.2 6.4 8.8 6.4 8.8-6.4" />
       </symbol>
+      <symbol id="i-pin" viewBox="0 0 24 24">
+        <path d="M12 21.4s7-6.4 7-12A7 7 0 0 0 5 9.4c0 5.6 7 12 7 12Z" />
+        <circle cx="12" cy="9.4" r="2.6" />
+      </symbol>
+      <symbol id="i-phone" viewBox="0 0 24 24">
+        <path d="M5.2 3.6h3.4l1.4 4.4-2.1 1.6a12.4 12.4 0 0 0 5.5 5.5l1.6-2.1 4.4 1.4v3.4c0 1-.9 1.8-1.9 1.6-4-.7-7.7-2.6-10.5-5.4C4.2 11.3 2.3 7.6 1.6 3.6c-.2-1 .6-1.9 1.6-1.9Z" />
+      </symbol>
+      <symbol id="i-clock" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="9" />
+        <path d="M12 7v5.3l3.6 2.1" />
+      </symbol>
     </svg>
   );
 }

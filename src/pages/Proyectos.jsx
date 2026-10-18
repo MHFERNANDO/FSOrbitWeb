@@ -6,16 +6,24 @@ import Icon from '@/components/Icon';
 import { useParallax } from '@/hooks/useParallax';
 import { useProjectPreview } from '@/components/ProjectPreviewModal';
 import { useSeo } from '@/hooks/useSeo';
+import { breadcrumbs, projectList } from '@/seo/jsonld';
 import { projects } from '@/data/content';
 
 const EASE_OUT = [0.22, 1, 0.36, 1];
 
 export default function Proyectos() {
   useSeo({
-    title: 'Proyectos | FS Orbit — Casos de Ingeniería Web',
+    title: 'Proyectos | FS Orbit — Desarrollo Web en Cuenca, Ecuador',
     description:
-      'Portafolio de FS Orbit: landing pages, e-commerce y aplicaciones web desarrolladas a medida en Ecuador. Casos reales con arquitectura escalable y rendimiento optimizado.',
+      'Portafolio de FS Orbit: landing pages, e-commerce y aplicaciones web desarrolladas a medida desde Cuenca, Ecuador. Casos reales con arquitectura escalable y rendimiento optimizado.',
     path: '/proyectos',
+    jsonLd: [
+      breadcrumbs([
+        { name: 'Inicio', path: '/' },
+        { name: 'Proyectos', path: '/proyectos' },
+      ]),
+      projectList(projects.map((p) => ({ title: p.title, description: p.description, path: `/proyectos/${p.slug}`, img: p.img }))),
+    ],
   });
   const preview = useProjectPreview();
 
@@ -29,7 +37,7 @@ export default function Proyectos() {
         <Reveal
           as="span"
           type="fade"
-          className="mb-s5 inline-flex items-center font-mono text-[length:var(--fs-mono)] tracking-[.1em] text-signal after:ml-1.5 after:h-[1.05em] after:w-[7px] after:animate-[caret_1.05s_steps(2)_infinite] after:bg-signal"
+          className="mb-s5 inline-flex items-center font-mono text-[length:var(--fs-mono)] tracking-[.1em] text-text-3 after:ml-1.5 after:h-[1.05em] after:w-[7px] after:animate-[caret_1.05s_steps(2)_infinite] after:bg-text-3"
         >
           &gt; fs_orbit --fetch-projects --active
         </Reveal>
@@ -62,6 +70,8 @@ function ProjectBlock({ project, even, onOpen }) {
         <img
           src={`/assets/${project.img}.png`}
           alt={project.alt}
+          width={project.w}
+          height={project.h}
           loading="lazy"
           decoding="async"
           className="h-[106%] w-full object-cover object-top saturate-[.7] contrast-[1.03] brightness-[.94] transition-[transform,filter] duration-1000 group-hover:scale-[1.04] group-hover:saturate-100 group-hover:contrast-100 group-hover:brightness-100"
@@ -95,14 +105,14 @@ function ProjectBlock({ project, even, onOpen }) {
         <a
           href={project.url}
           target="_blank"
-          rel="noopener"
+          rel="noopener noreferrer"
           onClick={(e) => {
             e.preventDefault();
             onOpen?.(project.url);
           }}
           className="inline-flex items-center gap-s2 rounded-r2 bg-signal px-s5 py-s4 font-mono text-[length:var(--fs-mono)] font-bold uppercase tracking-[var(--tr-mono)] text-signal-ink"
           style={{ display: 'inline-flex', boxShadow: 'none', transition: 'box-shadow 300ms ease-out' }}
-          onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 8px 32px rgba(198, 242, 78, 0.24)'}
+          onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 4px 14px var(--signal-a08)'}
           onMouseLeave={(e) => e.currentTarget.style.boxShadow = 'none'}
         >
           Ejecutar Proyecto

@@ -97,7 +97,7 @@ export default function Preloader({ onDone }) {
             strokeDasharray="126"
             strokeDashoffset="126"
             className="origin-[30px_30px] animate-[preloaderTrack_1.6s_var(--e-io)_infinite]"
-            style={{ filter: 'drop-shadow(0 0 6px var(--signal-a48))' }}
+            style={{ filter: 'drop-shadow(0 0 3px var(--signal-a12))' }}
           />
           <circle
             cx="30"
@@ -105,7 +105,7 @@ export default function Preloader({ onDone }) {
             r="2.6"
             fill="var(--color-signal)"
             className="origin-[30px_10px] animate-[preloaderCore_1.6s_var(--e-io)_infinite]"
-            style={{ filter: 'drop-shadow(0 0 8px var(--signal-a48))' }}
+            style={{ filter: 'drop-shadow(0 0 4px var(--signal-a12))' }}
           />
         </svg>
 
@@ -113,16 +113,16 @@ export default function Preloader({ onDone }) {
           <span className="min-w-[15ch] text-[length:var(--fs-mono)] uppercase tracking-[var(--tr-mono)] text-text-3">
             {status}
           </span>
-          <span className="text-[length:var(--fs-h4)] tabular-nums tracking-[.04em] text-signal">
+          <span className="text-[length:var(--fs-h4)] tabular-nums tracking-[.04em] text-text">
             {String(Math.round(progress * 100)).padStart(3, '0')}
-            <span className="ml-0.5 text-[.6em] text-text-4">%</span>
+            <span className="ml-0.5 text-[.6em] text-text-3">%</span>
           </span>
         </div>
 
         <div className="h-px w-[min(220px,42vw)] overflow-hidden bg-[color:var(--line)]">
           <span
-            className="block h-full origin-left bg-signal"
-            style={{ transform: `scaleX(${progress})`, boxShadow: '0 0 8px var(--signal-a48)' }}
+            className="block h-full origin-left bg-[color:var(--line-2)]"
+            style={{ transform: `scaleX(${progress})` }}
           />
         </div>
       </div>

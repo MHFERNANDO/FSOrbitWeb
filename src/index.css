@@ -19,25 +19,41 @@
    clases de Tailwind.
    ========================================================================== */
 @theme {
-  /* --- Superficies: tinta azulada, nunca negro puro --- */
-  --color-ink-1000: #050609;
-  --color-ink-900: #07080c;
-  --color-ink-850: #0a0b10;
-  --color-ink-800: #0d0f15;
-  --color-ink-750: #11141b;
-  --color-ink-700: #161a23;
-  --color-ink-600: #1e232e;
+  /* --- Superficies: tinta neutra, nunca negro puro. Valores del sistema
+     de tokens --bg/--surface-1/--surface-2 (ver AUDITORIA.md "Paleta —
+     reduccion del acento cian"). ink-850/750/700/600 son pasos
+     intermedios interpolados, no vienen del spec pero mantienen la
+     escalera de elevacion que ya usaban los componentes. --- */
+  --color-ink-1000: #0b0d10; /* --bg */
+  --color-ink-900: #121417; /* --surface-1: tarjetas, bloques */
+  --color-ink-850: #15171b;
+  --color-ink-800: #171a1e; /* --surface-2: tarjetas elevadas / hover */
+  --color-ink-750: #1b1e22;
+  --color-ink-700: #202327;
+  --color-ink-600: #2a2d32;
 
-  /* --- Texto --- */
-  --color-text: #edf0f6;
-  --color-text-2: #a3acbc;
-  --color-text-3: #7b8494;
-  --color-text-4: #575f6e;
+  /* --- Texto: nunca blanco/negro puro. Los valores exactos que pedia el
+     spec (--text-secondary #7d8187, --text-muted #55595e) fallan AA
+     (< 4.5:1) contra las superficies de tarjeta mas claras del sitio
+     (bg-ink-800 #171a1e: ChatDock, CodeWindow, tarjetas de precios).
+     Se ajustaron ambos un poco mas claros para que pasen 4.5:1 incluso
+     ahi — contraste verificado contra --bg, --color-ink-900 y
+     --color-ink-800 (ver AUDITORIA.md, nunca baja de 4.5:1 en ningun
+     caso real del sitio). --color-text-4 queda definido pero sin uso
+     en texto legible: no pasa AA ni siquiera contra --bg. --- */
+  --color-text: #d4d7db; /* --text-primary: 12.09-13.47:1 */
+  --color-text-2: #868a90; /* --text-secondary (ajustado): 5.03-5.61:1 */
+  --color-text-3: #808488; /* --text-muted (ajustado): 4.63-5.16:1 */
+  --color-text-4: #5b5f65; /* reservado, NO usar para texto: no pasa AA */
 
-  /* --- Senal: se usa en ~5% de la superficie. Nunca como relleno --- */
-  --color-signal: #c6f24e;
-  --color-signal-2: #a9d638;
-  --color-signal-ink: #090c03;
+  /* --- Acento: EXCLUSIVAMENTE el cian del logo (#22e4f5), reservado a
+     2-3 puntos de atencion por pantalla — nunca fondo, nunca borde
+     grueso, nunca glow difuminado en reposo. Ya no hay variante
+     secundaria de cian (--color-signal-2 se elimino): un solo tono, sin
+     gradaciones de marca. --color-signal-ink es el texto que va SOBRE
+     un relleno de acento (variante --filled del CTA, ver abajo). --- */
+  --color-signal: #22e4f5;
+  --color-signal-ink: #06262a;
   --color-warn: #ff7a4d;
 
   /* --- Tipografia --- */
@@ -70,14 +86,19 @@
    como variables CSS planas — igual que en la version estatica.
    -------------------------------------------------------------------------- */
 :root {
-  --line: rgba(255, 255, 255, .075);
-  --line-2: rgba(255, 255, 255, .13);
-  --line-3: rgba(255, 255, 255, .24);
+  /* --border / --border-strong: antes hairlines con alpha sobre blanco
+     (rgba(255,255,255,X)); ahora colores solidos propios, como pide el
+     sistema de tokens nuevo — un borde ya no se "enciende" solo por
+     subir la opacidad de blanco, es un color de superficie en si. */
+  --line: #1c2024; /* --border */
+  --line-2: #272c31; /* --border-strong */
 
-  --signal-a06: rgba(198, 242, 78, .06);
-  --signal-a12: rgba(198, 242, 78, .12);
-  --signal-a24: rgba(198, 242, 78, .24);
-  --signal-a48: rgba(198, 242, 78, .48);
+  /* --- Acento: solo queda el glow minimo (--accent-glow), para el
+     hover del CTA principal, y a12 para el estado "seleccionado" de un
+     control (ver AdvisorModal). a24/a48 (glow amplio) se eliminaron —
+     ningun box-shadow/drop-shadow del acento debe pasar de esto. --- */
+  --signal-a08: rgba(34, 228, 245, .08); /* --accent-glow */
+  --signal-a12: rgba(34, 228, 245, .12);
   --warn-a12: rgba(255, 122, 77, .12);
 
   --fs-micro: .625rem;
@@ -164,6 +185,42 @@
    es "sin capa alguna", que en cascade layers siempre gana. */
 @layer base {
 
+/* Fuentes autoalojadas (public/fonts/, descargadas de Google Fonts):
+   antes se pedian via <link> a fonts.googleapis.com en index.html —
+   una conexion cross-origin extra (DNS+TLS) solo para arrancar la
+   descarga de la fuente, bloqueando el primer pintado de texto.
+   Subset "latin" unicamente (cubre español: ñ, vocales acentuadas,
+   todo dentro de U+0000-00FF) en vez de los 6-10 subsets que Google
+   sirve por defecto (cirilico, vietnamita, griego...) que este sitio
+   nunca necesita. */
+@font-face {
+  font-family: "Archivo";
+  font-style: normal;
+  font-weight: 400 900;
+  font-stretch: 85% 118%;
+  font-display: swap;
+  src: url("/fonts/archivo-variable-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122;
+}
+
+@font-face {
+  font-family: "Instrument Sans";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("/fonts/instrument-sans-variable-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122;
+}
+
+@font-face {
+  font-family: "JetBrains Mono";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("/fonts/jetbrains-mono-variable-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122;
+}
+
 /* Metricas de respaldo: evitan el salto de layout mientras cargan las
    fuentes variables (el navegador reserva el mismo alto). */
 @font-face {
@@ -203,7 +260,9 @@ body {
   overflow-x: clip;
   min-height: 100svh;
   scrollbar-width: thin;
-  scrollbar-color: var(--color-signal) transparent;
+  /* Barra de scroll neutra: es chrome persistente, visible todo el
+     tiempo, no uno de los 2-3 puntos de atencion de la pantalla. */
+  scrollbar-color: var(--color-ink-600) transparent;
 }
 
 /* Scrollbar styles for Chrome, Edge, Safari */
@@ -216,14 +275,14 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--color-signal);
+  background: var(--color-ink-600);
   border-radius: 6px;
   border: 2px solid transparent;
   background-clip: padding-box;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-signal-2);
+  background: var(--line-2);
   background-clip: padding-box;
 }
 
@@ -324,7 +383,7 @@ h4 {
 }
 
 ::selection {
-  background: var(--signal-a24);
+  background: var(--signal-a12);
   color: var(--color-text);
 }
 

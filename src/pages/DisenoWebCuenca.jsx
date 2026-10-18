@@ -32,12 +32,12 @@ export default function DisenoWebCuenca() {
           answer: 'El plan de entrada (Orbit Impact, una landing page) parte desde $200. Ver /precios para el detalle completo de qué incluye cada plan.',
         },
         {
-          question: '¿Cuánto tiempo toma el desarrollo?',
-          answer: '{{TODO: tiempo de entrega real por plan — pendiente de confirmar con el cliente}}',
+          question: '¿El sitio se ve bien en celular?',
+          answer: 'Sí, cada plan incluye diseño responsive: la web se adapta a celular, tablet y escritorio desde el primer día, no como un ajuste posterior.',
         },
         {
-          question: '¿Puedo editar el contenido yo mismo después de la entrega?',
-          answer: '{{TODO: confirmar con el cliente si se entrega algún panel de edición o el contenido es fijo}}',
+          question: '¿Qué pasa si necesito cambios después de la entrega?',
+          answer: 'Podés pedirnos ajustes puntuales o contratar Mantenimiento Web: parches de seguridad, soporte técnico y backup diario, para que el sitio se mantenga actualizado.',
         },
       ]}
       ctaWhatsappText="Quiero cotizar una página web en Cuenca"

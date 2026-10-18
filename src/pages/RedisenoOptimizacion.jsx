@@ -28,12 +28,12 @@ export default function RedisenoOptimizacion() {
           answer: 'Parches de seguridad, soporte técnico y backup diario, para que tu sitio nunca deje de estar online.',
         },
         {
-          question: '¿Cómo saben si mi web necesita optimización?',
-          answer: '{{TODO: describir el proceso real de auditoría/diagnóstico que usa el cliente, si lo tiene}}',
+          question: '¿Pierdo mi diseño actual al optimizar?',
+          answer: 'No. Mejoramos el código y el rendimiento manteniendo tu identidad visual — no es empezar de cero, es resolver lo que te está frenando.',
         },
         {
-          question: '¿Cuánto cuesta rediseñar mi página actual?',
-          answer: '{{TODO: el precio de rediseño no está en los planes publicados (Orbit Impact/Commerce/Deep Space) — confirmar si aplica alguno de esos o es cotización aparte}}',
+          question: '¿Qué tipo de problemas resuelven?',
+          answer: 'Carga lenta, código desordenado, mala experiencia en celular y plugins pesados — los más comunes en sitios hechos con builders o sin mantenimiento.',
         },
       ]}
       ctaWhatsappText="Quiero optimizar mi página web actual"

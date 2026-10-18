@@ -28,16 +28,16 @@ export default function TiendasOnline() {
           answer: 'El plan Orbit Commerce (hasta 4 vistas, tienda completa) parte desde $500. Ver /precios para el detalle de qué incluye.',
         },
         {
-          question: '¿Incluye pasarela de pago?',
-          answer: '{{TODO: confirmar qué pasarelas de pago soporta el plan Orbit Commerce, o si por defecto es pedido vía WhatsApp}}',
+          question: '¿Cómo reciben los pedidos mis clientes?',
+          answer: 'El plan Orbit Commerce incluye un botón de pedido directo a WhatsApp. Si tu negocio necesita una pasarela de pago integrada, se cotiza aparte según el caso.',
         },
         {
           question: '¿Puedo gestionar yo el inventario?',
           answer: 'Sí, el plan incluye panel de gestión de inventario y capacitación de uso de la plataforma.',
         },
         {
-          question: '¿Cuánto tiempo toma lanzar la tienda?',
-          answer: '{{TODO: tiempo de entrega real — pendiente de confirmar con el cliente}}',
+          question: '¿Puedo empezar con un catálogo chico e ir agregando productos?',
+          answer: 'Sí, el catálogo es dinámico: podés lanzar con los productos que tengas listos y agregar o editar el resto después.',
         },
       ]}
       ctaWhatsappText="Quiero cotizar una tienda online"

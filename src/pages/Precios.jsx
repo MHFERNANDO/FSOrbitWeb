@@ -18,12 +18,12 @@ const faq = [
     answer: 'Es el precio base del plan. El costo final depende del alcance exacto del proyecto (número de vistas, integraciones, contenido).',
   },
   {
-    question: '¿Qué formas de pago aceptan?',
-    answer: '{{TODO: confirmar formas de pago reales (transferencia, tarjeta, etc.)}}',
+    question: '¿Qué pasa si mi proyecto no encaja en ninguno de estos 3 planes?',
+    answer: 'Nos escribís contándonos qué necesitás y lo cotizamos a medida — los planes son un punto de partida, no un molde cerrado.',
   },
   {
-    question: '¿El dominio y el hosting están incluidos?',
-    answer: '{{TODO: confirmar si el dominio/hosting corren por cuenta del cliente o están incluidos en algún plan}}',
+    question: '¿Puedo empezar con un plan y crecer después?',
+    answer: 'Sí. Es común arrancar con Orbit Impact y escalar a Orbit Commerce o a un sistema a medida (Deep Space System) cuando el negocio lo pide.',
   },
 ];
 

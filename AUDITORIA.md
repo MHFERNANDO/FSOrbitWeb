@@ -159,9 +159,46 @@ Commit en `rediseno-seo-geo` sobre el mismo trabajo de Fase 2.
 
 **Verificado**: build completo (`vite build` + prerender + sitemap) pasa; `dist/index.html` confirma título unificado, `og:image` apuntando a `og-image.png`, sin `meta keywords` ni `twitter:creator`.
 
-## 8. Checklist de acciones fuera del código (para ti)
+## 8. Fase 2 — Contenido: rutas nuevas, casos de estudio, formulario de contacto (implementado)
+
+Build verificado completo (9 rutas + 404, todas con contenido real en el HTML crudo, sin ejecutar JS — ver tabla abajo). Commits en `rediseno-seo-geo`.
+
+**Rutas nuevas** (todas con su propio `<title>`, `canonical`, meta description, OG/Twitter y JSON-LD — via `useSeo` extendido, ver abajo):
+
+| Ruta | Palabras en HTML crudo | Contenido |
+|---|---|---|
+| `/servicios/diseno-web-cuenca` | 267 (5× "Cuenca") | Landing local principal. Reutiliza las descripciones reales de "Desarrollo Web" y "Diseño UI/UX" de `content.js`. |
+| `/servicios/tiendas-online` | 238 | Reutiliza la descripción real de "E-commerce" + features del plan Orbit Commerce. |
+| `/servicios/rediseno-y-optimizacion` | 248 | Reutiliza "Optimización & Upgrade" + "Mantenimiento Web". |
+| `/precios` | 310 | Los 3 planes reales (`pricingPlans` de `content.js`), misma data que ya se mostraba en home, ahora con URL propia. |
+| `/proyectos/<slug>` ×4 | 106–138 c/u | Caso de estudio por proyecto: Problema / Solución / Resultado. "Solución" reutiliza la descripción real ya aprobada; "Problema" y "Resultado" quedan en `{{TODO}}` visible en la página — no hay esos datos en ningún lado del repo y el cliente no los dio. |
+| `/contacto` | 136 | WhatsApp, `tel:`, `mailto:`, zona de servicio ("Cuenca, Azuay — proyectos en todo Ecuador") + formulario. |
+| `/404` (y ruta `*`) | 106, `noindex` | Página de error real y útil, con enlaces a cada servicio, precios, proyectos y contacto. Generada también como `dist/404.html` para que Vercel la sirva en cualquier URL sin match. |
+
+**Arquitectura compartida**: las 3 landings de servicios usan una plantilla común (`src/pages/ServicePage.jsx`) para no triplicar el layout — cada página solo aporta datos (título, intro, highlights, FAQ). El resto (Home, Proyectos, Precios, Contacto, detalle de proyecto, 404) son páginas propias.
+
+**`useSeo` extendido** ([src/hooks/useSeo.js](src/hooks/useSeo.js)): ahora además de title/canonical/description acepta `jsonLd` (inyecta/limpia un `<script type="application/ld+json">` por ruta) y `noindex` (fuerza `robots: noindex, follow` y lo restaura al desmontar — usado solo en 404). Los helpers para armar `BreadcrumbList`, `Service` y `FAQPage` sin repetir boilerplate están en `src/seo/jsonld.js`. El `Organization` global (con telephone/geo/sameAs reales) sigue viviendo en `index.html`, compartido por todas las rutas.
+
+**FAQ**: cada pregunta con dato real de `content.js` se contestó con ese dato (SEO incluido, qué cubre el mantenimiento, precio desde, gestión de inventario). Las que no tienen dato en el repo (tiempos de entrega, formas de pago, dominio/hosting, pasarela de pago, si el contenido es editable) quedan como `{{TODO: ...}}` visible en la página — no se inventó ninguna respuesta.
+
+**Navegación interna**: el footer ahora tiene una columna "Enlaces" a las 3 landings de servicios, precios, proyectos y contacto (antes el footer no enlazaba a nada de esto). El botón "Hablemos" del navbar (desktop y drawer móvil) pasó de hacer scroll a un ancla `#contacto` en el footer a navegar de verdad a `/contacto` — la página con el formulario real. El navbar ganó un link a "Precios".
+
+**Formulario de contacto** ([src/pages/Contacto.jsx](src/pages/Contacto.jsx) + [api/contact.js](api/contact.js)): nombre, negocio, tipo de proyecto, presupuesto aproximado y mensaje (los campos que pediste), con honeypot (campo `website` oculto por CSS, invisible para una persona) y estado de éxito/error claro en el cliente.
+- El endpoint es una Vercel Serverless Function en `/api/contact` (Node.js, detectada automáticamente por estar en `/api`). Valida campos, descarta honeypot, aplica un rate-limit best-effort en memoria por IP (3 envíos/minuto) y reenvía el mensaje por email usando la API REST de Resend — un solo `fetch`, sin librería adicional.
+- **El email destino nunca se expone al cliente**: solo existe en la variable de entorno `CONTACT_TO_EMAIL` del servidor. El HTML/JS que se sirve al navegador no lo contiene en ningún lado.
+- `{{TODO: configurar en Vercel las variables de entorno RESEND_API_KEY y CONTACT_TO_EMAIL antes de que el formulario funcione en producción}}`. Sin `RESEND_API_KEY`, el endpoint responde 500 con un error claro (no falla en silencio).
+- `{{TODO: verificar el dominio fsorbit.com en la cuenta de Resend}}` — el `from` del email es `web@fsorbit.com`; Resend rechaza el envío si ese dominio no está verificado en la cuenta. Sin verificar, hay que usar temporalmente `onboarding@resend.dev` como `from` (Resend lo permite en modo sandbox, solo entregando al email del dueño de la cuenta).
+- **Limitación conocida y documentada**: el rate-limit vive en memoria dentro de la función — no es compartido entre instancias paralelas de Vercel ni sobrevive a un cold start. Es una segunda barrera además del honeypot, no una protección robusta contra spam a volumen. Si hace falta algo más serio, la migración natural es `@vercel/kv` o Upstash para un contador compartido — no se agregó en esta sesión para no sumar otra pieza de infraestructura sin que la pidieras.
+
+**Nuevo**: 2 íconos agregados al sprite (`pin`, `phone`) para los datos de contacto; `clock` también quedó disponible aunque no se usa todavía (no hay horario que mostrar).
+
+**Bug propio detectado y corregido durante esta fase**: al agregar las rutas nuevas, un `useNavigate` quedó usado en `Navbar.jsx` sin su import (lo había quitado al simplificar el botón "Hablemos") — tiraba abajo toda la SPA (pantalla en negro, cero contenido en todas las rutas). Se detectó porque el build volvió a dar 0 palabras en *todas* las rutas prerenderizadas, no solo una — la auditoría de palabras por ruta (ver tabla arriba) sirvió exactamente para lo que se diseñó: detectar esto antes de dar la fase por cerrada, no después.
+
+## 9. Checklist de acciones fuera del código (para ti)
 
 - Crear/optimizar Perfil de Empresa en Google (categoría "Diseñador de sitios web", Cuenca, fotos, reseñas reales).
 - Verificar en Google Search Console y Bing Webmaster Tools, enviar sitemap, pedir indexación.
 - Mismo nombre/ciudad/contacto (NAP) en Instagram, Facebook, LinkedIn y directorios locales.
 - Pedir a clientes (Accu-Lab, etc.) un enlace "Sitio desarrollado por FS Orbit" en su footer.
+- Crear una cuenta en [Resend](https://resend.com), verificar el dominio `fsorbit.com` y generar un API key.
+- En el proyecto de Vercel: agregar las variables de entorno `RESEND_API_KEY` y `CONTACT_TO_EMAIL` (el email donde quieres recibir los mensajes del formulario) — sin esto el formulario de `/contacto` no envía nada.

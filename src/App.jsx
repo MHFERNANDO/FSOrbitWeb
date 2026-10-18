@@ -10,6 +10,13 @@ import { AdvisorProvider } from './components/AdvisorModal';
 import { ProjectPreviewProvider } from './components/ProjectPreviewModal';
 import Home from './pages/Home';
 import Proyectos from './pages/Proyectos';
+import ProyectoDetalle from './pages/ProyectoDetalle';
+import DisenoWebCuenca from './pages/DisenoWebCuenca';
+import TiendasOnline from './pages/TiendasOnline';
+import RedisenoOptimizacion from './pages/RedisenoOptimizacion';
+import Precios from './pages/Precios';
+import Contacto from './pages/Contacto';
+import NotFound from './pages/NotFound';
 
 export default function App() {
   const [booted, setBooted] = useState(false);
@@ -35,6 +42,13 @@ export default function App() {
           <Routes location={location}>
             <Route path="/" element={<Home />} />
             <Route path="/proyectos" element={<Proyectos />} />
+            <Route path="/proyectos/:slug" element={<ProyectoDetalle />} />
+            <Route path="/servicios/diseno-web-cuenca" element={<DisenoWebCuenca />} />
+            <Route path="/servicios/tiendas-online" element={<TiendasOnline />} />
+            <Route path="/servicios/rediseno-y-optimizacion" element={<RedisenoOptimizacion />} />
+            <Route path="/precios" element={<Precios />} />
+            <Route path="/contacto" element={<Contacto />} />
+            <Route path="*" element={<NotFound />} />
           </Routes>
           <Footer />
           <ChatDock />

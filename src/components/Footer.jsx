@@ -1,18 +1,37 @@
+import { Link } from 'react-router-dom';
 import Icon from './Icon';
 import Reveal from './Reveal';
 import { contact } from '@/data/content';
 
+const FOOTER_LINKS = [
+  { to: '/servicios/diseno-web-cuenca', label: 'Diseño Web en Cuenca' },
+  { to: '/servicios/tiendas-online', label: 'Tiendas Online' },
+  { to: '/servicios/rediseno-y-optimizacion', label: 'Rediseño y Optimización' },
+  { to: '/precios', label: 'Precios' },
+  { to: '/proyectos', label: 'Proyectos' },
+  { to: '/contacto', label: 'Contacto' },
+];
+
 export default function Footer() {
   return (
-    <footer id="contacto" className="border-t border-[color:var(--line)]">
-      <div className="mx-auto grid max-w-(--maxw) gap-s8 px-(--gutter) py-s9 md:grid-cols-3">
+    <footer className="border-t border-[color:var(--line)]">
+      <div className="mx-auto grid max-w-(--maxw) gap-s8 px-(--gutter) py-s9 md:grid-cols-4">
         <Reveal as="div" type="rise" className="grid gap-s4">
           <img src="/assets/Logo.png" alt="FS Orbit" width={50} height={50} loading="lazy" decoding="async"
             className="h-[50px] w-[50px]" style={{ filter: 'brightness(0) invert(1)', opacity: 0.92 }} />
           <p className="max-w-[32ch] text-text-2">Transformando ideas en ecosistemas digitales de alto rendimiento.</p>
         </Reveal>
 
-        <Reveal as="div" type="rise" index={1} className="grid gap-s4">
+        <Reveal as="div" type="rise" index={1} className="grid content-start gap-s3">
+          <h4 className="font-display text-[length:var(--fs-h4)] font-extrabold">Enlaces</h4>
+          {FOOTER_LINKS.map((link) => (
+            <Link key={link.to} to={link.to} viewTransition className="text-text-2 transition-colors hover:text-signal">
+              {link.label}
+            </Link>
+          ))}
+        </Reveal>
+
+        <Reveal as="div" type="rise" index={2} className="grid gap-s4">
           <h4 className="font-display text-[length:var(--fs-h4)] font-extrabold">Contacto Directo</h4>
           <div className="grid gap-s3">
             {[
@@ -38,7 +57,7 @@ export default function Footer() {
           </div>
         </Reveal>
 
-        <Reveal as="div" type="rise" index={2} className="grid gap-s4">
+        <Reveal as="div" type="rise" index={3} className="grid gap-s4">
           <h4 className="font-display text-[length:var(--fs-h4)] font-extrabold">Escríbenos</h4>
           <p className="text-text-2">¿Prefieres el correo o una llamada?</p>
           <a href={`mailto:${contact.email}`} className="text-signal underline-offset-4 hover:underline">

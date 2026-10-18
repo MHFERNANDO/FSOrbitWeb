@@ -49,6 +49,19 @@ async function main() {
       await writeFile(path.join(outDir, 'index.html'), html, 'utf8');
       console.log(`[prerender] ${route} -> ${outDir}/index.html`);
     }
+
+    // 404 real: el preview server de Vite hace fallback SPA (sirve
+    // index.html para cualquier ruta no estatica), asi que visitar una
+    // ruta inexistente aca cae igual en el <Route path="*"> de App.jsx
+    // y renderiza NotFound.jsx. Guardado como dist/404.html, Vercel lo
+    // sirve automaticamente para cualquier URL que no matchee un
+    // archivo real (ver AUDITORIA.md — se verifica en vivo en Fase 7).
+    const notFoundUrl = new URL('/esta-ruta-no-existe-404', base).toString();
+    await page.goto(notFoundUrl, { waitUntil: 'networkidle0' });
+    await waitForBoot(page);
+    const notFoundHtml = await page.content();
+    await writeFile('dist/404.html', notFoundHtml, 'utf8');
+    console.log('[prerender] 404 -> dist/404.html');
   } finally {
     await browser.close();
     await new Promise((resolve) => server.httpServer.close(resolve));

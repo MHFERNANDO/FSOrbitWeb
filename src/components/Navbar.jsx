@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import Icon from './Icon';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
@@ -10,6 +10,7 @@ const EASE_OUT = [0.22, 1, 0.36, 1];
 const NAV_LINKS = [
   { href: '/#servicios', label: 'Servicios' },
   { href: '/proyectos', label: 'Proyectos' },
+  { href: '/precios', label: 'Precios' },
 ];
 
 const DRAWER_CLASS =
@@ -37,7 +38,7 @@ function DrawerLinks({ onNavigate, onHablemos }) {
           transition={{ duration: 0.3, ease: EASE_OUT }}
         >
           <a
-            href="/#contacto"
+            href="/contacto"
             onClick={onHablemos}
             className="inline-flex rounded-r2 bg-signal px-5 py-[11px] font-mono text-[length:var(--fs-mono)] font-bold uppercase tracking-[var(--tr-mono)] text-signal-ink"
             style={{ display: 'inline-flex', boxShadow: 'none', transition: 'box-shadow 300ms ease-out' }}
@@ -56,7 +57,6 @@ function DrawerLinks({ onNavigate, onHablemos }) {
 // scroll, barra de progreso de lectura sobre la hairline, y cajon movil.
 export default function Navbar() {
   const location = useLocation();
-  const navigate = useNavigate();
   const isProyectos = location.pathname.startsWith('/proyectos');
   const [scrolled, setScrolled] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -100,15 +100,7 @@ export default function Navbar() {
     return () => document.removeEventListener('keydown', onKey);
   }, [drawerOpen]);
 
-  const goHablemos = (e) => {
-    e.preventDefault();
-    setDrawerOpen(false);
-    if (location.pathname === '/') {
-      document.getElementById('contacto')?.scrollIntoView({ behavior: 'smooth' });
-    } else {
-      navigate('/#contacto');
-    }
-  };
+  const goHablemos = () => setDrawerOpen(false);
 
   return (
     <nav
@@ -186,7 +178,7 @@ export default function Navbar() {
                   transition={{ duration: 0.3, ease: EASE_OUT }}
                 >
                   <a
-                    href="/#contacto"
+                    href="/contacto"
                     onClick={goHablemos}
                     className="inline-flex rounded-r2 bg-signal px-5 py-[11px] font-mono text-[length:var(--fs-mono)] font-bold uppercase tracking-[var(--tr-mono)] text-signal-ink"
                     style={{ display: 'inline-flex', boxShadow: 'none', transition: 'box-shadow 300ms ease-out' }}

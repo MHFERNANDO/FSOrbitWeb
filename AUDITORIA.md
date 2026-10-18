@@ -252,11 +252,51 @@ Pasan a neutro (texto secundario/muted, bordes `--border`/`--border-strong`, sup
 
 Todo por encima de 4.5:1 (AA, texto normal) en los tres fondos reales del sitio. `--color-text-4` (#5b5f65) se mantiene definido mas no se usa en ningún texto legible — los 4 usos que tenía (número de servicio en Home, placeholder del formulario, numeración de línea del CodeWindow, el "%" del preloader) se migraron a `--color-text-3`, que sí pasa AA, porque esos textos sí comunican información (no son decoración pura) y un verificador automático de contraste los va a evaluar igual.
 
-**Pendiente de tu parte**: correr Lighthouse real contra el deploy (Fase 7) para confirmar que el puntaje de accesibilidad no bajó — el cálculo de contraste de arriba es correcto matemáticamente, pero no reemplaza una corrida real de Lighthouse/axe sobre la página renderizada.
+**Actualización (Fase 7)**: se corrió Lighthouse real (no estimado) contra el build — accesibilidad quedó en **100/100** en las 3 rutas verificadas. Ver sección "Fase 7 — Verificación" más abajo para el detalle completo, incluyendo 2 bugs de accesibilidad reales que esa corrida encontró (no relacionados al cambio de contraste) y ya se corrigieron.
 
 **Verificado visualmente** en el preview: home (hero, arquitectura, servicios, precios), `/precios` standalone y `/contacto` — en cada pantalla revisada, el cian aparece en 2-3 elementos como máximo (normalmente: el botón flotante de chat, que es persistente en todo el sitio, más el CTA principal de la sección y a veces la palabra resaltada del título).
 
-## 10. Checklist de acciones fuera del código (para ti)
+## 10. Fase 7 — Verificación (hecha localmente contra el build, 2026-10-18)
+
+No hay un deploy en vivo todavía, así que todo lo que sigue se corrió contra `dist/` servido localmente (`vite preview`) — lo que depende de la infraestructura real de Vercel (códigos HTTP de 404, los headers de seguridad llegando de verdad) queda marcado como pendiente de repetir una vez que exista una URL real.
+
+**Contenido real en el HTML crudo, por ruta** (script propio, sin ejecutar JS — lee `dist/**/index.html` directo): las 11 rutas + `404.html` tienen `<h1>`, al menos una mención de "Cuenca" y JSON-LD válido (JSON.parse sin error):
+
+| Ruta | Palabras | H1 | "Cuenca" | Bloques JSON-LD |
+|---|---|---|---|---|
+| `/` | 740 | ✅ | 1 | 2 (válidos) |
+| `/proyectos` | 138 | ✅ | 1 | 2 (válidos) |
+| `/proyectos/gravity-studio` | 85 | ✅ | 1 | 2 (válidos) |
+| `/proyectos/acculab-system` | 94 | ✅ | 1 | 2 (válidos) |
+| `/proyectos/jf-vapes-store` | 94 | ✅ | 1 | 2 (válidos) |
+| `/proyectos/laboratorio-diesel-mg` | 94 | ✅ | 1 | 2 (válidos) |
+| `/servicios/diseno-web-cuenca` | 267 | ✅ | 5 | 2 (válidos) |
+| `/servicios/tiendas-online` | 238 | ✅ | 2 | 2 (válidos) |
+| `/servicios/rediseno-y-optimizacion` | 248 | ✅ | 1 | 2 (válidos) |
+| `/precios` | 310 | ✅ | 1 | 2 (válidos) |
+| `/contacto` | 136 | ✅ | 3 | 2 (válidos) |
+| `404.html` | 106 | ✅ | 2 | 1 (válido) |
+
+**Lighthouse real (mobile, Chromium de Puppeteer vía `npx lighthouse`, no estimado)** contra `/`, `/servicios/diseno-web-cuenca` y `/contacto`:
+
+| Ruta | Performance | Accessibility | Best Practices | SEO | LCP | CLS | TBT |
+|---|---|---|---|---|---|---|---|
+| `/` | 84 | **100** | 96 | **100** | 3.2s | 0.008 | 130ms |
+| `/servicios/diseno-web-cuenca` | 85 | **100** | 96 | **100** | 3.5s | 0.008 | 50ms |
+| `/contacto` | 84 | **100** | 96 | **100** | 3.5s | 0.003 | 80ms |
+
+- **Accesibilidad**: llegó a 100/100 después de corregir 2 bugs reales que esta misma corrida encontró (no relacionados al cambio de paleta/contraste): `Odometer.jsx` tenía `aria-label` en un `<span>` sin rol que lo admita (se agregó `role="img"`), y había saltos de nivel de heading (H2→H4) en `Home.jsx` y en los títulos del footer (H4 sin H2/H3 intermedio en páginas como `/contacto`) — corregidos a H3 y H2 respectivamente.
+- **SEO**: 100/100 en las 3 rutas.
+- **Best Practices**: 96/100, no 100, por un único ítem: `/_vercel/insights/script.js` da 404 en este entorno porque esa ruta la sirve la infraestructura de Vercel en producción (el script de Vercel Analytics), no `vite preview` local — no es un bug de código, se verifica solo en el deploy real.
+- **Performance**: 84-85/100, no llega al objetivo de ≥95. El CLS (0.003-0.008) y el TBT (50-130ms) ya cumplen sobradamente. Lo que pesa es el **LCP (3.2-3.5s vs. el objetivo de <2.0s)**: el `Preloader` tapa toda la pantalla con una animación de carga durante ~2s en la primera visita (más ~1.35s de cortina de salida) antes de desmontarse — eso retrasa directamente cuándo se pinta el contenido real. Esto es una **decisión explícita del cliente ya documentada en el propio código** (`index.css`, bloque "DECISIÓN DEL CLIENTE"): no se tocó sin confirmarlo primero. Si en algún momento se quiere perseguir el objetivo de Performance ≥95, achicar la duración del preloader (hoy 2000ms + 1350ms) es la palanca más directa — pero es exactamente la decisión que ya se tomó en sentido contrario.
+
+**Pendiente de verificar contra un deploy real** (no se puede probar localmente de forma representativa):
+- `curl -I` de una ruta inexistente → debe dar 404 real (depende de cómo Vercel resuelve archivos estáticos sin el rewrite que se quitó en Fase 2 — la lógica está lista, `dist/404.html` existe, pero el comportamiento de servido de Vercel solo se confirma en vivo).
+- `curl -I /` mostrando todos los headers de seguridad configurados en `vercel.json` (Vercel los agrega al servir, no existen en los archivos estáticos).
+- Validación de JSON-LD contra el Rich Results Test de Google / schema.org validator (se validó que el JSON es sintácticamente válido; falta la validación semántica contra sus reglas específicas, que requiere la URL pública).
+- Prueba con `prefers-reduced-motion: reduce` activado: **intencionalmente no se implementa** — decisión del cliente ya documentada (ver sección 3 de esta auditoría), así que no hay nada que probar ahí.
+
+## 11. Checklist de acciones fuera del código (para ti)
 
 - Crear/optimizar Perfil de Empresa en Google (categoría "Diseñador de sitios web", Cuenca, fotos, reseñas reales).
 - Verificar en Google Search Console y Bing Webmaster Tools, enviar sitemap, pedir indexación.

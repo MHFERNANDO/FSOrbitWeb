@@ -42,6 +42,16 @@ async function launchBrowser() {
   return puppeteer.launch({ headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox'] });
 }
 
+// Al cargar un chunk lazy que a su vez importa otro (p. ej.
+// DisenoWebCuenca -> ServicePage), Vite inyecta <link rel="modulepreload">
+// con URL absoluta del origen donde corre el prerender
+// (http://127.0.0.1:4321/...). Capturado tal cual, produccion pedia
+// esos archivos a localhost. Se reescribe el origen local a rutas
+// relativas a la raiz.
+function absolutize(html, origin) {
+  return html.split(origin).join('');
+}
+
 async function waitForBoot(page) {
   // Espera a que el preloader (src/components/Preloader.jsx) termine su
   // ciclo y quite body.is-loading, para capturar el estado final de la
@@ -67,7 +77,7 @@ async function main() {
       await page.goto(url, { waitUntil: 'networkidle0' });
       await waitForBoot(page);
 
-      const html = await page.content();
+      const html = absolutize(await page.content(), base);
       const outDir = route === '/' ? 'dist' : path.join('dist', route.replace(/^\//, ''));
       await mkdir(outDir, { recursive: true });
       await writeFile(path.join(outDir, 'index.html'), html, 'utf8');
@@ -83,7 +93,7 @@ async function main() {
     const notFoundUrl = new URL('/esta-ruta-no-existe-404', base).toString();
     await page.goto(notFoundUrl, { waitUntil: 'networkidle0' });
     await waitForBoot(page);
-    const notFoundHtml = await page.content();
+    const notFoundHtml = absolutize(await page.content(), base);
     await writeFile('dist/404.html', notFoundHtml, 'utf8');
     console.log('[prerender] 404 -> dist/404.html');
   } finally {

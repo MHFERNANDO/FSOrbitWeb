@@ -63,7 +63,10 @@ export default function SplitHeading({ as: Tag = 'h2', segments, className }) {
   return (
     <Tag className={cn(className)}>
       {segments.map((seg, i) => {
-        if (seg.break) return <br key={i} />;
+        // Espacio antes del <br>: visualmente no cambia nada, pero los
+        // extractores de texto que solo quitan etiquetas (varios bots de
+        // IA) leian "Páginas webdiseñadas" pegado.
+        if (seg.break) return [' ', <br key={i} />];
         // Espacio real entre segmentos consecutivos sin <br> (p. ej.
         // "Ingeniería de" + "Alto Rendimiento"): sin esto el DOM queda
         // "...de</span><span>Alto..." pegado para cualquier crawler que

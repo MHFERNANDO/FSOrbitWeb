@@ -110,7 +110,20 @@ No voy a revertir esa decisión del cliente por mi cuenta — es una decisión d
 - `{{TODO: tiempos de entrega reales por plan/servicio, para la sección Proceso y FAQ}}`
 - `{{TODO: Vercel Analytics o GA4? (el brief pide preguntar antes de instalar)}}`
 
-## 6. Checklist de acciones fuera del código (para ti)
+## 6. Fase 2 — Arquitectura de prerender (implementado)
+
+Commits `808cf97` (paleta) y `a9d6799` (prerender) en la rama `rediseno-seo-geo`.
+
+- **Arquitectura elegida**: prerender post-build con Puppeteer (`scripts/prerender.mjs`), no `vite-react-ssg`. Motivo: esa librería exige `react-router-dom@^6.14.1` como peer dependency; el sitio usa v7.18.2 y depende de `viewTransition` en `<Link>` para las transiciones entre `/` y `/proyectos` (API estable solo desde v7 — en v6 sería `unstable_viewTransition`, con otro comportamiento). Bajar el router de versión mayor solo para encajar con el prerender era más riesgo que escribir el script. Decisión confirmada con el cliente antes de implementar.
+- Cómo funciona: `vite build` compila la SPA normal → `scripts/prerender.mjs` levanta ese `dist/` con el preview server de Vite, visita cada ruta de `src/seo/routes.js` con Chromium headless, espera a que el preloader termine (`body` pierde la clase `is-loading`) y guarda `page.content()` — el DOM ya incluye el `<head>` por ruta que `useSeo.js` escribe en cliente (title, canonical, meta description, og:*, twitter:*) — como `dist/<ruta>/index.html`. No hubo que duplicar la lógica de SEO en un entorno de servidor: el mismo hook que ya existía queda "congelado" en el HTML final.
+- `scripts/generate-sitemap.mjs` genera `dist/sitemap.xml` desde la misma `src/seo/routes.js`, con `lastmod` de la fecha del build. `public/sitemap.xml` (a mano, con 2 URLs fijas) se eliminó.
+- `vercel.json`: se quitó el rewrite SPA global. Cada ruta real ahora tiene su propio archivo estático en `dist/`; lo que no existe debe devolver 404 real de Vercel. **Pendiente de confirmar en vivo** (Fase 7, `curl -I` contra el deploy) que el comportamiento de servido de directorios de Vercel resuelve `/proyectos` → `dist/proyectos/index.html` sin rewrite — es el comportamiento default documentado, pero no se puede verificar 100% con el preview local de Vite (que sí hace fallback SPA).
+- **Importante — no es SSR real, es prerender "snapshot"**: `main.jsx` sigue usando `createRoot(...).render(...)`, no `hydrateRoot`. Cuando el JS carga en un visitante real, React vuelve a montar todo el árbol desde cero sobre el HTML prerenderizado (remount, no hydration). No hay mismatch ni errores — es el mismo patrón que usan herramientas como `react-snap` — pero significa que no hay ganancia de "hydration más rápida"; la ganancia es 100% para crawlers y para el primer pintado de texto. El `Preloader` ya tapa visualmente ese remount para usuarios reales.
+- Verificado con el build real: `dist/index.html` pasó de **0 a 720 palabras** en el `<body>` crudo (sin ejecutar JS); `dist/proyectos/index.html`, de 0 a 119. Cada ruta tiene su propio `<title>` y `<link rel="canonical">` ya en el HTML servido, no solo tras hidratar.
+- De paso se corrigió `SplitHeading.jsx`: los segmentos de título sin `<br>` entre ellos no llevaban espacio en el DOM (confirmado con el HTML prerenderizado real: `...de</span><span>Alto...`). Ahora se inserta un nodo de texto `" "` entre segmentos consecutivos que no vienen separados por `break`.
+- **Limitación actual**: el prerender solo corre sobre las 2 rutas que existen hoy (`/`, `/proyectos`). Las rutas nuevas de Fase 2 de contenido (servicios, precios, proyectos/slug, contacto) se agregan agregando entradas a `src/seo/routes.js` — no requiere tocar el script.
+
+## 7. Checklist de acciones fuera del código (para ti)
 
 - Crear/optimizar Perfil de Empresa en Google (categoría "Diseñador de sitios web", Cuenca, fotos, reseñas reales).
 - Verificar en Google Search Console y Bing Webmaster Tools, enviar sitemap, pedir indexación.

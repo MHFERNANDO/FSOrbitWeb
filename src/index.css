@@ -185,6 +185,42 @@
    es "sin capa alguna", que en cascade layers siempre gana. */
 @layer base {
 
+/* Fuentes autoalojadas (public/fonts/, descargadas de Google Fonts):
+   antes se pedian via <link> a fonts.googleapis.com en index.html —
+   una conexion cross-origin extra (DNS+TLS) solo para arrancar la
+   descarga de la fuente, bloqueando el primer pintado de texto.
+   Subset "latin" unicamente (cubre español: ñ, vocales acentuadas,
+   todo dentro de U+0000-00FF) en vez de los 6-10 subsets que Google
+   sirve por defecto (cirilico, vietnamita, griego...) que este sitio
+   nunca necesita. */
+@font-face {
+  font-family: "Archivo";
+  font-style: normal;
+  font-weight: 400 900;
+  font-stretch: 85% 118%;
+  font-display: swap;
+  src: url("/fonts/archivo-variable-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122;
+}
+
+@font-face {
+  font-family: "Instrument Sans";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("/fonts/instrument-sans-variable-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122;
+}
+
+@font-face {
+  font-family: "JetBrains Mono";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("/fonts/jetbrains-mono-variable-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122;
+}
+
 /* Metricas de respaldo: evitan el salto de layout mientras cargan las
    fuentes variables (el navegador reserva el mismo alto). */
 @font-face {

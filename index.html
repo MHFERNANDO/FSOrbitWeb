@@ -39,10 +39,12 @@
 
     <title>FS Orbit | Desarrollo Web en Cuenca, Ecuador</title>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@85..118,400..900&family=Instrument+Sans:wght@400..700&family=JetBrains+Mono:wght@400..700&display=swap">
+    <!-- Fuentes autoalojadas (public/fonts/, @font-face en src/index.css)
+         en vez de <link> a fonts.googleapis.com: sin conexion
+         cross-origin extra antes de poder empezar a descargar la
+         fuente. Se precarga la variable font de titulares (Archivo),
+         que es la que pinta el H1 del hero — el elemento de LCP. -->
+    <link rel="preload" href="/fonts/archivo-variable-latin.woff2" as="font" type="font/woff2" crossorigin>
 
     <!-- Organization/ProfessionalService global: vive en index.html (no
          por ruta) porque describe el negocio, no una pagina especifica.

@@ -33,7 +33,15 @@ async function main() {
   const server = await preview({ preview: { port: PORT, strictPort: true, host: '127.0.0.1' } });
   const base = `http://127.0.0.1:${PORT}`;
 
-  const browser = await puppeteer.launch({ headless: true });
+  // --no-sandbox/--disable-setuid-sandbox: el contenedor de build de
+  // Vercel corre como usuario sin privilegios y sin el namespace de
+  // kernel que el sandbox de Chromium necesita — sin estos flags
+  // puppeteer.launch() falla ahi con "No usable sandbox" aunque en
+  // local (Windows/con privilegios) funcione sin problema.
+  const browser = await puppeteer.launch({
+    headless: true,
+    args: ['--no-sandbox', '--disable-setuid-sandbox'],
+  });
 
   try {
     const page = await browser.newPage();

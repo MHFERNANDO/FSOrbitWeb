@@ -3,20 +3,19 @@ import Reveal from '@/components/Reveal';
 import Icon from '@/components/Icon';
 import { useSeo } from '@/hooks/useSeo';
 import { breadcrumbs } from '@/seo/jsonld';
-import { projects, caseStudies } from '@/data/content';
+import { projects } from '@/data/content';
 
 export default function ProyectoDetalle() {
   const { slug } = useParams();
   const project = projects.find((p) => p.slug === slug);
-  const study = project ? caseStudies[project.slug] : null;
 
   // Hook de SEO siempre se llama (reglas de hooks) — con datos vacios
   // si el slug no existe; el return de abajo redirige antes de pintar
   // nada con esos datos vacios.
   useSeo({
-    title: project ? `${project.title} | Caso de Estudio — FS Orbit` : 'Proyecto no encontrado',
+    title: project ? `${project.title} | Proyectos — FS Orbit` : 'Proyecto no encontrado',
     description: project
-      ? `Caso de estudio: ${project.title}. ${study.solution}`
+      ? `${project.title}: ${project.description}`
       : 'Proyecto no encontrado.',
     path: `/proyectos/${slug}`,
     jsonLd: project
@@ -71,18 +70,9 @@ export default function ProyectoDetalle() {
       </section>
 
       <section className="border-t border-[color:var(--line)]">
-        <div className="mx-auto grid max-w-(--maxw) gap-s8 px-(--gutter) py-[var(--section-y)] md:grid-cols-3">
-          <Reveal as="div" type="rise" className="grid gap-s3">
-            <h2 className="font-mono text-[length:var(--fs-mono)] uppercase tracking-[var(--tr-mono)] text-text-3">Problema</h2>
-            <p className="text-text-2">{study.problem}</p>
-          </Reveal>
-          <Reveal as="div" type="rise" index={1} className="grid gap-s3">
-            <h2 className="font-mono text-[length:var(--fs-mono)] uppercase tracking-[var(--tr-mono)] text-signal">Solución</h2>
-            <p className="text-text-2">{study.solution}</p>
-          </Reveal>
-          <Reveal as="div" type="rise" index={2} className="grid gap-s3">
-            <h2 className="font-mono text-[length:var(--fs-mono)] uppercase tracking-[var(--tr-mono)] text-text-3">Resultado</h2>
-            <p className="text-text-2">{study.result}</p>
+        <div className="mx-auto max-w-(--maxw) px-(--gutter) py-[var(--section-y)]">
+          <Reveal as="p" type="rise" className="max-w-[64ch] text-[length:var(--fs-lead)] text-text-2">
+            {project.description}
           </Reveal>
         </div>
       </section>

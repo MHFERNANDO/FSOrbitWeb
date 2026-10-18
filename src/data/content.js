@@ -177,33 +177,6 @@ export const projects = [
   },
 ];
 
-// Caso de estudio por proyecto: problema y resultado medible no estan
-// documentados en ningun lado del repo (nunca se registraron). En vez
-// de inventarlos, quedan como {{TODO}} — ver AUDITORIA.md. "solucion"
-// SI es real: reutiliza la descripcion ya aprobada de arriba.
-export const caseStudies = {
-  'gravity-studio': {
-    problem: '{{TODO: qué problema tenía Gravity Studio antes del proyecto}}',
-    solution: 'Landing page de autor para un estudio creativo, sin plantillas, con animaciones de scroll propias.',
-    result: '{{TODO: resultado medible — conversión, velocidad, tráfico, lo que haya}}',
-  },
-  'acculab-system': {
-    problem: '{{TODO: qué problema tenía Acculab antes del proyecto}}',
-    solution: 'Arquitectura médica de misión crítica optimizada para datos en tiempo real.',
-    result: '{{TODO: resultado medible — tiempos de respuesta, uptime, lo que haya}}',
-  },
-  'jf-vapes-store': {
-    problem: '{{TODO: qué problema tenía JF Vapes antes del proyecto}}',
-    solution: 'E-commerce de alto impacto diseñado para la máxima conversión en móvil.',
-    result: '{{TODO: resultado medible — ventas, conversión móvil, lo que haya}}',
-  },
-  'laboratorio-diesel-mg': {
-    problem: '{{TODO: qué problema tenía Laboratorio Diesel MG antes del proyecto}}',
-    solution: 'Plataforma web corporativa especializada para servicios de laboratorio e inyección diésel.',
-    result: '{{TODO: resultado medible — leads, posicionamiento, lo que haya}}',
-  },
-};
-
 export const advisorSteps = {
   step1: {
     label: '01/02',

@@ -40,9 +40,12 @@ export default function Footer() {
 
         <Reveal as="div" type="rise" index={2} className="grid gap-s4">
           <h4 className="font-display text-[length:var(--fs-h4)] font-extrabold">Escríbenos</h4>
-          <p className="text-text-2">¿Prefieres el correo tradicional?</p>
+          <p className="text-text-2">¿Prefieres el correo o una llamada?</p>
           <a href={`mailto:${contact.email}`} className="text-signal underline-offset-4 hover:underline">
             {contact.email}
+          </a>
+          <a href={`tel:${contact.tel}`} className="text-signal underline-offset-4 hover:underline">
+            {contact.telDisplay}
           </a>
           <a
             href={contact.instagram}

@@ -97,17 +97,20 @@ No voy a revertir esa decisión del cliente por mi cuenta — es una decisión d
 10. Code-splitting por ruta, imágenes AVIF/WebP con `srcset`, fuentes auto-alojadas — una vez que haya más de 2 rutas esto importa mucho más.
 11. Testimonios/FAQ/Proceso: solo con contenido real, componente listo con `{{TODO}}` si no hay datos.
 
-## 5. Lista de `{{TODO}}` — lo que necesito que me confirmes/entregues
+## 5. Lista de `{{TODO}}` — resueltos por el cliente (2026-10-18)
 
-- `{{TODO: teléfono con tel: (número real, puede ser uno de los WhatsApp o uno nuevo)}}`
-- `{{TODO: dirección física en Cuenca, si existe (calle, sector) — o confirmar que no hay oficina física y se usa solo "Cuenca, Azuay, Ecuador" como área de servicio}}`
-- `{{TODO: horario de atención (openingHoursSpecification)}}`
-- `{{TODO: testimonios/reseñas reales de clientes (texto + nombre/empresa), si los hay}}`
-- `{{TODO: métricas reales de los proyectos del portafolio (Acculab, Gravity, JF Vapes, Lab Diesel) — resultado medible de cada caso, si existe}}`
-- `{{TODO: confirmar si https://acculab.bio es el dominio de producción correcto para reemplazar los dos links a acculab.vercel.app}}`
-- `{{TODO: perfiles sociales adicionales reales (Facebook, LinkedIn) además de Instagram (https://www.instagram.com/fs_orbit/, ya confirmado en content.js)}}`
-- `{{TODO: tiempos de entrega reales por plan/servicio, para la sección Proceso y FAQ}}`
-- `{{TODO: Vercel Analytics o GA4? (el brief pide preguntar antes de instalar)}}`
+Respuestas recibidas directamente del cliente. Lo que sigue abierto queda marcado como tal.
+
+- **Teléfono**: resuelto. `+593983113942` (mismo número del WhatsApp de ventas) — ya usado como `tel:` en `contact.tel`/`contact.telDisplay` ([content.js](src/data/content.js)), footer y JSON-LD.
+- **Dirección física**: resuelto, sin dato publicable. El cliente confirmó que la base está en Cuenca pero que atienden "cualquier lugar" — no se agrega `streetAddress` (no se dio ninguno). El JSON-LD queda con `addressLocality: Cuenca`, `addressRegion: Azuay`, sin calle.
+- **Horario de atención**: resuelto — no hay. No se agrega `openingHoursSpecification` al JSON-LD.
+- **Testimonios/reseñas**: resuelto — no hay. No se construye la sección de Testimonios en Fase 2 (se omite del todo, no se deja un componente vacío, porque el cliente no pidió reservar el espacio).
+- **Link de Acculab**: resuelto. `https://acculab.bio` ya reemplazó las dos referencias a `acculab.vercel.app` en `content.js`.
+- **Perfiles sociales adicionales**: resuelto — no hay más que Instagram (`https://www.instagram.com/fs_orbit/`, ya en `sameAs`).
+- **Analítica**: resuelto — Vercel Analytics. Instalado (`@vercel/analytics`) y montado en `main.jsx`.
+- **Métricas reales de los proyectos del portafolio**: `{{TODO: sigue pendiente}}` — no se tocó, sin esto la sección de casos de estudio de Fase 2 queda con placeholder.
+- **Tiempos de entrega reales por plan/servicio**: `{{TODO: sigue pendiente}}` — necesario para la sección Proceso/FAQ de Fase 2.
+- **¿Forzar actualización de `shadcn` (breaking)?**: el cliente pidió forzarla. Se intentó (`npm audit fix --force` → `shadcn@1.0.0`) y **rompió el build**: esa versión mayor ya no exporta `shadcn/tailwind.css`, que `src/index.css` importa directo (`@import "shadcn/tailwind.css";`) — no es solo una CLI de dev, el CSS del tema sí se consume en build. Se revirtió a `shadcn@4.19.0` (la que funcionaba) para no romper la regla de "no avanzar sin que el build pase". Quedan otra vez 6 vulnerabilidades high, todas en la cadena de dependencias de `shadcn` (fast-glob/micromatch/braces/ts-morph) usada solo por su CLI de scaffolding — no se ejecuta en producción ni se envía al bundle del cliente (confirmado: nada de esos paquetes aparece en `dist/assets/*.js`). Arreglarlo de verdad requeriría migrar el import de Tailwind a otra fuente (o esperar a que el shadcn CLI nuevo vuelva a exponer el CSS) — queda fuera de esta sesión, documentado como riesgo aceptado y de bajo impacto real.
 
 ## 6. Fase 2 — Arquitectura de prerender (implementado)
 

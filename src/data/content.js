@@ -4,8 +4,17 @@
 export const contact = {
   whatsappSales: '593983113942',
   whatsappSupport: '593987582463',
+  // Mismo numero de ventas, para el link tel: del header/footer (el
+  // cliente confirmo que no hay otra linea fija).
+  tel: '+593983113942',
+  telDisplay: '+593 98 311 3942',
   email: 'fsorbitt@gmail.com',
   instagram: 'https://www.instagram.com/fs_orbit/',
+  // Base en Cuenca, pero el cliente atiende cualquier ubicacion (no solo
+  // Azuay/Cuenca) — confirmado, no hay direccion publica de oficina.
+  city: 'Cuenca',
+  region: 'Azuay',
+  country: 'Ecuador',
 };
 
 export const services = [
@@ -113,7 +122,7 @@ export const featuredWork = [
     tag: 'Plataforma de Análisis Clínicos',
     img: 'AccuLabPreview',
     alt: 'Acculab - Plataforma Médica',
-    url: 'https://acculab.vercel.app/index.html',
+    url: 'https://acculab.bio',
   },
   {
     title: 'Gravity Studio',
@@ -142,7 +151,7 @@ export const projects = [
     tags: ['JS_ENGINE', 'HEALTH_TECH'],
     img: 'AccuLabPreview',
     alt: 'Acculab',
-    url: 'https://acculab.vercel.app/index.html',
+    url: 'https://acculab.bio',
   },
   {
     code: '// 03_JF_VAPES_STORE',

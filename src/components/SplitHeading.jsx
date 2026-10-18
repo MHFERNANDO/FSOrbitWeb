@@ -64,9 +64,14 @@ export default function SplitHeading({ as: Tag = 'h2', segments, className }) {
     <Tag className={cn(className)}>
       {segments.map((seg, i) => {
         if (seg.break) return <br key={i} />;
+        // Espacio real entre segmentos consecutivos sin <br> (p. ej.
+        // "Ingeniería de" + "Alto Rendimiento"): sin esto el DOM queda
+        // "...de</span><span>Alto..." pegado para cualquier crawler que
+        // no ejecute JS o copie el texto.
+        const needsSpace = i > 0 && !segments[i - 1].break;
         const words = renderWords(seg.text);
-        if (seg.highlight) return <Highlight key={i}>{words}</Highlight>;
-        return <span key={i}>{words}</span>;
+        const node = seg.highlight ? <Highlight key={i}>{words}</Highlight> : <span key={i}>{words}</span>;
+        return needsSpace ? [' ', node] : node;
       })}
     </Tag>
   );

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import IconSprite from './components/IconSprite';
 import SiteBg from './components/SiteBg';
@@ -8,15 +8,20 @@ import ChatDock from './components/ChatDock';
 import Preloader from './components/Preloader';
 import { AdvisorProvider } from './components/AdvisorModal';
 import { ProjectPreviewProvider } from './components/ProjectPreviewModal';
+// Home va eager: es la ruta de entrada mas pisada y no tiene sentido
+// esperar un import() async para la primera pintura. El resto de
+// paginas se parte por ruta (React.lazy) — antes todo el sitio
+// (10 rutas + sus datos) viajaba en un solo bundle de 480KB sin
+// importar cual de las 10 pedia el visitante.
 import Home from './pages/Home';
-import Proyectos from './pages/Proyectos';
-import ProyectoDetalle from './pages/ProyectoDetalle';
-import DisenoWebCuenca from './pages/DisenoWebCuenca';
-import TiendasOnline from './pages/TiendasOnline';
-import RedisenoOptimizacion from './pages/RedisenoOptimizacion';
-import Precios from './pages/Precios';
-import Contacto from './pages/Contacto';
-import NotFound from './pages/NotFound';
+const Proyectos = lazy(() => import('./pages/Proyectos'));
+const ProyectoDetalle = lazy(() => import('./pages/ProyectoDetalle'));
+const DisenoWebCuenca = lazy(() => import('./pages/DisenoWebCuenca'));
+const TiendasOnline = lazy(() => import('./pages/TiendasOnline'));
+const RedisenoOptimizacion = lazy(() => import('./pages/RedisenoOptimizacion'));
+const Precios = lazy(() => import('./pages/Precios'));
+const Contacto = lazy(() => import('./pages/Contacto'));
+const NotFound = lazy(() => import('./pages/NotFound'));
 
 export default function App() {
   const [booted, setBooted] = useState(false);
@@ -39,17 +44,19 @@ export default function App() {
       <AdvisorProvider>
         <ProjectPreviewProvider>
           <Navbar />
-          <Routes location={location}>
-            <Route path="/" element={<Home />} />
-            <Route path="/proyectos" element={<Proyectos />} />
-            <Route path="/proyectos/:slug" element={<ProyectoDetalle />} />
-            <Route path="/servicios/diseno-web-cuenca" element={<DisenoWebCuenca />} />
-            <Route path="/servicios/tiendas-online" element={<TiendasOnline />} />
-            <Route path="/servicios/rediseno-y-optimizacion" element={<RedisenoOptimizacion />} />
-            <Route path="/precios" element={<Precios />} />
-            <Route path="/contacto" element={<Contacto />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <Suspense fallback={<div className="min-h-[60svh]" aria-hidden="true" />}>
+            <Routes location={location}>
+              <Route path="/" element={<Home />} />
+              <Route path="/proyectos" element={<Proyectos />} />
+              <Route path="/proyectos/:slug" element={<ProyectoDetalle />} />
+              <Route path="/servicios/diseno-web-cuenca" element={<DisenoWebCuenca />} />
+              <Route path="/servicios/tiendas-online" element={<TiendasOnline />} />
+              <Route path="/servicios/rediseno-y-optimizacion" element={<RedisenoOptimizacion />} />
+              <Route path="/precios" element={<Precios />} />
+              <Route path="/contacto" element={<Contacto />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Suspense>
           <Footer />
           <ChatDock />
         </ProjectPreviewProvider>

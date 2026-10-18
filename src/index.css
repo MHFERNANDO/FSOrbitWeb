@@ -35,9 +35,9 @@
   --color-text-4: #575f6e;
 
   /* --- Senal: se usa en ~5% de la superficie. Nunca como relleno --- */
-  --color-signal: #c6f24e;
-  --color-signal-2: #a9d638;
-  --color-signal-ink: #090c03;
+  --color-signal: #22e4f5;
+  --color-signal-2: #14a3b8;
+  --color-signal-ink: #04171c;
   --color-warn: #ff7a4d;
 
   /* --- Tipografia --- */
@@ -74,10 +74,10 @@
   --line-2: rgba(255, 255, 255, .13);
   --line-3: rgba(255, 255, 255, .24);
 
-  --signal-a06: rgba(198, 242, 78, .06);
-  --signal-a12: rgba(198, 242, 78, .12);
-  --signal-a24: rgba(198, 242, 78, .24);
-  --signal-a48: rgba(198, 242, 78, .48);
+  --signal-a06: rgba(34, 228, 245, .06);
+  --signal-a12: rgba(34, 228, 245, .12);
+  --signal-a24: rgba(34, 228, 245, .24);
+  --signal-a48: rgba(34, 228, 245, .48);
   --warn-a12: rgba(255, 122, 77, .12);
 
   --fs-micro: .625rem;

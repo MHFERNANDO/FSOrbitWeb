@@ -73,7 +73,7 @@ export default function HeroOrbit() {
 
       ctx.beginPath();
       ctx.ellipse(0, 0, rx, ry, 0, 0, TAU);
-      ctx.strokeStyle = orbit.glow ? 'rgba(198, 242, 78, .16)' : 'rgba(255, 255, 255, .085)';
+      ctx.strokeStyle = orbit.glow ? 'rgba(34, 228, 245, .16)' : 'rgba(255, 255, 255, .085)';
       ctx.lineWidth = 1;
       ctx.stroke();
 
@@ -83,15 +83,15 @@ export default function HeroOrbit() {
 
       ctx.beginPath();
       ctx.ellipse(0, 0, rx, ry, 0, p - 0.55, p);
-      ctx.strokeStyle = orbit.glow ? 'rgba(198, 242, 78, .5)' : 'rgba(255, 255, 255, .3)';
+      ctx.strokeStyle = orbit.glow ? 'rgba(34, 228, 245, .5)' : 'rgba(255, 255, 255, .3)';
       ctx.lineWidth = 1.5;
       ctx.stroke();
 
       ctx.beginPath();
       ctx.arc(px, py, orbit.glow ? 2.6 : 1.8, 0, TAU);
-      ctx.fillStyle = orbit.glow ? '#C6F24E' : '#EDF0F6';
+      ctx.fillStyle = orbit.glow ? '#22E4F5' : '#EDF0F6';
       ctx.shadowBlur = 12;
-      ctx.shadowColor = orbit.glow ? 'rgba(198, 242, 78, .8)' : 'rgba(237, 240, 246, .5)';
+      ctx.shadowColor = orbit.glow ? 'rgba(34, 228, 245, .8)' : 'rgba(237, 240, 246, .5)';
       ctx.fill();
 
       ctx.restore();
@@ -121,21 +121,21 @@ export default function HeroOrbit() {
 
       ctx.beginPath();
       ctx.arc(cx, cy, unit * 0.02, 0, TAU);
-      ctx.fillStyle = 'rgba(198, 242, 78, .95)';
+      ctx.fillStyle = 'rgba(34, 228, 245, .95)';
       ctx.shadowBlur = 14;
-      ctx.shadowColor = 'rgba(198, 242, 78, .6)';
+      ctx.shadowColor = 'rgba(34, 228, 245, .6)';
       ctx.fill();
       ctx.shadowBlur = 0;
 
       ctx.beginPath();
       ctx.arc(cx, cy, unit * 0.062 + Math.sin(t * 0.0012) * 2, 0, TAU);
-      ctx.strokeStyle = 'rgba(198, 242, 78, .38)';
+      ctx.strokeStyle = 'rgba(34, 228, 245, .38)';
       ctx.lineWidth = 1;
       ctx.stroke();
 
       ctx.beginPath();
       ctx.arc(cx, cy, unit * 0.115 + Math.sin(t * 0.0012 + 1.2) * 4, 0, TAU);
-      ctx.strokeStyle = 'rgba(198, 242, 78, .16)';
+      ctx.strokeStyle = 'rgba(34, 228, 245, .16)';
       ctx.lineWidth = 1;
       ctx.stroke();
 

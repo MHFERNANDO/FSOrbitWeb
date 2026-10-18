@@ -16,7 +16,7 @@ export default function Odometer({ value }) {
   const digits = String(value).split('');
 
   return (
-    <span ref={ref} className="odo inline-flex leading-none" aria-label={value}>
+    <span ref={ref} className="odo inline-flex leading-none" role="img" aria-label={value}>
       {digits.map((digit, i) => {
         const target = Number(digit);
         const dist = ran ? 10 + target : 0;

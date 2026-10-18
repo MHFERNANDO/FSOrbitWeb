@@ -24,7 +24,7 @@ export default function Footer() {
         </Reveal>
 
         <Reveal as="div" type="rise" index={1} className="grid content-start gap-s3">
-          <h4 className="font-display text-[length:var(--fs-h4)] font-extrabold">Enlaces</h4>
+          <h2 className="font-display text-[length:var(--fs-h4)] font-extrabold">Enlaces</h2>
           {FOOTER_LINKS.map((link) => (
             <Link key={link.to} to={link.to} viewTransition className="text-text-2 transition-colors hover:text-text">
               {link.label}
@@ -33,7 +33,7 @@ export default function Footer() {
         </Reveal>
 
         <Reveal as="div" type="rise" index={2} className="grid gap-s4">
-          <h4 className="font-display text-[length:var(--fs-h4)] font-extrabold">Contacto Directo</h4>
+          <h2 className="font-display text-[length:var(--fs-h4)] font-extrabold">Contacto Directo</h2>
           <div className="grid gap-s3">
             {[
               { number: contact.whatsappSales, label: '098 311 3942' },
@@ -60,7 +60,7 @@ export default function Footer() {
         </Reveal>
 
         <Reveal as="div" type="rise" index={3} className="grid gap-s4">
-          <h4 className="font-display text-[length:var(--fs-h4)] font-extrabold">Escríbenos</h4>
+          <h2 className="font-display text-[length:var(--fs-h4)] font-extrabold">Escríbenos</h2>
           <p className="text-text-2">¿Prefieres el correo o una llamada?</p>
           <a href={`mailto:${contact.email}`} onClick={() => trackClick('email', { source: 'footer' })} className="text-text-2 underline-offset-4 transition-colors hover:text-signal hover:underline">
             {contact.email}

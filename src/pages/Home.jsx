@@ -120,7 +120,7 @@ export default function Home() {
 
             <Reveal as="div" type="rise" className="mt-s4 grid gap-s5 sm:grid-cols-2">
               <div className="grid gap-s3 rounded-r3 border border-[color:var(--line)] p-s5">
-                <h4 className="font-display font-bold text-text-2">WordPress / Builders</h4>
+                <h3 className="font-display font-bold text-text-2">WordPress / Builders</h3>
                 <ul className="grid gap-s2 text-[length:var(--fs-small)] text-text-3">
                   {['Código inflado y lento', 'Dependencia de plugins', 'Vulnerabilidades constantes', 'Diseño limitado a bloques'].map((t) => (
                     <li key={t} className="flex items-center gap-s2">
@@ -131,7 +131,7 @@ export default function Home() {
                 </ul>
               </div>
               <div className="grid gap-s3 rounded-r3 border border-[color:var(--line-2)] bg-ink-850 p-s5">
-                <h4 className="font-display font-bold text-signal">FS Orbit Pure Code</h4>
+                <h3 className="font-display font-bold text-signal">FS Orbit Pure Code</h3>
                 <ul className="grid gap-s2 text-[length:var(--fs-small)] text-text-2">
                   {['Carga instantánea (Core Web Vitals)', 'Seguridad de nivel militar', 'Escalabilidad ilimitada', 'Diseño 100% a medida'].map((t) => (
                     <li key={t} className="flex items-center gap-s2">
@@ -355,7 +355,7 @@ function WorkCard({ work, index, onOpen }) {
       </div>
       <div className="flex items-center justify-between p-s5">
         <div>
-          <h4 className="font-display font-bold">{work.title}</h4>
+          <h3 className="font-display font-bold">{work.title}</h3>
           <p className="text-[length:var(--fs-small)] text-text-3">{work.tag}</p>
         </div>
         <span className="inline-flex items-center gap-s2 text-[length:var(--fs-small)] text-text-2">

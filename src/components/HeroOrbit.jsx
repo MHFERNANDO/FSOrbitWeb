@@ -44,8 +44,10 @@ export default function HeroOrbit() {
       blink: 8 + Math.random() * 32,
     }));
 
-    const resize = () => {
-      const rect = host.getBoundingClientRect();
+    // rect: el contentRect que entrega ResizeObserver (ya calculado tras
+    // el layout). Solo sin ResizeObserver se mide a mano, lo que fuerza un
+    // layout sincrono en plena carga.
+    const resize = (rect = host.getBoundingClientRect()) => {
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
       w = rect.width;
       h = rect.height;
@@ -158,19 +160,20 @@ export default function HeroOrbit() {
       rafId = null;
     };
 
-    resize();
-    render(0);
-
     let resizeObserver;
     let onWindowResize;
     if ('ResizeObserver' in window) {
-      resizeObserver = new ResizeObserver(() => {
-        resize();
+      // La primera notificacion llega antes del primer pintado, asi que
+      // reemplaza al resize() + render(0) inicial sin dejar un frame vacio.
+      resizeObserver = new ResizeObserver(([entry]) => {
+        resize(entry.contentRect);
         render(performance.now());
       });
       resizeObserver.observe(host);
     } else {
-      onWindowResize = resize;
+      resize();
+      render(0);
+      onWindowResize = () => resize();
       window.addEventListener('resize', onWindowResize);
     }
 

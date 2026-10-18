@@ -1,67 +1,89 @@
-import { useRef } from 'react';
-import { motion, useInView } from 'framer-motion';
-import { cn } from '@/lib/utils';
+import { useLayoutEffect, useRef } from 'react';
+import { observeOnce, pausedAnimation, EASE_OUT } from '@/lib/inView';
 
-const EASE_OUT = [0.22, 1, 0.36, 1];
-
-function Word({ index, children }) {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, amount: 0.12, margin: '0px 0px -8% 0px' });
-
+// Antes cada palabra era un motion.span con su propio useInView (un
+// observer y un estado de React por palabra). Ahora el titulo entero
+// tiene un solo observer compartido y cada palabra sube con una Web
+// Animation propia: mismo recorrido (110% -> 0), misma duracion (1.2s),
+// mismo escalonado (0.12s por palabra) y misma curva.
+function Word({ children }) {
   return (
-    <span ref={ref} className="mb-[-0.14em] inline-block overflow-hidden pb-[0.14em] align-bottom">
-      <motion.span
-        className="inline-block"
-        initial={{ y: '110%' }}
-        animate={isInView ? { y: 0 } : { y: '110%' }}
-        transition={{ duration: 1.2, delay: index * 0.12, ease: EASE_OUT }}
-      >
+    <span className="mb-[-0.14em] inline-block overflow-hidden pb-[0.14em] align-bottom">
+      <span className="inline-block" data-word="">
         {children}
-      </motion.span>
+      </span>
     </span>
   );
 }
 
 export function Highlight({ children }) {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, amount: 0.12 });
 
-  const baseStyle = {
-    backgroundImage: 'linear-gradient(var(--color-signal), var(--color-signal))',
-    backgroundRepeat: 'no-repeat',
-    backgroundPosition: '0 calc(100% - .04em)',
-  };
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el) return undefined;
+    const anim = pausedAnimation(el, [{ backgroundSize: '0% .055em' }, { backgroundSize: '100% .055em' }], {
+      duration: 2000,
+      delay: 420,
+      easing: EASE_OUT,
+    });
+    const stop = observeOnce(el, () => anim.play(), { amount: 0.12 });
+    return () => {
+      stop();
+      anim.cancel();
+    };
+  }, []);
 
   return (
-    <motion.span
+    <span
       ref={ref}
       className="text-signal"
-      style={baseStyle}
-      initial={{ backgroundSize: '0% .055em' }}
-      animate={isInView ? { backgroundSize: '100% .055em' } : { backgroundSize: '0% .055em' }}
-      transition={{ duration: 2.0, delay: 0.42, ease: EASE_OUT }}
+      style={{
+        backgroundImage: 'linear-gradient(var(--color-signal), var(--color-signal))',
+        backgroundRepeat: 'no-repeat',
+        backgroundPosition: '0 calc(100% - .04em)',
+        backgroundSize: '100% .055em',
+      }}
     >
       {children}
-    </motion.span>
+    </span>
   );
 }
 
 export default function SplitHeading({ as: Tag = 'h2', segments, className }) {
-  let wordIndex = 0;
+  const ref = useRef(null);
+  // segments llega como literal nuevo en cada render del padre: la
+  // dependencia es el texto, no la identidad del array.
+  const textKey = segments.map((s) => (s.break ? '/' : s.text)).join('|');
+
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el) return undefined;
+    const anims = Array.from(el.querySelectorAll('[data-word]'), (word, i) =>
+      pausedAnimation(word, [{ transform: 'translateY(110%)' }, { transform: 'none' }], {
+        duration: 1200,
+        delay: i * 120,
+        easing: EASE_OUT,
+      }),
+    );
+    const stop = observeOnce(el, () => anims.forEach((a) => a.play()), {
+      amount: 0.12,
+      margin: '0px 0px -8% 0px',
+    });
+    return () => {
+      stop();
+      anims.forEach((a) => a.cancel());
+    };
+  }, [textKey]);
 
   const renderWords = (text) =>
     text.split(/(\s+)/).map((chunk, i) => {
       if (!chunk.trim()) return chunk;
-      const idx = wordIndex++;
-      return (
-        <Word key={`${idx}-${chunk}`} index={idx}>
-          {chunk}
-        </Word>
-      );
+      return <Word key={`${i}-${chunk}`}>{chunk}</Word>;
     });
 
   return (
-    <Tag className={cn(className)}>
+    <Tag ref={ref} className={className}>
       {segments.map((seg, i) => {
         // Espacio antes del <br>: visualmente no cambia nada, pero los
         // extractores de texto que solo quitan etiquetas (varios bots de

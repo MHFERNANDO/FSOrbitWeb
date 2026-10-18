@@ -1,41 +1,56 @@
-import { motion } from 'framer-motion';
+import { useLayoutEffect, useRef } from 'react';
+import { observeOnce, pausedAnimation, EASE_OUT } from '@/lib/inView';
 
 // Reemplaza el motor [data-reveal] + IntersectionObserver a mano de
-// legacy-static/js/core.js. whileInView + viewport.once ya resuelve el
-// caso que tuvo que parchearse ahi (salto de scroll instantaneo que se
-// salta la franja donde dispara el observer).
+// legacy-static/js/core.js. Antes era un motion[as] de Framer Motion por
+// reveal (~40 en la home), cada uno con su propio observer y su propio
+// estado de React. Ahora es un elemento normal: un IntersectionObserver
+// compartido dispara una Web Animation con los mismos keyframes, duracion,
+// delay y curva — sin re-render de React ni trabajo por frame en el hilo
+// principal. Sigue disparando una sola vez, igual que viewport.once.
 const variants = {
-  rise: { hidden: { opacity: 0, y: 26 }, show: { opacity: 1, y: 0 } },
-  fade: { hidden: { opacity: 0 }, show: { opacity: 1 } },
-  scale: { hidden: { opacity: 0, scale: 0.965 }, show: { opacity: 1, scale: 1 } },
-  left: { hidden: { opacity: 0, x: -28 }, show: { opacity: 1, x: 0 } },
-  mask: {
-    hidden: { opacity: 0, y: 14, clipPath: 'inset(0 0 100% 0)' },
-    show: { opacity: 1, y: 0, clipPath: 'inset(0 0 0% 0)' },
-  },
+  rise: [{ opacity: 0, transform: 'translateY(26px)' }, { opacity: 1, transform: 'none' }],
+  fade: [{ opacity: 0 }, { opacity: 1 }],
+  scale: [{ opacity: 0, transform: 'scale(0.965)' }, { opacity: 1, transform: 'none' }],
+  left: [{ opacity: 0, transform: 'translateX(-28px)' }, { opacity: 1, transform: 'none' }],
+  mask: [
+    { opacity: 0, transform: 'translateY(14px)', clipPath: 'inset(0 0 100% 0)' },
+    { opacity: 1, transform: 'none', clipPath: 'inset(0 0 0% 0)' },
+  ],
 };
-
-const EASE_OUT = [0.22, 1, 0.36, 1];
 
 // React 19: ref ya es una prop normal en componentes de funcion, no hace
 // falta forwardRef para que useMagnetic/useCursorTag puedan engancharse
-// al nodo real que monta motion[as].
-export default function Reveal({ as = 'div', type = 'rise', index = 0, className, children, ref, ...props }) {
-  const MotionTag = motion[as] ?? motion.div;
-  const v = variants[type] ?? variants.rise;
+// al nodo real.
+export default function Reveal({ as: Tag = 'div', type = 'rise', index = 0, className, children, ref, ...props }) {
+  const localRef = useRef(null);
+
+  const setRef = (node) => {
+    localRef.current = node;
+    if (typeof ref === 'function') ref(node);
+    else if (ref) ref.current = node;
+  };
+
+  // Layout effect: el estado inicial (oculto) se aplica antes del primer
+  // pintado tras montar/hidratar, como hacia initial="hidden".
+  useLayoutEffect(() => {
+    const el = localRef.current;
+    if (!el) return undefined;
+    const anim = pausedAnimation(el, variants[type] ?? variants.rise, {
+      duration: 850,
+      delay: index * 110,
+      easing: EASE_OUT,
+    });
+    const stop = observeOnce(el, () => anim.play(), { amount: 0.12, margin: '0px 0px -8% 0px' });
+    return () => {
+      stop();
+      anim.cancel();
+    };
+  }, [type, index]);
 
   return (
-    <MotionTag
-      ref={ref}
-      className={className}
-      initial="hidden"
-      whileInView="show"
-      viewport={{ once: true, amount: 0.12, margin: '0px 0px -8% 0px' }}
-      variants={v}
-      transition={{ duration: 0.85, delay: index * 0.11, ease: EASE_OUT }}
-      {...props}
-    >
+    <Tag ref={setRef} className={className} {...props}>
       {children}
-    </MotionTag>
+    </Tag>
   );
 }

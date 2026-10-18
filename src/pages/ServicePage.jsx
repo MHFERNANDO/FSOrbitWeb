@@ -76,8 +76,8 @@ export default function ServicePage({
         <div className="mx-auto max-w-(--maxw) px-(--gutter) py-[var(--section-y)]">
           <div className="grid gap-s7 md:grid-cols-2">
             {highlights.map((h, i) => (
-              <Reveal as="article" type="rise" index={i} key={h.title} className="grid gap-s3">
-                <span className="grid size-13 place-items-center rounded-r2 border border-[color:var(--line-2)] text-signal">
+              <Reveal as="article" type="rise" index={i} key={h.title} className="group grid gap-s3">
+                <span className="grid size-13 place-items-center rounded-r2 border border-[color:var(--line-2)] text-signal shadow-[0_0_0_rgba(0,0,0,0)] transition-[box-shadow] duration-(--d3) group-hover:shadow-[0_0_12px_var(--signal-a08)]">
                   <Icon name={h.icon} className="text-xl" />
                 </span>
                 <h2 className="font-display text-[length:var(--fs-h3)] font-extrabold">{h.title}</h2>

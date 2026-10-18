@@ -171,12 +171,12 @@ export default function Home() {
                 type="rise"
                 index={i}
                 key={s.number}
-                className="grid grid-cols-[auto_auto_1fr] items-center gap-x-s6 gap-y-s4 border-b border-[color:var(--line)] py-s6 md:grid-cols-[58px_52px_1fr_280px]"
+                className="group grid grid-cols-[auto_auto_1fr] items-center gap-x-s6 gap-y-s4 border-b border-[color:var(--line)] px-s4 py-s6 -mx-s4 transition-colors duration-(--d3) hover:bg-ink-850 md:grid-cols-[58px_52px_1fr_280px]"
               >
                 <span className="font-mono text-[length:var(--fs-h3)] text-text-3">
                   <Odometer value={s.number} />
                 </span>
-                <span className="grid size-13 place-items-center rounded-r2 border border-[color:var(--line-2)] text-signal">
+                <span className="grid size-13 place-items-center rounded-r2 border border-[color:var(--line-2)] text-signal shadow-[0_0_0_rgba(0,0,0,0)] transition-[box-shadow] duration-(--d3) group-hover:shadow-[0_0_12px_var(--signal-a08)]">
                   <Icon name={s.icon} className="text-xl" />
                 </span>
                 <div className="col-span-2 grid gap-s2 md:col-span-1">

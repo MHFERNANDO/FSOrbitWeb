@@ -296,7 +296,26 @@ No hay un deploy en vivo todavía, así que todo lo que sigue se corrió contra 
 - Validación de JSON-LD contra el Rich Results Test de Google / schema.org validator (se validó que el JSON es sintácticamente válido; falta la validación semántica contra sus reglas específicas, que requiere la URL pública).
 - Prueba con `prefers-reduced-motion: reduce` activado: **intencionalmente no se implementa** — decisión del cliente ya documentada (ver sección 3 de esta auditoría), así que no hay nada que probar ahí.
 
-## 11. Checklist de acciones fuera del código (para ti)
+## 11. Auditoría post-lanzamiento de fsorbit.com en producción (2026-10-18)
+
+**Lo que ya está bien en producción** (verificado contra `https://fsorbit.com`, no local): las 11 rutas devuelven 200 con contenido real en el HTML (130-740 palabras, leído con user-agent de GPTBot); una ruta inexistente devuelve **404 real**; los 6 headers de seguridad llegan; `robots.txt`, `sitemap.xml` y `llms.txt` responden; title, description, canonical y JSON-LD propios por ruta. Lighthouse móvil en producción: Accesibilidad 100, Best Practices 100, SEO 100.
+
+**Corregido en esta auditoría**:
+- Las 3 landings de servicio servían `<link rel="modulepreload" href="http://127.0.0.1:4321/...">`: el prerender capturaba el origen del servidor local. Ahora se reescribe a rutas relativas.
+- Los H1 de dos líneas se leían pegados para extractores simples ("Páginas webdiseñadas"). Se agregó un espacio antes del `<br>`.
+
+**Lo que falta, por impacto en aparecer primero**:
+
+1. **No hay señales externas de que FS Orbit existe** (lo más importante). Una búsqueda de "FS Orbit desarrollo web Cuenca" no devuelve el sitio ni ninguna mención de la marca: solo agencias homónimas (Orbit Media Studios en Chicago, Orbitwebtech en India, ORBIT Dev en Túnez). Los buscadores con IA citan lo que terceros dicen de un negocio, no solo lo que el negocio dice de sí mismo. Falta: Perfil de Empresa en Google, Bing Webmaster Tools (Bing alimenta la búsqueda de ChatGPT y Copilot), fichas en directorios (Clutch, GoodFirms, DesignRush, Sortlist, TechBehemoths), página de LinkedIn y Facebook con el mismo nombre/ciudad/teléfono. Hoy `sameAs` en el JSON-LD solo tiene Instagram.
+2. **Reseñas reales**: no hay ninguna. Son lo que más pesa en el paquete local de Google ("diseño web Cuenca" con mapa) y lo que habilita estrellas en resultados.
+3. **Enlaces desde los sitios de clientes**: los 4 proyectos podrían llevar "Sitio desarrollado por FS Orbit" en el footer. Dos de ellos (JF Vapes, Laboratorio Diesel MG) están en subdominios `*.vercel.app`, que casi no transmiten autoridad.
+4. **Correo en dominio propio**: `fsorbitt@gmail.com` (con doble t) resta confianza frente a `contacto@fsorbit.com`.
+5. **Rendimiento móvil en producción: 49/100** (LCP 3.7s, TBT 6.4s con la CPU limitada que simula Lighthouse). Es la única categoría bajo el objetivo. Causas: el preloader tapa el contenido ~3.3s (decisión del cliente, no se tocó); React vuelve a montar toda la página prerenderizada en vez de hidratarla (`createRoot` en lugar de `hydrateRoot`); cada palabra de cada título es un componente animado de Framer Motion; bundle principal de 450KB. Google usa datos de usuarios reales para esto y el sitio aún no tiene tráfico suficiente para que cuenten, así que pesa menos que los puntos 1-4, pero sí afecta la experiencia de quien llega desde un celular.
+6. **El H1 de la home no dice qué hacen ni dónde**: "Tu presencia online, diseñada con precisión." El title sí dice "Desarrollo Web en Cuenca, Ecuador", el H1 no. Las landings de servicio sí lo resuelven ("Páginas web diseñadas en Cuenca.").
+7. **Poco contenido que una IA pueda citar**: las páginas de proyecto tienen ~90 palabras y las de servicio ~250. Una sección de guías con respuestas directas a lo que la gente pregunta ("¿Cuánto cuesta una página web en Ecuador?", "¿WordPress o código a medida?", "¿Qué necesita una tienda online en Ecuador?") daría material citable.
+8. **Meta descriptions largas**: la home (169 caracteres), `/proyectos` (180) y rediseño (165) pasan de ~160 y Google las corta.
+
+## 12. Checklist de acciones fuera del código (para ti)
 
 - Crear/optimizar Perfil de Empresa en Google (categoría "Diseñador de sitios web", Cuenca, fotos, reseñas reales).
 - Verificar en Google Search Console y Bing Webmaster Tools, enviar sitemap, pedir indexación.

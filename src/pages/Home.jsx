@@ -13,6 +13,7 @@ import { useProjectPreview } from '@/components/ProjectPreviewModal';
 import { useMagnetic } from '@/hooks/useMagnetic';
 import { useCursorTag } from '@/hooks/useCursorTag';
 import { useSeo } from '@/hooks/useSeo';
+import { breadcrumbs, website } from '@/seo/jsonld';
 import { services, pricingPlans, featuredWork } from '@/data/content';
 
 const WA_BASE = 'https://wa.me/593983113942?text=';
@@ -38,6 +39,7 @@ export default function Home() {
     description:
       'Desarrollo web de alto rendimiento en Cuenca, Ecuador. Código a medida, sin plantillas: landing pages, e-commerce y software custom con SEO técnico y carga ultra-rápida.',
     path: '/',
+    jsonLd: [website(), breadcrumbs([{ name: 'Inicio', path: '/' }])],
   });
   const advisor = useAdvisor();
   const preview = useProjectPreview();

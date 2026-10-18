@@ -6,6 +6,7 @@ import Icon from '@/components/Icon';
 import { useParallax } from '@/hooks/useParallax';
 import { useProjectPreview } from '@/components/ProjectPreviewModal';
 import { useSeo } from '@/hooks/useSeo';
+import { breadcrumbs, projectList } from '@/seo/jsonld';
 import { projects } from '@/data/content';
 
 const EASE_OUT = [0.22, 1, 0.36, 1];
@@ -16,6 +17,13 @@ export default function Proyectos() {
     description:
       'Portafolio de FS Orbit: landing pages, e-commerce y aplicaciones web desarrolladas a medida desde Cuenca, Ecuador. Casos reales con arquitectura escalable y rendimiento optimizado.',
     path: '/proyectos',
+    jsonLd: [
+      breadcrumbs([
+        { name: 'Inicio', path: '/' },
+        { name: 'Proyectos', path: '/proyectos' },
+      ]),
+      projectList(projects.map((p) => ({ title: p.title, description: p.description, path: `/proyectos/${p.slug}`, img: p.img }))),
+    ],
   });
   const preview = useProjectPreview();
 

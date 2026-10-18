@@ -30,6 +30,46 @@ export function service({ name, description, path, areaServed = ['Cuenca', 'Azua
   };
 }
 
+export function website() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'FS Orbit',
+    url: ORIGIN,
+    inLanguage: 'es-EC',
+  };
+}
+
+export function projectList(items) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    itemListElement: items.map(({ title, description, path, img }, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      item: {
+        '@type': 'CreativeWork',
+        name: title,
+        description,
+        url: `${ORIGIN}${path}`,
+        image: `${ORIGIN}/assets/${img}.png`,
+      },
+    })),
+  };
+}
+
+export function creativeWork({ name, description, path, img }) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'CreativeWork',
+    name,
+    description,
+    url: `${ORIGIN}${path}`,
+    image: `${ORIGIN}/assets/${img}.png`,
+    creator: { '@type': 'Organization', name: 'FS Orbit', url: ORIGIN },
+  };
+}
+
 export function faqPage(qa) {
   return {
     '@context': 'https://schema.org',

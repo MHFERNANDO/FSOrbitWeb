@@ -44,15 +44,23 @@
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@85..118,400..900&family=Instrument+Sans:wght@400..700&family=JetBrains+Mono:wght@400..700&display=swap">
 
+    <!-- Organization/ProfessionalService global: vive en index.html (no
+         por ruta) porque describe el negocio, no una pagina especifica.
+         El BreadcrumbList que antes vivia aca (fijo, Inicio->Proyectos)
+         se quito: cada ruta ya inyecta el suyo propio via useSeo
+         (src/hooks/useSeo.js + src/seo/jsonld.js), tenerlo tambien aca
+         duplicaba/contradecia el de la pagina real. -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "Organization",
+      "@type": "ProfessionalService",
       "name": "FS Orbit",
       "alternateName": "FS Orbit Ecuador",
       "url": "https://fsorbit.com",
       "logo": "https://fsorbit.com/assets/Logo.png",
+      "image": "https://fsorbit.com/assets/og-image.png",
       "description": "Agencia de desarrollo web en Cuenca, Ecuador. Sitios a medida, sin plantillas: landing pages, e-commerce y software custom con código propio y SEO técnico.",
+      "priceRange": "$200-$500+",
       "address": {
         "@type": "PostalAddress",
         "addressLocality": "Cuenca",
@@ -87,27 +95,6 @@
         "Web Optimization",
         "Architecture Consulting",
         "Technical Audits"
-      ]
-    }
-    </script>
-
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      "itemListElement": [
-        {
-          "@type": "ListItem",
-          "position": 1,
-          "name": "Inicio",
-          "item": "https://fsorbit.com/"
-        },
-        {
-          "@type": "ListItem",
-          "position": 2,
-          "name": "Proyectos",
-          "item": "https://fsorbit.com/proyectos"
-        }
       ]
     }
     </script>

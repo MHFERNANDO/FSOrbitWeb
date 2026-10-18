@@ -2,7 +2,7 @@ import { useParams, Navigate, Link } from 'react-router-dom';
 import Reveal from '@/components/Reveal';
 import Icon from '@/components/Icon';
 import { useSeo } from '@/hooks/useSeo';
-import { breadcrumbs } from '@/seo/jsonld';
+import { breadcrumbs, creativeWork } from '@/seo/jsonld';
 import { projects } from '@/data/content';
 
 export default function ProyectoDetalle() {
@@ -19,11 +19,14 @@ export default function ProyectoDetalle() {
       : 'Proyecto no encontrado.',
     path: `/proyectos/${slug}`,
     jsonLd: project
-      ? breadcrumbs([
-          { name: 'Inicio', path: '/' },
-          { name: 'Proyectos', path: '/proyectos' },
-          { name: project.title, path: `/proyectos/${slug}` },
-        ])
+      ? [
+          breadcrumbs([
+            { name: 'Inicio', path: '/' },
+            { name: 'Proyectos', path: '/proyectos' },
+            { name: project.title, path: `/proyectos/${slug}` },
+          ]),
+          creativeWork({ name: project.title, description: project.description, path: `/proyectos/${slug}`, img: project.img }),
+        ]
       : undefined,
   });
 

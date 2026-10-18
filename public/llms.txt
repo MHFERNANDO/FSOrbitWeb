@@ -1,0 +1,32 @@
+# FS Orbit
+
+> Agencia de desarrollo web con base en Cuenca, Azuay, Ecuador. Atiende proyectos en cualquier ubicación del país. Construye sitios y software a medida, con código propio — sin plantillas de WordPress, Wix ni builders.
+
+FS Orbit diseña y desarrolla landing pages, tiendas online y software a medida, con foco en rendimiento (Core Web Vitals), SEO técnico y diseño sin plantillas.
+
+## Servicios
+
+- [Diseño Web en Cuenca](https://fsorbit.com/servicios/diseno-web-cuenca): landing pages y sitios corporativos a medida.
+- [Tiendas Online](https://fsorbit.com/servicios/tiendas-online): e-commerce con catálogo, gestión de inventario y pedidos vía WhatsApp o pasarela de pago.
+- [Rediseño y Optimización](https://fsorbit.com/servicios/rediseno-y-optimizacion): mejora de velocidad y modernización de sitios existentes.
+- Mantenimiento web: parches de seguridad, soporte técnico y backup diario.
+
+## Precios
+
+Ver [fsorbit.com/precios](https://fsorbit.com/precios) para el detalle completo. Resumen:
+
+- **Orbit Impact** — desde $200: 1 landing page, diseño de autor, SEO on-page estructural.
+- **Orbit Commerce** — desde $500: tienda online de hasta 4 vistas, catálogo dinámico, pedidos por WhatsApp.
+- **Deep Space System** — precio a consultar: software a medida (React/Next.js, bases de datos, roles de usuario, integraciones).
+
+## Proyectos
+
+Portafolio completo en [fsorbit.com/proyectos](https://fsorbit.com/proyectos): Gravity Studio (landing page), Acculab System (plataforma médica), JF Vapes Store (e-commerce) y Laboratorio Diesel MG (sitio corporativo).
+
+## Contacto
+
+- Web: [fsorbit.com/contacto](https://fsorbit.com/contacto) (formulario, WhatsApp, teléfono, correo)
+- WhatsApp: +593 98 311 3942
+- Correo: fsorbitt@gmail.com
+- Instagram: https://www.instagram.com/fs_orbit/
+- Zona de servicio: Cuenca, Azuay — proyectos en todo Ecuador

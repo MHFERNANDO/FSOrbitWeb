@@ -102,7 +102,7 @@ export function AdvisorProvider({ children }) {
 function StepView({ data, onPick }) {
   return (
     <div className="grid gap-s5">
-      <span className="font-mono text-[length:var(--fs-mono)] uppercase tracking-[var(--tr-mono)] text-signal">
+      <span className="font-mono text-[length:var(--fs-mono)] uppercase tracking-[var(--tr-mono)] text-text-3">
         {data.label}
       </span>
       <h2 className="font-display text-[length:var(--fs-h3)] font-extrabold">{data.question}</h2>
@@ -112,9 +112,9 @@ function StepView({ data, onPick }) {
             key={opt.value}
             type="button"
             onClick={() => onPick(opt.value)}
-            className="flex items-center gap-s4 rounded-r3 border border-[color:var(--line)] p-s5 text-left transition-colors hover:border-signal-a48 hover:bg-ink-800"
+            className="flex items-center gap-s4 rounded-r3 border border-[color:var(--line)] p-s5 text-left transition-colors hover:border-[color:var(--line-2)] hover:bg-ink-800"
           >
-            <Icon name={opt.icon} className="text-signal" />
+            <Icon name={opt.icon} className="text-text-2" />
             {opt.label}
           </button>
         ))}

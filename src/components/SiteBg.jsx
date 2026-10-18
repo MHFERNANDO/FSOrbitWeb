@@ -1,4 +1,8 @@
 // Fondo global fijo: reticula + vineta. Estatico, sin blur pesado.
+// El tinte radial era cian (--signal-a06) cubriendo buena parte del
+// viewport — exactamente el tipo de "fondo con el acento" que la
+// paleta nueva prohibe (ver AUDITORIA.md). Se reemplaza por un tinte
+// neutro: misma sutileza visual, sin teñir toda la pantalla de marca.
 export default function SiteBg() {
   return (
     <div className="pointer-events-none fixed inset-0 z-[var(--z-bg)] overflow-hidden" aria-hidden="true">
@@ -16,7 +20,7 @@ export default function SiteBg() {
         className="absolute inset-0"
         style={{
           background:
-            'radial-gradient(ellipse 60% 45% at 78% 8%, var(--signal-a06), transparent 62%), radial-gradient(ellipse 70% 50% at 12% 42%, rgba(93, 120, 255, .05), transparent 65%)',
+            'radial-gradient(ellipse 60% 45% at 78% 8%, rgba(255, 255, 255, .035), transparent 62%), radial-gradient(ellipse 70% 50% at 12% 42%, rgba(255, 255, 255, .02), transparent 65%)',
         }}
       />
     </div>

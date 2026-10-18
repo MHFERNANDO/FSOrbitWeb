@@ -43,7 +43,7 @@ export default function Precios() {
   return (
     <main id="main">
       <header className="mx-auto max-w-(--maxw) px-(--gutter) pb-[clamp(56px,7vw,96px)] pt-[clamp(72px,10vw,152px)]">
-        <Reveal as="span" type="fade" className="mb-s5 inline-block font-mono text-[length:var(--fs-mono)] uppercase tracking-[var(--tr-mono)] text-signal">
+        <Reveal as="span" type="fade" className="mb-s5 inline-block font-mono text-[length:var(--fs-mono)] uppercase tracking-[var(--tr-mono)] text-text-3">
           Niveles de Despliegue
         </Reveal>
         <SplitHeading
@@ -69,7 +69,7 @@ export default function Precios() {
                 style={plan.popular ? { boxShadow: 'inset 0 2px 0 0 var(--color-signal)' } : undefined}
               >
                 {plan.popular && (
-                  <span className="absolute right-s6 top-s5 font-mono text-[length:var(--fs-micro)] font-bold uppercase tracking-[.14em] text-signal">
+                  <span className="absolute right-s6 top-s5 font-mono text-[length:var(--fs-micro)] font-bold uppercase tracking-[.14em] text-text-2">
                     EL MÁS SOLICITADO
                   </span>
                 )}
@@ -87,7 +87,7 @@ export default function Precios() {
                 <ul className="grid gap-s3">
                   {plan.features.map((f) => (
                     <li key={f} className="flex items-start gap-s2 text-[length:var(--fs-small)] text-text-2">
-                      <Icon name="check" className="mt-1 shrink-0 text-signal" />
+                      <Icon name="check" className="mt-1 shrink-0 text-text-2" />
                       {f}
                     </li>
                   ))}
@@ -98,8 +98,8 @@ export default function Precios() {
                   rel="noopener noreferrer"
                   className={
                     plan.ctaVariant === 'primary'
-                      ? 'rounded-r2 bg-signal px-s5 py-s4 text-center font-mono text-[length:var(--fs-mono)] font-bold uppercase tracking-[var(--tr-mono)] text-signal-ink transition-all duration-300 hover:scale-105 hover:bg-signal-2 active:scale-95'
-                      : 'rounded-r2 border border-[color:var(--line-2)] px-s5 py-s4 text-center font-mono text-[length:var(--fs-mono)] font-bold uppercase tracking-[var(--tr-mono)] text-text transition-all duration-300 hover:border-signal hover:bg-signal-a12 hover:text-signal'
+                      ? 'rounded-r2 bg-signal px-s5 py-s4 text-center font-mono text-[length:var(--fs-mono)] font-bold uppercase tracking-[var(--tr-mono)] text-signal-ink transition-all duration-300 hover:scale-105 active:scale-95'
+                      : 'rounded-r2 border border-[color:var(--line-2)] px-s5 py-s4 text-center font-mono text-[length:var(--fs-mono)] font-bold uppercase tracking-[var(--tr-mono)] text-text transition-all duration-300 hover:bg-ink-800'
                   }
                 >
                   {plan.cta}

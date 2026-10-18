@@ -56,7 +56,7 @@ export default function Home() {
 
         <div className="relative grid gap-s5">
           <AtomReveal>
-            <span className="size-1.5 rounded-full bg-signal" style={{ boxShadow: '0 0 6px var(--signal-a24)' }} />
+            <span className="size-1.5 rounded-full bg-[color:var(--line-2)]" />
             Impulsando negocios en la era digital
           </AtomReveal>
 
@@ -75,14 +75,16 @@ export default function Home() {
             <Reveal as="button" type="rise" index={0}
               ref={primaryBtnRef}
               onClick={advisor?.openModal}
-              className="rounded-r2 bg-signal px-s6 py-s4 font-mono text-[length:var(--fs-mono)] font-bold uppercase tracking-[var(--tr-mono)] text-signal-ink transition-all duration-300 hover:scale-115 hover:shadow-xl hover:bg-signal-2 active:scale-95"
-              style={{ boxShadow: '0 0 8px var(--signal-a24)' }}
+              className="rounded-r2 bg-signal px-s6 py-s4 font-mono text-[length:var(--fs-mono)] font-bold uppercase tracking-[var(--tr-mono)] text-signal-ink transition-all duration-300 hover:scale-105 active:scale-95"
+              style={{ boxShadow: 'none', transition: 'box-shadow 300ms ease-out, transform 300ms ease-out' }}
+              onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 4px 18px var(--signal-a08)'}
+              onMouseLeave={(e) => e.currentTarget.style.boxShadow = 'none'}
             >
               Empezar ahora
             </Reveal>
             <Reveal as="a" type="rise" index={1}
               href="#proyectos"
-              className="rounded-r2 border border-[color:var(--line-2)] px-s6 py-s4 font-mono text-[length:var(--fs-mono)] font-bold uppercase tracking-[var(--tr-mono)] text-text transition-all duration-300 hover:border-signal hover:bg-signal-a12 hover:text-signal active:bg-signal-a24"
+              className="rounded-r2 border border-[color:var(--line-2)] px-s6 py-s4 font-mono text-[length:var(--fs-mono)] font-bold uppercase tracking-[var(--tr-mono)] text-text transition-all duration-300 hover:border-[color:var(--line-2)] hover:bg-ink-800"
             >
               Ver trabajos
             </Reveal>
@@ -99,7 +101,7 @@ export default function Home() {
       <section id="superioridad" className="border-t border-[color:var(--line)]">
         <div className="mx-auto grid max-w-(--maxw) gap-s9 px-(--gutter) py-[var(--section-y)] lg:grid-cols-2">
           <div className="grid gap-s5">
-            <Reveal as="span" type="fade" className="font-mono text-[length:var(--fs-mono)] uppercase tracking-[var(--tr-mono)] text-signal">
+            <Reveal as="span" type="fade" className="font-mono text-[length:var(--fs-mono)] uppercase tracking-[var(--tr-mono)] text-text-3">
               Arquitectura Limpia
             </Reveal>
             <SplitHeading
@@ -125,12 +127,12 @@ export default function Home() {
                   ))}
                 </ul>
               </div>
-              <div className="grid gap-s3 rounded-r3 border border-signal-a48 bg-signal-a06 p-s5">
+              <div className="grid gap-s3 rounded-r3 border border-[color:var(--line-2)] bg-ink-850 p-s5">
                 <h4 className="font-display font-bold text-signal">FS Orbit Pure Code</h4>
                 <ul className="grid gap-s2 text-[length:var(--fs-small)] text-text-2">
                   {['Carga instantánea (Core Web Vitals)', 'Seguridad de nivel militar', 'Escalabilidad ilimitada', 'Diseño 100% a medida'].map((t) => (
                     <li key={t} className="flex items-center gap-s2">
-                      <Icon name="check" className="text-signal" />
+                      <Icon name="check" className="text-text-2" />
                       {t}
                     </li>
                   ))}
@@ -168,7 +170,7 @@ export default function Home() {
                 key={s.number}
                 className="grid grid-cols-[auto_auto_1fr] items-center gap-x-s6 gap-y-s4 border-b border-[color:var(--line)] py-s6 md:grid-cols-[58px_52px_1fr_280px]"
               >
-                <span className="font-mono text-[length:var(--fs-h3)] text-text-4">
+                <span className="font-mono text-[length:var(--fs-h3)] text-text-3">
                   <Odometer value={s.number} />
                 </span>
                 <span className="grid size-13 place-items-center rounded-r2 border border-[color:var(--line-2)] text-signal">
@@ -219,7 +221,7 @@ export default function Home() {
                 style={plan.popular ? { boxShadow: 'inset 0 2px 0 0 var(--color-signal)' } : undefined}
               >
                 {plan.popular && (
-                  <span className="absolute right-s6 top-s5 font-mono text-[length:var(--fs-micro)] font-bold uppercase tracking-[.14em] text-signal">
+                  <span className="absolute right-s6 top-s5 font-mono text-[length:var(--fs-micro)] font-bold uppercase tracking-[.14em] text-text-2">
                     EL MÁS SOLICITADO
                   </span>
                 )}
@@ -237,7 +239,7 @@ export default function Home() {
                 <ul className="grid gap-s3">
                   {plan.features.map((f) => (
                     <li key={f} className="flex items-start gap-s2 text-[length:var(--fs-small)] text-text-2">
-                      <Icon name="check" className="mt-1 shrink-0 text-signal" />
+                      <Icon name="check" className="mt-1 shrink-0 text-text-2" />
                       {f}
                     </li>
                   ))}
@@ -249,8 +251,8 @@ export default function Home() {
                   ref={plan.popular ? storeBtnRef : undefined}
                   className={
                     plan.ctaVariant === 'primary'
-                      ? 'rounded-r2 bg-signal px-s5 py-s4 text-center font-mono text-[length:var(--fs-mono)] font-bold uppercase tracking-[var(--tr-mono)] text-signal-ink transition-all duration-300 hover:scale-115 hover:shadow-xl hover:bg-signal-2 active:scale-95'
-                      : 'rounded-r2 border border-[color:var(--line-2)] px-s5 py-s4 text-center font-mono text-[length:var(--fs-mono)] font-bold uppercase tracking-[var(--tr-mono)] text-text transition-all duration-300 hover:border-signal hover:bg-signal-a12 hover:text-signal active:bg-signal-a24'
+                      ? 'rounded-r2 bg-signal px-s5 py-s4 text-center font-mono text-[length:var(--fs-mono)] font-bold uppercase tracking-[var(--tr-mono)] text-signal-ink transition-all duration-300 hover:scale-105 active:scale-95'
+                      : 'rounded-r2 border border-[color:var(--line-2)] px-s5 py-s4 text-center font-mono text-[length:var(--fs-mono)] font-bold uppercase tracking-[var(--tr-mono)] text-text transition-all duration-300 hover:bg-ink-800'
                   }
                 >
                   {plan.cta}
@@ -299,7 +301,7 @@ export default function Home() {
             ref={exploreBtnRef}
             to="/proyectos"
             viewTransition
-            className="inline-flex shrink-0 items-center gap-s3 rounded-r2 border-signal-a48 bg-signal px-s6 py-s4 font-mono text-[length:var(--fs-mono)] font-bold tracking-[var(--tr-mono)] uppercase"
+            className="inline-flex shrink-0 items-center gap-s3 rounded-r2 border-transparent bg-signal px-s6 py-s4 font-mono text-[length:var(--fs-mono)] font-bold tracking-[var(--tr-mono)] uppercase"
             textClassName="flex items-center gap-s3 text-signal-ink"
           >
             Explorar Galería Completa
@@ -350,7 +352,7 @@ function WorkCard({ work, index, onOpen }) {
           <h4 className="font-display font-bold">{work.title}</h4>
           <p className="text-[length:var(--fs-small)] text-text-3">{work.tag}</p>
         </div>
-        <span className="inline-flex items-center gap-s2 text-[length:var(--fs-small)] text-signal">
+        <span className="inline-flex items-center gap-s2 text-[length:var(--fs-small)] text-text-2">
           Ver Preview
           <Icon name="arrow-ur" />
         </span>

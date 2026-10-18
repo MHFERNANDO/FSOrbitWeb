@@ -36,7 +36,7 @@ export default function ProyectoDetalle() {
         <Link
           to="/proyectos"
           viewTransition
-          className="mb-s6 inline-flex items-center gap-s2 font-mono text-[length:var(--fs-mono)] font-bold uppercase tracking-[var(--tr-mono)] text-text-2 transition-colors hover:text-signal"
+          className="mb-s6 inline-flex items-center gap-s2 font-mono text-[length:var(--fs-mono)] font-bold uppercase tracking-[var(--tr-mono)] text-text-2 transition-colors hover:text-text"
         >
           <Icon name="arrow-left" />
           Volver a proyectos
@@ -101,7 +101,7 @@ export default function ProyectoDetalle() {
               href={project.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-s3 rounded-r2 border border-[color:var(--line-2)] px-s6 py-s4 font-mono text-[length:var(--fs-mono)] font-bold uppercase tracking-[var(--tr-mono)] text-text transition-all hover:border-signal hover:text-signal"
+              className="inline-flex items-center gap-s3 rounded-r2 border border-[color:var(--line-2)] px-s6 py-s4 font-mono text-[length:var(--fs-mono)] font-bold uppercase tracking-[var(--tr-mono)] text-text transition-all hover:bg-ink-800"
             >
               Ver sitio en vivo
               <Icon name="arrow-ur" />

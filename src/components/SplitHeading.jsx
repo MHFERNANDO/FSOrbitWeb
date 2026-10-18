@@ -27,7 +27,7 @@ export function Highlight({ children }) {
   const isInView = useInView(ref, { once: true, amount: 0.12 });
 
   const baseStyle = {
-    backgroundImage: 'linear-gradient(var(--signal-a48), var(--signal-a48))',
+    backgroundImage: 'linear-gradient(var(--color-signal), var(--color-signal))',
     backgroundRepeat: 'no-repeat',
     backgroundPosition: '0 calc(100% - .04em)',
   };

@@ -26,7 +26,7 @@ export default function NotFound() {
   return (
     <main id="main">
       <div className="mx-auto grid max-w-(--maxw) place-items-start gap-s7 px-(--gutter) py-[clamp(96px,14vw,196px)]">
-        <Reveal as="span" type="fade" className="font-mono text-[length:var(--fs-mono)] uppercase tracking-[var(--tr-mono)] text-signal">
+        <Reveal as="span" type="fade" className="font-mono text-[length:var(--fs-mono)] uppercase tracking-[var(--tr-mono)] text-text-3">
           Error 404
         </Reveal>
         <Reveal as="h1" type="rise" index={1} className="max-w-[16ch] font-display text-[length:var(--fs-h1)] font-extrabold leading-[var(--lh-tight)]">
@@ -42,7 +42,7 @@ export default function NotFound() {
               key={link.to}
               to={link.to}
               viewTransition
-              className="group flex items-center justify-between gap-s3 rounded-r3 border border-[color:var(--line)] px-s5 py-s4 transition-colors hover:border-signal hover:text-signal"
+              className="group flex items-center justify-between gap-s3 rounded-r3 border border-[color:var(--line)] px-s5 py-s4 transition-colors hover:border-[color:var(--line-2)] hover:text-text"
             >
               {link.label}
               <Icon name="arrow-right" className="transition-transform group-hover:translate-x-1" />

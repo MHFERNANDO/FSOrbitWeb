@@ -29,7 +29,7 @@ export default function Proyectos() {
         <Reveal
           as="span"
           type="fade"
-          className="mb-s5 inline-flex items-center font-mono text-[length:var(--fs-mono)] tracking-[.1em] text-signal after:ml-1.5 after:h-[1.05em] after:w-[7px] after:animate-[caret_1.05s_steps(2)_infinite] after:bg-signal"
+          className="mb-s5 inline-flex items-center font-mono text-[length:var(--fs-mono)] tracking-[.1em] text-text-3 after:ml-1.5 after:h-[1.05em] after:w-[7px] after:animate-[caret_1.05s_steps(2)_infinite] after:bg-text-3"
         >
           &gt; fs_orbit --fetch-projects --active
         </Reveal>
@@ -102,7 +102,7 @@ function ProjectBlock({ project, even, onOpen }) {
           }}
           className="inline-flex items-center gap-s2 rounded-r2 bg-signal px-s5 py-s4 font-mono text-[length:var(--fs-mono)] font-bold uppercase tracking-[var(--tr-mono)] text-signal-ink"
           style={{ display: 'inline-flex', boxShadow: 'none', transition: 'box-shadow 300ms ease-out' }}
-          onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 6px 16px rgba(34, 228, 245, 0.14)'}
+          onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 4px 14px var(--signal-a08)'}
           onMouseLeave={(e) => e.currentTarget.style.boxShadow = 'none'}
         >
           Ejecutar Proyecto

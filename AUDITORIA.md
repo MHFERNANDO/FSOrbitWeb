@@ -194,7 +194,69 @@ Build verificado completo (9 rutas + 404, todas con contenido real en el HTML cr
 
 **Bug propio detectado y corregido durante esta fase**: al agregar las rutas nuevas, un `useNavigate` quedó usado en `Navbar.jsx` sin su import (lo había quitado al simplificar el botón "Hablemos") — tiraba abajo toda la SPA (pantalla en negro, cero contenido en todas las rutas). Se detectó porque el build volvió a dar 0 palabras en *todas* las rutas prerenderizadas, no solo una — la auditoría de palabras por ruta (ver tabla arriba) sirvió exactamente para lo que se diseñó: detectar esto antes de dar la fase por cerrada, no después.
 
-## 9. Checklist de acciones fuera del código (para ti)
+## 9. Paleta — reducción del acento cian (implementado, 2026-10-18)
+
+Pedido explícito del cliente: el cian (#22E4F5) dejó de ser "el color del sitio" (fondos, bordes, glows, íconos por todas partes) para pasar a ser un acento puntual — 2-3 focos de atención por pantalla, nunca fondo, nunca borde grueso, nunca glow difuminado en reposo. El cian del logo no cambia.
+
+**Por qué**: legibilidad (demasiado cian compite con el texto en vez de dirigir la vista), percepción de marca premium (un acento usado con disciplina lee como una decisión de diseño; usado en todas partes lee como "tema por defecto de una librería de componentes"), y foco de atención (si todo es el color de marca, nada destaca como *la* acción a tomar).
+
+**Tokens nuevos/ajustados en [src/index.css](src/index.css)**:
+
+| Antes | Después | Nota |
+|---|---|---|
+| `--color-ink-1000` `#050609` | `#0b0d10` | fondo base |
+| `--color-ink-900` `#07080c` | `#121417` | superficie 1 (tarjetas) |
+| `--color-ink-800` `#0d0f15` | `#171a1e` | superficie 2 (tarjetas elevadas/hover) |
+| `--color-text` `#edf0f6` | `#d4d7db` | texto primario |
+| `--color-text-2` `#a3acbc` | `#868a90` | texto secundario (ajustado por contraste, ver abajo) |
+| `--color-text-3` `#7b8494` | `#808488` | texto muted (ajustado por contraste) |
+| `--color-signal-2` `#14a3b8` | *(eliminado)* | ya no hay variante secundaria de cian |
+| `--signal-a24` `rgba(…,.24)`, `--signal-a48` `rgba(…,.48)` | *(eliminados)* | glow amplio prohibido |
+| *(nuevo)* | `--signal-a08` `rgba(34,228,245,.08)` | `--accent-glow`, solo hover del CTA principal |
+| `--line` `rgba(255,255,255,.075)` | `#1c2024` (sólido) | `--border` |
+| `--line-2` `rgba(255,255,255,.13)` | `#272c31` (sólido) | `--border-strong` |
+| `--color-signal` `#22e4f5` | sin cambio | el acento en sí no cambia |
+| `--color-signal-ink` `#04171c` | `#06262a` | texto sobre relleno de acento |
+
+**Elemento por elemento — qué se quedó cian y qué pasó a neutro** (la lista completa está en los commits; resumen por tipo):
+
+Se quedan cian (los únicos usos permitidos):
+- CTA principal de cada sección (un botón relleno por sección, nunca dos compitiendo): hero, planes destacados, cada landing de servicio, formulario de contacto, modal del asesor, preview de proyecto, botón flotante del chat.
+- Estado activo de navegación (el link de la página actual, nuevo — antes no existía indicador de "dónde estoy") y el anillo de foco global (`--ring`, ya apuntaba al acento).
+- Íconos funcionales dentro de las tarjetas de servicio (`/`, `/servicios/*`) — es la excepción que vos mismo marcaste como permitida.
+- Subrayados de hover en links de texto (email/teléfono del footer, ahora neutros por defecto y cian solo al hover+underline).
+- Un puñado de acentos tipográficos puntuales que funcionan como "la única cosa que destaca en esta sección" sin ser fondo/borde/glow: la palabra resaltada en cada H1/H2 (`SplitHeading`), la etiqueta "FS Orbit Pure Code" en la comparación de arquitectura, el label "Solución" en cada caso de estudio, "Volver al inicio" en el 404.
+
+Pasan a neutro (texto secundario/muted, bordes `--border`/`--border-strong`, superficies):
+- Todos los kickers/etiquetas de sección ("Arquitectura Limpia", "Niveles de Despliegue", "Diseño Web — Cuenca", etc.) en las 9 rutas.
+- Badges informativos ("EL MÁS SOLICITADO") y checkmarks de listas de features (18 checks solo en la sección de precios de Home).
+- Botones secundarios/outline junto a un CTA principal ("Ver trabajos", "Ver precios", planes no destacados) — antes todos tenían hover cian, ahora es "uno, no varios" por sección.
+- Barra de progreso de scroll del navbar (chrome ambiental, no un punto de atención).
+- El tinte radial cian de fondo global (`SiteBg.jsx`) — exactamente el "fondo con el acento" que la regla prohíbe; reemplazado por un tinte blanco neutro de la misma sutileza.
+- La tarjeta comparativa "FS Orbit Pure Code" (antes `border-signal-a48 bg-signal-a06`, un fondo + borde cian): ahora superficie y borde neutros, solo el título queda como acento.
+- Scrollbar del sitio (antes cian sólido todo el scroll, chrome persistente) → gris neutro.
+- Íconos de contacto en Footer y `/contacto` (WhatsApp, teléfono, correo, ubicación) — eran 4+ círculos cian simultáneos; ahora neutros con hover sutil.
+- Íconos de las opciones del ChatDock y del asesor de 3 pasos (AdvisorModal) — varias opciones a la vez no pueden ser todas "la" opción destacada.
+- El token "string" del resaltado de sintaxis en `CodeWindow.jsx` (decoración de editor de código, no UI de marca) pasó de cian a un verde convencional de sintaxis, coherente con los otros colores ya hardcodeados ahí (morado, azul, amarillo).
+- Glows: todo `box-shadow`/`drop-shadow` del acento que usaba `--signal-a24`/`--signal-a48` (8-32px de blur, hasta 48% de opacidad) bajó a `--signal-a08`/`--signal-a12` (3-18px, 8-12% de opacidad) y, salvo en el CTA principal al hover, se eliminó en reposo. El canvas del hero (`HeroOrbit.jsx`) se dejó como arte ambiental de marca, no como "UI chrome" — ya tenía solo 2 de 4 órbitas en cian antes de este cambio, y su `shadowBlur` ya estaba por debajo del límite de 16px desde el pase de "reducir el estilo neón" anterior en esta misma sesión; se documenta la distinción (arte de fondo vs. elementos de interfaz) como criterio aplicado, no como omisión.
+
+**Contraste AA — verificado y corregido**: los valores que pedía el spec para `--text-secondary` (#7d8187) y `--text-muted` (#55595e) fallaban AA (< 4.5:1) contra las superficies de tarjeta más claras del sitio (`--color-ink-800` / `#171a1e`, usada en el ChatDock, `CodeWindow` y las tarjetas de precios) — hasta 2.76:1 en el peor caso. Se ajustaron a `#868a90` y `#808488` respectivamente, verificados por cálculo de luminancia relativa (WCAG) contra las 3 superficies reales del sitio (`--bg`, `--color-ink-900`, `--color-ink-800`):
+
+| Color | vs. `--bg` | vs. `ink-900` | vs. `ink-800` |
+|---|---|---|---|
+| `--text` sobre fondo | 13.47:1 | 12.78:1 | 12.09:1 |
+| `--text-2` sobre fondo | 5.61:1 | 5.32:1 | 5.03:1 |
+| `--text-3` sobre fondo | 5.16:1 | 4.90:1 | 4.63:1 |
+| `--color-signal` (acento) sobre fondo | 12.49:1 | 11.85:1 | 11.21:1 |
+| `--color-signal-ink` sobre `--color-signal` (texto de botón relleno) | 10.23:1 | — | — |
+
+Todo por encima de 4.5:1 (AA, texto normal) en los tres fondos reales del sitio. `--color-text-4` (#5b5f65) se mantiene definido mas no se usa en ningún texto legible — los 4 usos que tenía (número de servicio en Home, placeholder del formulario, numeración de línea del CodeWindow, el "%" del preloader) se migraron a `--color-text-3`, que sí pasa AA, porque esos textos sí comunican información (no son decoración pura) y un verificador automático de contraste los va a evaluar igual.
+
+**Pendiente de tu parte**: correr Lighthouse real contra el deploy (Fase 7) para confirmar que el puntaje de accesibilidad no bajó — el cálculo de contraste de arriba es correcto matemáticamente, pero no reemplaza una corrida real de Lighthouse/axe sobre la página renderizada.
+
+**Verificado visualmente** en el preview: home (hero, arquitectura, servicios, precios), `/precios` standalone y `/contacto` — en cada pantalla revisada, el cian aparece en 2-3 elementos como máximo (normalmente: el botón flotante de chat, que es persistente en todo el sitio, más el CTA principal de la sección y a veces la palabra resaltada del título).
+
+## 10. Checklist de acciones fuera del código (para ti)
 
 - Crear/optimizar Perfil de Empresa en Google (categoría "Diseñador de sitios web", Cuenca, fotos, reseñas reales).
 - Verificar en Google Search Console y Bing Webmaster Tools, enviar sitemap, pedir indexación.

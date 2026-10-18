@@ -25,7 +25,7 @@ export default function Footer() {
         <Reveal as="div" type="rise" index={1} className="grid content-start gap-s3">
           <h4 className="font-display text-[length:var(--fs-h4)] font-extrabold">Enlaces</h4>
           {FOOTER_LINKS.map((link) => (
-            <Link key={link.to} to={link.to} viewTransition className="text-text-2 transition-colors hover:text-signal">
+            <Link key={link.to} to={link.to} viewTransition className="text-text-2 transition-colors hover:text-text">
               {link.label}
             </Link>
           ))}
@@ -45,7 +45,7 @@ export default function Footer() {
                 rel="noopener noreferrer"
                 className="group flex items-center gap-s4 transition-transform duration-(--d3) hover:translate-x-1"
               >
-                <span className="grid size-10 place-items-center rounded-r2 border border-[color:var(--line-2)] text-signal">
+                <span className="grid size-10 place-items-center rounded-r2 border border-[color:var(--line-2)] text-text-2 transition-colors group-hover:text-signal">
                   <Icon name="whatsapp" fill className="text-lg" />
                 </span>
                 <span className="grid">
@@ -60,10 +60,10 @@ export default function Footer() {
         <Reveal as="div" type="rise" index={3} className="grid gap-s4">
           <h4 className="font-display text-[length:var(--fs-h4)] font-extrabold">Escríbenos</h4>
           <p className="text-text-2">¿Prefieres el correo o una llamada?</p>
-          <a href={`mailto:${contact.email}`} className="text-signal underline-offset-4 hover:underline">
+          <a href={`mailto:${contact.email}`} className="text-text-2 underline-offset-4 transition-colors hover:text-signal hover:underline">
             {contact.email}
           </a>
-          <a href={`tel:${contact.tel}`} className="text-signal underline-offset-4 hover:underline">
+          <a href={`tel:${contact.tel}`} className="text-text-2 underline-offset-4 transition-colors hover:text-signal hover:underline">
             {contact.telDisplay}
           </a>
           <a
@@ -81,7 +81,7 @@ export default function Footer() {
       <div className="mx-auto flex max-w-(--maxw) flex-col items-center justify-between gap-s4 border-t border-[color:var(--line)] px-(--gutter) py-s5 text-[length:var(--fs-small)] text-text-3 sm:flex-row">
         <p>&copy; 2026 FS Orbit. Todos los derechos reservados.</p>
         <div className="flex items-center gap-s2">
-          <span className="size-1.5 rounded-full bg-signal" style={{ boxShadow: '0 0 4px var(--signal-a24)' }} />
+          <span className="size-1.5 rounded-full bg-[color:var(--line-2)]" />
           Sistemas Operativos Online
         </div>
       </div>

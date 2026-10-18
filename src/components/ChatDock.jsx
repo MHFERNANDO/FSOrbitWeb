@@ -31,7 +31,7 @@ function ChatPanel({ panelRef, setOpen }) {
     <>
       <div className="flex items-center justify-between gap-s3 border-b border-[color:var(--line)] p-s5">
         <div className="flex items-center gap-s3">
-          <span className="size-2 rounded-full bg-signal" style={{ boxShadow: '0 0 4px var(--signal-a24)' }} />
+          <span className="size-2 rounded-full bg-[color:var(--line-2)]" />
           <div>
             <p className="font-display text-sm font-bold text-text">FS Orbit Assistant</p>
             <p className="text-[length:var(--fs-small)] text-text-3">Online • Respuesta inmediata</p>
@@ -55,9 +55,9 @@ function ChatPanel({ panelRef, setOpen }) {
               href={opt.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-s3 rounded-r3 border border-[color:var(--line)] p-s4 transition-colors hover:border-signal-a48"
+              className="flex items-center gap-s3 rounded-r3 border border-[color:var(--line)] p-s4 transition-colors hover:border-[color:var(--line-2)]"
             >
-              <Icon name={opt.icon} className="text-signal" />
+              <Icon name={opt.icon} className="text-text-2" />
               <span className="grid">
                 <strong className="text-sm text-text">{opt.title}</strong>
                 <small className="text-[length:var(--fs-micro)] text-text-3">{opt.subtitle}</small>
@@ -120,12 +120,14 @@ export default function ChatDock() {
         onClick={() => setOpen((v) => !v)}
         aria-label={open ? 'Cerrar chat' : 'Abrir chat'}
         aria-expanded={open}
-        className="relative grid size-14 place-items-center rounded-full bg-signal text-signal-ink transition-transform hover:scale-105"
-        style={{ boxShadow: '0 0 12px var(--signal-a24)' }}
+        className="relative grid size-14 place-items-center rounded-full bg-signal text-signal-ink transition-[transform,box-shadow] hover:scale-105"
+        style={{ boxShadow: 'none', transition: 'box-shadow 300ms ease-out, transform 300ms ease-out' }}
+        onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 4px 18px var(--signal-a08)'}
+        onMouseLeave={(e) => e.currentTarget.style.boxShadow = 'none'}
       >
         <Icon name="chat" className="text-xl" />
         {!open && (
-          <span className="absolute inset-0 -z-10 animate-ping rounded-full bg-signal-a24" aria-hidden="true" />
+          <span className="absolute inset-0 -z-10 animate-ping rounded-full bg-signal-a12" aria-hidden="true" />
         )}
       </button>
     </div>

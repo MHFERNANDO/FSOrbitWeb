@@ -40,7 +40,7 @@ export default function ServicePage({
   return (
     <main id="main">
       <header className="mx-auto max-w-(--maxw) px-(--gutter) pb-[clamp(56px,7vw,96px)] pt-[clamp(72px,10vw,152px)]">
-        <Reveal as="span" type="fade" className="mb-s5 inline-block font-mono text-[length:var(--fs-mono)] uppercase tracking-[var(--tr-mono)] text-signal">
+        <Reveal as="span" type="fade" className="mb-s5 inline-block font-mono text-[length:var(--fs-mono)] uppercase tracking-[var(--tr-mono)] text-text-3">
           {kicker}
         </Reveal>
         <SplitHeading
@@ -56,14 +56,14 @@ export default function ServicePage({
             href={`${WA_BASE}${encodeURIComponent(ctaWhatsappText)}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="rounded-r2 bg-signal px-s6 py-s4 font-mono text-[length:var(--fs-mono)] font-bold uppercase tracking-[var(--tr-mono)] text-signal-ink transition-all duration-300 hover:scale-105 hover:bg-signal-2 active:scale-95"
+            className="rounded-r2 bg-signal px-s6 py-s4 font-mono text-[length:var(--fs-mono)] font-bold uppercase tracking-[var(--tr-mono)] text-signal-ink transition-all duration-300 hover:scale-105 active:scale-95"
           >
             Cotiza por WhatsApp
           </a>
           <Link
             to="/precios"
             viewTransition
-            className="rounded-r2 border border-[color:var(--line-2)] px-s6 py-s4 font-mono text-[length:var(--fs-mono)] font-bold uppercase tracking-[var(--tr-mono)] text-text transition-all duration-300 hover:border-signal hover:bg-signal-a12 hover:text-signal"
+            className="rounded-r2 border border-[color:var(--line-2)] px-s6 py-s4 font-mono text-[length:var(--fs-mono)] font-bold uppercase tracking-[var(--tr-mono)] text-text transition-all duration-300 hover:bg-ink-800"
           >
             Ver precios
           </Link>

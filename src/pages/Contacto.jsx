@@ -9,7 +9,7 @@ import { contact } from '@/data/content';
 const WA_BASE = 'https://wa.me/593983113942?text=';
 
 const FIELD_CLASS =
-  'w-full rounded-r2 border border-[color:var(--line-2)] bg-ink-900 px-s4 py-s3 text-text placeholder:text-text-4 outline-none transition-colors focus:border-signal';
+  'w-full rounded-r2 border border-[color:var(--line-2)] bg-ink-900 px-s4 py-s3 text-text placeholder:text-text-3 outline-none transition-colors focus:border-signal';
 
 function Field({ label, children }) {
   return (
@@ -56,7 +56,7 @@ export default function Contacto() {
   return (
     <main id="main">
       <header className="mx-auto max-w-(--maxw) px-(--gutter) pb-[clamp(56px,7vw,96px)] pt-[clamp(72px,10vw,152px)]">
-        <Reveal as="span" type="fade" className="mb-s5 inline-block font-mono text-[length:var(--fs-mono)] uppercase tracking-[var(--tr-mono)] text-signal">
+        <Reveal as="span" type="fade" className="mb-s5 inline-block font-mono text-[length:var(--fs-mono)] uppercase tracking-[var(--tr-mono)] text-text-3">
           Contacto
         </Reveal>
         <SplitHeading
@@ -76,9 +76,9 @@ export default function Contacto() {
               href={`${WA_BASE}${encodeURIComponent('Hola, quiero cotizar un proyecto web')}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="group flex items-center gap-s4 rounded-r3 border border-[color:var(--line)] p-s5 transition-colors hover:border-signal"
+              className="group flex items-center gap-s4 rounded-r3 border border-[color:var(--line)] p-s5 transition-colors hover:border-[color:var(--line-2)]"
             >
-              <span className="grid size-12 place-items-center rounded-r2 border border-[color:var(--line-2)] text-signal">
+              <span className="grid size-12 place-items-center rounded-r2 border border-[color:var(--line-2)] text-text-2">
                 <Icon name="whatsapp" fill className="text-xl" />
               </span>
               <span className="grid">
@@ -87,8 +87,8 @@ export default function Contacto() {
               </span>
             </a>
 
-            <a href={`tel:${contact.tel}`} className="group flex items-center gap-s4 rounded-r3 border border-[color:var(--line)] p-s5 transition-colors hover:border-signal">
-              <span className="grid size-12 place-items-center rounded-r2 border border-[color:var(--line-2)] text-signal">
+            <a href={`tel:${contact.tel}`} className="group flex items-center gap-s4 rounded-r3 border border-[color:var(--line)] p-s5 transition-colors hover:border-[color:var(--line-2)]">
+              <span className="grid size-12 place-items-center rounded-r2 border border-[color:var(--line-2)] text-text-2">
                 <Icon name="phone" className="text-xl" />
               </span>
               <span className="grid">
@@ -97,8 +97,8 @@ export default function Contacto() {
               </span>
             </a>
 
-            <a href={`mailto:${contact.email}`} className="group flex items-center gap-s4 rounded-r3 border border-[color:var(--line)] p-s5 transition-colors hover:border-signal">
-              <span className="grid size-12 place-items-center rounded-r2 border border-[color:var(--line-2)] text-signal">
+            <a href={`mailto:${contact.email}`} className="group flex items-center gap-s4 rounded-r3 border border-[color:var(--line)] p-s5 transition-colors hover:border-[color:var(--line-2)]">
+              <span className="grid size-12 place-items-center rounded-r2 border border-[color:var(--line-2)] text-text-2">
                 <Icon name="mail" className="text-xl" />
               </span>
               <span className="grid">
@@ -108,7 +108,7 @@ export default function Contacto() {
             </a>
 
             <div className="flex items-center gap-s4 rounded-r3 border border-[color:var(--line)] p-s5">
-              <span className="grid size-12 place-items-center rounded-r2 border border-[color:var(--line-2)] text-signal">
+              <span className="grid size-12 place-items-center rounded-r2 border border-[color:var(--line-2)] text-text-2">
                 <Icon name="pin" className="text-xl" />
               </span>
               <span className="grid">
@@ -156,7 +156,7 @@ export default function Contacto() {
             <button
               type="submit"
               disabled={status === 'sending'}
-              className="rounded-r2 bg-signal px-s6 py-s4 font-mono text-[length:var(--fs-mono)] font-bold uppercase tracking-[var(--tr-mono)] text-signal-ink transition-all duration-300 hover:bg-signal-2 disabled:opacity-50"
+              className="rounded-r2 bg-signal px-s6 py-s4 font-mono text-[length:var(--fs-mono)] font-bold uppercase tracking-[var(--tr-mono)] text-signal-ink transition-all duration-300 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:hover:scale-100"
             >
               {status === 'sending' ? 'Enviando…' : 'Enviar mensaje'}
             </button>

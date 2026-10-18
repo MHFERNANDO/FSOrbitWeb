@@ -42,7 +42,7 @@ function DrawerLinks({ onNavigate, onHablemos }) {
             onClick={onHablemos}
             className="inline-flex rounded-r2 bg-signal px-5 py-[11px] font-mono text-[length:var(--fs-mono)] font-bold uppercase tracking-[var(--tr-mono)] text-signal-ink"
             style={{ display: 'inline-flex', boxShadow: 'none', transition: 'box-shadow 300ms ease-out' }}
-            onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 6px 16px rgba(34, 228, 245, 0.14)'}
+            onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 4px 14px var(--signal-a08)'}
             onMouseLeave={(e) => e.currentTarget.style.boxShadow = 'none'}
           >
             Hablemos
@@ -130,7 +130,7 @@ export default function Navbar() {
           <Link
             viewTransition
             to="/"
-            className="inline-flex items-center gap-s3 font-mono text-[length:var(--fs-mono)] font-bold uppercase tracking-[var(--tr-mono)] text-text-2 transition-colors duration-(--d2) hover:text-signal [&:hover_svg]:-translate-x-1"
+            className="inline-flex items-center gap-s3 font-mono text-[length:var(--fs-mono)] font-bold uppercase tracking-[var(--tr-mono)] text-text-2 transition-colors duration-(--d2) hover:text-text [&:hover_svg]:-translate-x-1"
           >
             <Icon name="arrow-left" className="text-[1.35em] transition-transform duration-(--d3)" />
             Volver
@@ -159,17 +159,27 @@ export default function Navbar() {
             </button>
 
             <ul className="hidden items-center gap-s7 md:flex">
-              {NAV_LINKS.map((link) => (
-                <li key={link.href}>
-                  <a
-                    href={link.href}
-                    className="group relative block py-s2 font-mono text-[length:var(--fs-mono)] font-medium uppercase tracking-[var(--tr-mono)] text-text-2 transition-colors duration-(--d2) hover:text-text"
-                  >
-                    {link.label}
-                    <span className="absolute inset-x-0 bottom-0 h-px origin-right scale-x-0 bg-signal transition-transform duration-(--d3) group-hover:origin-left group-hover:scale-x-100" />
-                  </a>
-                </li>
-              ))}
+              {NAV_LINKS.map((link) => {
+                // Activo = la ruta actual matchea el link (ignorando el
+                // ancla de "Servicios", que vive dentro de Home). Unico
+                // lugar del nav donde el acento marca "donde estoy", no
+                // decoracion.
+                const isActive = link.href === '/#servicios' ? false : location.pathname === link.href;
+                return (
+                  <li key={link.href}>
+                    <a
+                      href={link.href}
+                      aria-current={isActive ? 'page' : undefined}
+                      className={`group relative block py-s2 font-mono text-[length:var(--fs-mono)] font-medium uppercase tracking-[var(--tr-mono)] transition-colors duration-(--d2) ${isActive ? 'text-signal' : 'text-text-2 hover:text-text'}`}
+                    >
+                      {link.label}
+                      <span
+                        className={`absolute inset-x-0 bottom-0 h-px origin-right bg-signal transition-transform duration-(--d3) group-hover:origin-left group-hover:scale-x-100 ${isActive ? 'scale-x-100' : 'scale-x-0'}`}
+                      />
+                    </a>
+                  </li>
+                );
+              })}
               <li>
                 <motion.div
                   className="inline-block"
@@ -182,7 +192,7 @@ export default function Navbar() {
                     onClick={goHablemos}
                     className="inline-flex rounded-r2 bg-signal px-5 py-[11px] font-mono text-[length:var(--fs-mono)] font-bold uppercase tracking-[var(--tr-mono)] text-signal-ink"
                     style={{ display: 'inline-flex', boxShadow: 'none', transition: 'box-shadow 300ms ease-out' }}
-                    onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 6px 16px rgba(34, 228, 245, 0.14)'}
+                    onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 4px 14px var(--signal-a08)'}
                     onMouseLeave={(e) => e.currentTarget.style.boxShadow = 'none'}
                   >
                     Hablemos
@@ -213,13 +223,14 @@ export default function Navbar() {
         )}
       </div>
 
+      {/* Barra de progreso de lectura: chrome ambiental, no uno de los
+          2-3 puntos de atencion de la pantalla — neutra, sin glow. */}
       <span
-        className="absolute inset-x-0 -bottom-px h-px origin-left bg-signal"
+        className="absolute inset-x-0 -bottom-px h-px origin-left bg-[color:var(--line-2)]"
         style={{
           transform: `scaleX(${progress})`,
           opacity: progress > 0.001 ? 1 : 0,
-          boxShadow: progress > 0.001 ? '0 0 6px var(--signal-a24)' : 'none',
-          transitionProperty: 'opacity, box-shadow',
+          transitionProperty: 'opacity',
           transitionDuration: '0ms',
           transitionTimingFunction: 'ease-out'
         }}

@@ -54,7 +54,7 @@ function ChatPanel({ panelRef, setOpen }) {
               key={opt.title}
               href={opt.href}
               target="_blank"
-              rel="noopener"
+              rel="noopener noreferrer"
               className="flex items-center gap-s3 rounded-r3 border border-[color:var(--line)] p-s4 transition-colors hover:border-signal-a48"
             >
               <Icon name={opt.icon} className="text-signal" />

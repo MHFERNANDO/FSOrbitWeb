@@ -23,7 +23,7 @@ export default function Footer() {
                 key={wa.number}
                 href={`https://wa.me/${wa.number}`}
                 target="_blank"
-                rel="noopener"
+                rel="noopener noreferrer"
                 className="group flex items-center gap-s4 transition-transform duration-(--d3) hover:translate-x-1"
               >
                 <span className="grid size-10 place-items-center rounded-r2 border border-[color:var(--line-2)] text-signal">
@@ -47,7 +47,7 @@ export default function Footer() {
           <a
             href={contact.instagram}
             target="_blank"
-            rel="noopener"
+            rel="noopener noreferrer"
             className="inline-flex items-center gap-s2 text-text-2 transition-colors hover:text-signal"
           >
             <Icon name="instagram" fill />

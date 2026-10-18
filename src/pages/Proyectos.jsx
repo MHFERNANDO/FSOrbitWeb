@@ -12,9 +12,9 @@ const EASE_OUT = [0.22, 1, 0.36, 1];
 
 export default function Proyectos() {
   useSeo({
-    title: 'Proyectos | FS Orbit — Casos de Ingeniería Web',
+    title: 'Proyectos | FS Orbit — Desarrollo Web en Cuenca, Ecuador',
     description:
-      'Portafolio de FS Orbit: landing pages, e-commerce y aplicaciones web desarrolladas a medida en Ecuador. Casos reales con arquitectura escalable y rendimiento optimizado.',
+      'Portafolio de FS Orbit: landing pages, e-commerce y aplicaciones web desarrolladas a medida desde Cuenca, Ecuador. Casos reales con arquitectura escalable y rendimiento optimizado.',
     path: '/proyectos',
   });
   const preview = useProjectPreview();
@@ -95,7 +95,7 @@ function ProjectBlock({ project, even, onOpen }) {
         <a
           href={project.url}
           target="_blank"
-          rel="noopener"
+          rel="noopener noreferrer"
           onClick={(e) => {
             e.preventDefault();
             onOpen?.(project.url);

@@ -105,7 +105,6 @@ No voy a revertir esa decisión del cliente por mi cuenta — es una decisión d
 - `{{TODO: testimonios/reseñas reales de clientes (texto + nombre/empresa), si los hay}}`
 - `{{TODO: métricas reales de los proyectos del portafolio (Acculab, Gravity, JF Vapes, Lab Diesel) — resultado medible de cada caso, si existe}}`
 - `{{TODO: confirmar si https://acculab.bio es el dominio de producción correcto para reemplazar los dos links a acculab.vercel.app}}`
-- `{{TODO: confirmar cuenta real de Twitter/X @fsorbit, o quitar twitter:creator}}`
 - `{{TODO: perfiles sociales adicionales reales (Facebook, LinkedIn) además de Instagram (https://www.instagram.com/fs_orbit/, ya confirmado en content.js)}}`
 - `{{TODO: tiempos de entrega reales por plan/servicio, para la sección Proceso y FAQ}}`
 - `{{TODO: Vercel Analytics o GA4? (el brief pide preguntar antes de instalar)}}`
@@ -123,7 +122,40 @@ Commits `808cf97` (paleta) y `a9d6799` (prerender) en la rama `rediseno-seo-geo`
 - De paso se corrigió `SplitHeading.jsx`: los segmentos de título sin `<br>` entre ellos no llevaban espacio en el DOM (confirmado con el HTML prerenderizado real: `...de</span><span>Alto...`). Ahora se inserta un nodo de texto `" "` entre segmentos consecutivos que no vienen separados por `break`.
 - **Limitación actual**: el prerender solo corre sobre las 2 rutas que existen hoy (`/`, `/proyectos`). Las rutas nuevas de Fase 2 de contenido (servicios, precios, proyectos/slug, contacto) se agregan agregando entradas a `src/seo/routes.js` — no requiere tocar el script.
 
-## 7. Checklist de acciones fuera del código (para ti)
+## 7. Fase técnica — robots.txt, headers de seguridad y metadatos (implementado)
+
+Commit en `rediseno-seo-geo` sobre el mismo trabajo de Fase 2.
+
+**`public/robots.txt`**
+- `Disallow: *.pdf` → `Disallow: /*.pdf$` (sintaxis válida).
+- Se eliminaron los bloques específicos de `Googlebot`/`Bingbot` (hacían que Google ignorara el bloque `*`) y el `Crawl-delay` (Google no lo usa; Bing lo tiene deprecado).
+- Se quitaron `Disallow: /admin` y `Disallow: /private`: esas rutas no existen en el código (`App.jsx` solo define `/` y `/proyectos`), así que anunciarlas en robots.txt solo revelaba nombres de rutas sin proteger nada real. Si en el futuro se construye un panel, se protege con auth + `noindex`, no con robots.txt.
+- Se agregó `Allow: /` explícito para GPTBot, OAI-SearchBot, ClaudeBot, PerplexityBot y Google-Extended.
+
+**`vercel.json` — headers de seguridad** (aplican a todas las rutas vía `source: "/(.*)"`)
+- `Strict-Transport-Security: max-age=63072000; includeSubDomains; preload`
+- `X-Content-Type-Options: nosniff`
+- `Referrer-Policy: strict-origin-when-cross-origin`
+- `Permissions-Policy` deshabilita cámara, micrófono, geolocalización, pagos, USB, sensores de movimiento y FLoC (`interest-cohort`) — el sitio no usa ninguno.
+- `Cross-Origin-Opener-Policy: same-origin`
+- `Content-Security-Policy-Report-Only` (intencionalmente en modo *report-only*, no enforced todavía, siguiendo la instrucción del brief de ajustar antes de activar): `default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'`.
+  - `style-src 'unsafe-inline'` es necesario porque Framer Motion controla las animaciones con estilos inline dinámicos (`style="transform:..."`) en casi todos los componentes — sin esto se rompería toda la animación del sitio. No hay forma práctica de usar nonces ahí sin reescribir el motor de animaciones.
+  - **Pendiente antes de activarlo como `Content-Security-Policy` real**: los dos bloques `<script type="application/ld+json">` del `<head>` son scripts inline; con `script-src 'self'` estricto, Chrome los reporta como violación (aunque no ejecutan código). Antes de enforced hay que agregarles un hash SHA-256 a `script-src` o mover el JSON-LD a un archivo externo. Se deja documentado para no activar un CSP que rompa el JSON-LD sin darse cuenta.
+  - No hay endpoint de `report-to`/`report-uri` configurado — en este modo las violaciones solo se ven en la consola del navegador, no se centralizan. Suficiente para probar manualmente antes de Fase 7; si se quiere monitoreo real hace falta un endpoint de reportes.
+
+**Metadatos (`index.html`, `useSeo` de Home/Proyectos, JSON-LD)**
+- `<title>`, `og:title` y `twitter:title` unificados: **"FS Orbit | Desarrollo Web en Cuenca, Ecuador"** (antes eran tres textos distintos). Mismo criterio en la descripción (meta description = og:description = twitter:description), reescrita sin relleno tipo "ecosistemas digitales potentes": *"Desarrollo web de alto rendimiento en Cuenca, Ecuador. Código a medida, sin plantillas: landing pages, e-commerce y software custom con SEO técnico y carga ultra-rápida."*
+- `meta name="keywords"` eliminada (Google la ignora; tenía además el typo "desarrollo scalable").
+- `geo.placename` → "Cuenca, Ecuador", `geo.region` → "EC-A" (código ISO 3166-2 de Azuay), `ICBM` → coordenadas reales de Cuenca (`-2.9001, -79.0059`, antes apuntaba al centro geográfico de Ecuador).
+- `twitter:creator` (`@fsorbit`) eliminado: no pude verificar que esa cuenta exista — por la regla de no inventar datos, se quita en vez de dejar una afirmación sin confirmar. Si existe de verdad, es un `{{TODO}}` trivial de volver a agregar.
+- **Imagen OG nueva**: se generó `public/assets/og-image.png` (1200×630, con `scripts/generate-og-image.mjs` — Puppeteer renderiza una tarjeta HTML con el logo real, la paleta cian del sitio y el copy ya unificado, nada inventado) en vez de servir `Logo.png` (414×414) como miniatura. `og:image:width/height` actualizados a 1200/630 y `twitter:card` pasó de `summary` a `summary_large_image`.
+- JSON-LD `Organization`: `address` ahora tiene `addressLocality: "Cuenca"` y `addressRegion: "Azuay"` (antes `addressLocality: "Ecuador"`, un error de nivel — un país no es una localidad); se agregó `geo` (GeoCoordinates) y `areaServed`. `sameAs` apuntaba a `instagram.com/fsorbit` (sin guión bajo, cuenta no confirmada); se corrigió a la cuenta real que ya estaba confirmada en `content.js`: `https://www.instagram.com/fs_orbit/`. Se quitó el campo `founder` (solo decía "FS Orbit Team", sin valor informativo real).
+- Todos los enlaces externos (`target="_blank"`) pasaron de `rel="noopener"` a `rel="noopener noreferrer"` (7 instancias en `Home.jsx`, `Proyectos.jsx`, `Footer.jsx`, `ChatDock.jsx`, `ProjectPreviewModal.jsx`).
+- `npm audit fix` (sin `--force`): bajó de 17 a 7 vulnerabilidades. Las 7 restantes son todas de la cadena de `shadcn` (herramienta CLI de scaffolding, devDependency, no se envía al bundle del cliente) y requieren una actualización mayor (`shadcn@1.0.0`, breaking). No se aplicó sin confirmar — es una dependencia de desarrollo, no de producción, así que el riesgo real es bajo; queda como `{{TODO: decidir si forzamos la actualización de shadcn (breaking) para limpiar el audit al 100%}}`.
+
+**Verificado**: build completo (`vite build` + prerender + sitemap) pasa; `dist/index.html` confirma título unificado, `og:image` apuntando a `og-image.png`, sin `meta keywords` ni `twitter:creator`.
+
+## 8. Checklist de acciones fuera del código (para ti)
 
 - Crear/optimizar Perfil de Empresa en Google (categoría "Diseñador de sitios web", Cuenca, fotos, reseñas reales).
 - Verificar en Google Search Console y Bing Webmaster Tools, enviar sitemap, pedir indexación.

@@ -34,9 +34,9 @@ function AtomReveal({ children }) {
 
 export default function Home() {
   useSeo({
-    title: 'FS Orbit | Soluciones Digitales a Medida',
+    title: 'FS Orbit | Desarrollo Web en Cuenca, Ecuador',
     description:
-      'FS Orbit | Desarrollo web de alto rendimiento en Ecuador. Ingeniería digital, arquitecturas escalables, diseño moderno. Servicios: Landing Pages, E-commerce, Aplicaciones web, Optimización, Soluciones custom.',
+      'Desarrollo web de alto rendimiento en Cuenca, Ecuador. Código a medida, sin plantillas: landing pages, e-commerce y software custom con SEO técnico y carga ultra-rápida.',
     path: '/',
   });
   const advisor = useAdvisor();
@@ -245,7 +245,7 @@ export default function Home() {
                 <a
                   href={`${WA_BASE}${encodeURIComponent(plan.whatsappText)}`}
                   target="_blank"
-                  rel="noopener"
+                  rel="noopener noreferrer"
                   ref={plan.popular ? storeBtnRef : undefined}
                   className={
                     plan.ctaVariant === 'primary'
@@ -326,7 +326,7 @@ function WorkCard({ work, index, onOpen }) {
       ref={cursorRef}
       href={work.url}
       target="_blank"
-      rel="noopener"
+      rel="noopener noreferrer"
       onClick={(e) => {
         e.preventDefault();
         onOpen?.(work.url);

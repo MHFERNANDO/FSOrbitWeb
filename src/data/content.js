@@ -20,6 +20,7 @@ export const contact = {
 export const services = [
   {
     number: '01',
+    href: '/servicios/diseno-web-cuenca',
     icon: 'globe',
     title: 'Desarrollo Web',
     description: 'Sitios de alto rendimiento, seguros y optimizados para SEO. Construimos la base sólida que tu empresa necesita para escalar.',
@@ -27,6 +28,7 @@ export const services = [
   },
   {
     number: '02',
+    href: '/servicios/diseno-web-cuenca',
     icon: 'layout',
     title: 'Diseño UI/UX',
     description: 'Interfaces modernas centradas en el usuario. No solo diseñamos cosas bonitas, creamos experiencias que convierten visitas en clientes.',
@@ -34,6 +36,7 @@ export const services = [
   },
   {
     number: '03',
+    href: '/servicios/tiendas-online',
     icon: 'bag',
     title: 'E-commerce',
     description: 'Sistemas de venta online robustos y escalables. Gestiona inventario, pagos y envíos en una plataforma diseñada para vender 24/7.',
@@ -41,6 +44,7 @@ export const services = [
   },
   {
     number: '04',
+    href: '/servicios/rediseno-y-optimizacion',
     icon: 'shield',
     title: 'Mantenimiento Web',
     description: 'Protegemos tu inversión con soporte técnico continuo. Corrección de errores, actualizaciones de seguridad y respaldos constantes para que nunca dejes de estar online.',
@@ -48,6 +52,7 @@ export const services = [
   },
   {
     number: '05',
+    href: '/servicios/rediseno-y-optimizacion',
     icon: 'bolt',
     title: 'Optimización & Upgrade',
     description: '¿Tu web se quedó en el pasado? Transformamos sitios lentos y antiguos en plataformas rápidas y modernas, mejorando el código y la experiencia móvil sin perder tu esencia.',
@@ -130,6 +135,7 @@ const IMG_SIZE = {
 export const featuredWork = [
   {
     title: 'Acculab',
+    slug: 'acculab-system',
     tag: 'Plataforma de Análisis Clínicos',
     img: 'AccuLabPreview',
     ...IMG_SIZE.AccuLabPreview,
@@ -138,6 +144,7 @@ export const featuredWork = [
   },
   {
     title: 'Gravity Studio',
+    slug: 'gravity-studio',
     tag: 'Landing Page',
     img: 'GravityPreview',
     ...IMG_SIZE.GravityPreview,
@@ -152,7 +159,7 @@ export const projects = [
     slug: 'gravity-studio',
     code: '// 01_GRAVITY_STUDIO',
     title: 'Gravity Studio',
-    description: 'Landing Page',
+    description: 'Landing page de autor para un estudio creativo, sin plantillas, con animaciones de scroll propias.',
     tags: ['JS_ENGINE', 'MARKETING'],
     img: 'GravityPreview',
     ...IMG_SIZE.GravityPreview,

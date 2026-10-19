@@ -1,22 +1,15 @@
 {
   "short_name": "FS Orbit",
-  "name": "FS Orbit | Ingeniería de Alto Rendimiento",
-  "description": "Ecosistemas digitales y arquitecturas de software de misión crítica.",
+  "name": "FS Orbit | Desarrollo Web en Cuenca, Ecuador",
+  "description": "Desarrollo web a medida en Cuenca, Ecuador: landing pages, tiendas online y software con código propio.",
+  "lang": "es-EC",
   "icons": [
-    {
-      "src": "/assets/Logo.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "/assets/Logo.png",
-      "sizes": "512x512",
-      "type": "image/png"
-    }
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ],
   "start_url": "/",
   "display": "standalone",
-  "theme_color": "#22E4F5",
-  "background_color": "#050609",
-  "orientation": "portrait"
+  "theme_color": "#0b0d10",
+  "background_color": "#0b0d10"
 }

@@ -38,7 +38,7 @@ export default function Home() {
   useSeo({
     title: 'FS Orbit | Desarrollo Web en Cuenca, Ecuador',
     description:
-      'Desarrollo web de alto rendimiento en Cuenca, Ecuador. Código a medida, sin plantillas: landing pages, e-commerce y software custom con SEO técnico y carga ultra-rápida.',
+      'Desarrollo web en Cuenca, Ecuador. Código a medida, sin plantillas: landing pages, tiendas online y software con SEO técnico y carga rápida.',
     path: '/',
     jsonLd: [website(), breadcrumbs([{ name: 'Inicio', path: '/' }])],
   });
@@ -180,7 +180,11 @@ export default function Home() {
                   <Icon name={s.icon} className="text-xl" />
                 </span>
                 <div className="col-span-2 grid gap-s2 md:col-span-1">
-                  <h3 className="font-display text-[length:var(--fs-h3)] font-extrabold">{s.title}</h3>
+                  <h3 className="font-display text-[length:var(--fs-h3)] font-extrabold">
+                    <Link to={s.href} viewTransition className="transition-colors hover:text-signal">
+                      {s.title}
+                    </Link>
+                  </h3>
                   <p className="max-w-[56ch] text-text-2">{s.description}</p>
                 </div>
                 <ul className="col-span-3 flex flex-wrap gap-s2 md:col-span-1 md:justify-end">
@@ -325,21 +329,19 @@ function WorkCard({ work, index, onOpen }) {
   const cursorRef = useCursorTag('Ver preview');
 
   return (
-    <Reveal
-      as="a"
-      type="rise"
-      index={index}
-      ref={cursorRef}
-      href={work.url}
-      target="_blank"
-      rel="noopener noreferrer"
-      onClick={(e) => {
-        e.preventDefault();
-        onOpen?.(work.url);
-      }}
-      className="group block overflow-hidden rounded-r4 border border-[color:var(--line)]"
-    >
-      <div className="aspect-video overflow-hidden">
+    <Reveal as="article" type="rise" index={index} className="group overflow-hidden rounded-r4 border border-[color:var(--line)]">
+      <a
+        ref={cursorRef}
+        href={work.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={`Vista previa de ${work.title}`}
+        onClick={(e) => {
+          e.preventDefault();
+          onOpen?.(work.url);
+        }}
+        className="block aspect-video overflow-hidden"
+      >
         <picture>
           <source srcSet={`/assets/${work.img}.webp`} type="image/webp" />
           <img
@@ -352,16 +354,24 @@ function WorkCard({ work, index, onOpen }) {
             className="h-full w-full object-cover transition-transform duration-(--d4) group-hover:scale-105"
           />
         </picture>
-      </div>
+      </a>
       <div className="flex items-center justify-between p-s5">
         <div>
-          <h3 className="font-display font-bold">{work.title}</h3>
+          <h3 className="font-display font-bold">
+            <Link to={`/proyectos/${work.slug}`} viewTransition className="transition-colors hover:text-signal">
+              {work.title}
+            </Link>
+          </h3>
           <p className="text-[length:var(--fs-small)] text-text-3">{work.tag}</p>
         </div>
-        <span className="inline-flex items-center gap-s2 text-[length:var(--fs-small)] text-text-2">
-          Ver Preview
-          <Icon name="arrow-ur" />
-        </span>
+        <Link
+          to={`/proyectos/${work.slug}`}
+          viewTransition
+          className="inline-flex items-center gap-s2 text-[length:var(--fs-small)] text-text-2 transition-colors hover:text-text"
+        >
+          Ver proyecto
+          <Icon name="arrow-right" />
+        </Link>
       </div>
     </Reveal>
   );

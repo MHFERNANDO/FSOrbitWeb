@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Reveal from '@/components/Reveal';
 import SplitHeading from '@/components/SplitHeading';
@@ -15,7 +16,7 @@ export default function Proyectos() {
   useSeo({
     title: 'Proyectos | FS Orbit — Desarrollo Web en Cuenca, Ecuador',
     description:
-      'Portafolio de FS Orbit: landing pages, e-commerce y aplicaciones web desarrolladas a medida desde Cuenca, Ecuador. Casos reales con arquitectura escalable y rendimiento optimizado.',
+      'Proyectos web de FS Orbit: landing pages, tiendas online y plataformas a medida hechas desde Cuenca, Ecuador, con código propio.',
     path: '/proyectos',
     jsonLd: [
       breadcrumbs([
@@ -84,7 +85,11 @@ function ProjectBlock({ project, even, onOpen }) {
   const content = (
     <div className="grid items-start gap-s4 justify-items-start">
       <span className="font-mono text-[length:var(--fs-mono)] tracking-[.12em] text-text-3">{project.code}</span>
-      <h2 className="font-display text-[length:var(--fs-h2)] leading-[1.02] font-extrabold">{project.title}</h2>
+      <h2 className="font-display text-[length:var(--fs-h2)] leading-[1.02] font-extrabold">
+        <Link to={`/proyectos/${project.slug}`} viewTransition className="transition-colors hover:text-signal">
+          {project.title}
+        </Link>
+      </h2>
       <p className="max-w-[44ch] text-[length:var(--fs-small)] text-text-2">{project.description}</p>
       <ul className="mt-s1 flex flex-wrap gap-s2">
         {project.tags.map((tag) => (

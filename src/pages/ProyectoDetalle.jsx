@@ -84,6 +84,28 @@ export default function ProyectoDetalle() {
       </section>
 
       <section className="border-t border-[color:var(--line)]">
+        <div className="mx-auto max-w-(--maxw) px-(--gutter) py-s8">
+          <h2 className="font-mono text-[length:var(--fs-mono)] uppercase tracking-[var(--tr-mono)] text-text-3">Otros proyectos</h2>
+          <ul className="mt-s5 grid gap-s3 sm:grid-cols-3">
+            {projects
+              .filter((p) => p.slug !== project.slug)
+              .map((p) => (
+                <li key={p.slug}>
+                  <Link
+                    to={`/proyectos/${p.slug}`}
+                    viewTransition
+                    className="group flex items-center justify-between gap-s3 rounded-r3 border border-[color:var(--line)] px-s5 py-s4 transition-colors hover:border-[color:var(--line-2)] hover:text-text"
+                  >
+                    {p.title}
+                    <Icon name="arrow-right" className="transition-transform group-hover:translate-x-1" />
+                  </Link>
+                </li>
+              ))}
+          </ul>
+        </div>
+      </section>
+
+      <section className="border-t border-[color:var(--line)]">
         <Reveal
           as="div"
           type="rise"

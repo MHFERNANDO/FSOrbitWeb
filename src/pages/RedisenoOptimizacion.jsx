@@ -6,7 +6,7 @@ export default function RedisenoOptimizacion() {
       path="/servicios/rediseno-y-optimizacion"
       breadcrumbLabel="Rediseño y Optimización Web"
       seoTitle="Rediseño y Optimización de Páginas Web | FS Orbit"
-      seoDescription="¿Tu página web es lenta o quedó anticuada? La rediseñamos y optimizamos: mejor velocidad de carga, código limpio y experiencia móvil, desde Cuenca para todo Ecuador."
+      seoDescription="¿Tu web es lenta o anticuada? La rediseñamos y optimizamos: carga rápida, código limpio y buena experiencia en celular. Desde Cuenca para todo Ecuador."
       kicker="Rediseño & Optimización"
       h1Segments={[{ text: 'Tu web lenta,' }, { break: true }, { text: 'rediseñada y rápida.', highlight: true }]}
       intro="¿Tu página web se quedó en el pasado? Transformamos sitios lentos y antiguos en plataformas rápidas y modernas, mejorando el código y la experiencia móvil sin perder tu esencia de marca."

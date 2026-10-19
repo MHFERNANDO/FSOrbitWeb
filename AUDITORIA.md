@@ -315,6 +315,8 @@ No hay un deploy en vivo todavía, así que todo lo que sigue se corrió contra 
 7. **Poco contenido que una IA pueda citar**: las páginas de proyecto tienen ~90 palabras y las de servicio ~250. Una sección de guías con respuestas directas a lo que la gente pregunta ("¿Cuánto cuesta una página web en Ecuador?", "¿WordPress o código a medida?", "¿Qué necesita una tienda online en Ecuador?") daría material citable.
 8. **Meta descriptions largas**: la home (169 caracteres), `/proyectos` (180) y rediseño (165) pasan de ~160 y Google las corta.
 
+**Re-auditoría (2026-10-19), corregido y verificado en producción**: redirección de `/ruta/` y `/index.html` a la URL canónica (308); caché de un año para JS/CSS con hash y fuentes; favicon cuadrado solo con el emblema (favicon.ico + 48/192/512); manifest actualizado; los 4 casos de proyecto ya reciben enlaces (antes eran páginas huérfanas) y los servicios de la home enlazan a su landing; meta descriptions dentro de 160 caracteres; `lang="es-EC"`. Con el merge de la rama de rendimiento, Lighthouse móvil en producción: Performance 49 → **80** (TBT 6.4 s → 200 ms), Accesibilidad, Best Practices y SEO en 100. Pendiente de tu lado: `www.fsorbit.com` sigue redirigiendo con 307 temporal porque lo define el panel de dominios de Vercel.
+
 ## 12. Checklist de acciones fuera del código (para ti)
 
 - Crear/optimizar Perfil de Empresa en Google (categoría "Diseñador de sitios web", Cuenca, fotos, reseñas reales).

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { reducedMotion } from '@/lib/motion';
 
 const SESSION_KEY = 'fsorbit-booted';
 const STATUS_MESSAGES = ['Inicializando sistema', 'Cargando activos', 'Compilando interfaz', 'Listo'];
@@ -19,7 +20,9 @@ export default function Preloader({ onDone }) {
     document.body.classList.add('is-loading');
 
     const returning = sessionStorage.getItem(SESSION_KEY) === 'true';
-    const duration = returning ? 700 : 2000;
+    // Con "reducir movimiento" el pase de entrada es breve (sin esperar 2s).
+    const quick = reducedMotion();
+    const duration = quick ? 300 : returning ? 700 : 2000;
     const messages = returning ? [STATUS_MESSAGES[0], STATUS_MESSAGES[3]] : STATUS_MESSAGES;
 
     const start = performance.now();
@@ -46,7 +49,7 @@ export default function Preloader({ onDone }) {
         finishedRef.current = true;
         document.body.classList.remove('is-loading');
         onDone();
-      }, 1350);
+      }, quick ? 120 : 1350);
     };
 
     raf = requestAnimationFrame(tick);

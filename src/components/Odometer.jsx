@@ -16,7 +16,9 @@ export default function Odometer({ value }) {
   const digits = String(value).split('');
 
   return (
-    <span ref={ref} className="odo inline-flex leading-none" role="img" aria-label={value}>
+    // Numero decorativo (01, 02...) que gira al aparecer: oculto para lectores de
+    // pantalla y fuera de los fragmentos de Google.
+    <span ref={ref} aria-hidden="true" data-nosnippet className="odo inline-flex leading-none">
       {digits.map((digit, i) => {
         const target = Number(digit);
         const dist = ran ? 10 + target : 0;

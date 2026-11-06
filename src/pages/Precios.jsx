@@ -1,49 +1,27 @@
 import Reveal from '@/components/Reveal';
 import SplitHeading from '@/components/SplitHeading';
 import Icon from '@/components/Icon';
-import { useSeo } from '@/hooks/useSeo';
-import { breadcrumbs, faqPage } from '@/seo/jsonld';
+import Breadcrumbs from '@/components/Breadcrumbs';
+import { usePageSeo } from '@/hooks/usePageSeo';
+import { planNodes, faqNode } from '@/seo/jsonld';
 import { pricingPlans } from '@/data/content';
+import { faqPrecios as faq } from '@/data/faq';
 import { trackClick } from '@/lib/analytics';
 
 const WA_BASE = 'https://wa.me/593983113942?text=';
 
-const faq = [
-  {
-    question: '¿Los precios incluyen SEO?',
-    answer: 'Sí, todos los planes incluyen SEO on-page estructural como parte del desarrollo, no como costo adicional.',
-  },
-  {
-    question: '¿Qué significa "desde" en el precio?',
-    answer: 'Es el precio base del plan. El costo final depende del alcance exacto del proyecto (número de vistas, integraciones, contenido).',
-  },
-  {
-    question: '¿Qué pasa si mi proyecto no encaja en ninguno de estos 3 planes?',
-    answer: 'Nos escribís contándonos qué necesitás y lo cotizamos a medida — los planes son un punto de partida, no un molde cerrado.',
-  },
-  {
-    question: '¿Puedo empezar con un plan y crecer después?',
-    answer: 'Sí. Es común arrancar con Orbit Impact y escalar a Orbit Commerce o a un sistema a medida (Deep Space System) cuando el negocio lo pide.',
-  },
+const CRUMBS = [
+  { name: 'Inicio', path: '/' },
+  { name: 'Precios', path: '/precios' },
 ];
 
 export default function Precios() {
-  useSeo({
-    title: 'Precios | Planes de Desarrollo Web — FS Orbit',
-    description: 'Planes de desarrollo web de FS Orbit: Orbit Impact (landing page), Orbit Commerce (tienda online) y Deep Space System (software a medida). Precios desde $200.',
-    path: '/precios',
-    jsonLd: [
-      breadcrumbs([
-        { name: 'Inicio', path: '/' },
-        { name: 'Precios', path: '/precios' },
-      ]),
-      faqPage(faq),
-    ],
-  });
+  usePageSeo({ path: '/precios', crumbs: CRUMBS, nodes: [...planNodes('/precios'), faqNode('/precios', faq)] });
 
   return (
     <main id="main">
       <header className="mx-auto max-w-(--maxw) px-(--gutter) pb-[clamp(56px,7vw,96px)] pt-[clamp(72px,10vw,152px)]">
+        <Breadcrumbs crumbs={CRUMBS} />
         <Reveal as="span" type="fade" className="mb-s5 inline-block font-mono text-[length:var(--fs-mono)] uppercase tracking-[var(--tr-mono)] text-text-3">
           Niveles de Despliegue
         </Reveal>

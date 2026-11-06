@@ -26,11 +26,11 @@ function setJsonLd(jsonLd) {
   const script = document.createElement('script');
   script.type = 'application/ld+json';
   script.id = JSONLD_ID;
-  script.textContent = JSON.stringify(Array.isArray(jsonLd) ? jsonLd : [jsonLd]);
+  script.textContent = JSON.stringify(jsonLd);
   document.head.appendChild(script);
 }
 
-export function useSeo({ title, description, path, jsonLd, noindex = false }) {
+export function useSeo({ title, description, path, jsonLd, noindex = false, ogType = 'website' }) {
   useEffect(() => {
     document.title = title;
 
@@ -38,6 +38,7 @@ export function useSeo({ title, description, path, jsonLd, noindex = false }) {
     setMeta('link[rel="canonical"]', 'href', url);
     setMeta('meta[name="description"]', 'content', description);
     setMeta('meta[property="og:url"]', 'content', url);
+    setMeta('meta[property="og:type"]', 'content', ogType);
     setMeta('meta[property="og:title"]', 'content', title);
     setMeta('meta[property="og:description"]', 'content', description);
     setMeta('meta[property="twitter:url"]', 'content', url);
@@ -55,5 +56,5 @@ export function useSeo({ title, description, path, jsonLd, noindex = false }) {
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [title, description, path, JSON.stringify(jsonLd), noindex]);
+  }, [title, description, path, JSON.stringify(jsonLd), noindex, ogType]);
 }

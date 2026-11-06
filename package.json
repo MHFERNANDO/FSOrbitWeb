@@ -5,10 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && node scripts/prerender.mjs && node scripts/generate-sitemap.mjs",
+    "build": "vite build && node scripts/prerender.mjs && node scripts/generate-sitemap.mjs && node scripts/generate-llms.mjs && node scripts/verify-build.mjs",
     "build:vite-only": "vite build",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "smoke": "node scripts/smoke-test.mjs"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.3",

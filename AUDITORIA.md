@@ -360,3 +360,58 @@ Lighthouse 13.5.0 móvil (CPU 4x simulado), local contra `vite preview` con el C
 Tiempo de JS al cargar la home (`bootup-time`, mediana de los pares): 2.4s → 1.0s. Bundle inicial: un `index` de 450 KB → `index` 97 + `react` 229 + `motion` 126 KB (mismo total).
 
 **Qué falta para ≥95**: el LCP sigue en ~3.1–3.2s porque el Preloader tapa la pantalla ~3.3s en la primera visita. Es decisión del cliente (sección 10) y no se tocó. Lighthouse en producción va a dar números distintos a los locales (el 49 de producción se midió en una máquina más lenta). Hay que volver a medir en `fsorbit.com` después del deploy.
+
+## 14. Brief SEO/IA — títulos, rutas nuevas, JSON-LD, blog, CSP y movimiento (implementado, 2026-11-05)
+
+### Decisiones y correcciones respecto al brief
+
+- **"La web no tiene formularios" es falso**: `/contacto` tiene un formulario (nombre, negocio, tipo de proyecto, presupuesto, mensaje) que envía un correo por Resend. La política de privacidad lo declara, y también Vercel Web Analytics, WhatsApp/Instagram y las vistas previas de sitios de clientes en iframe.
+- **Textos que se corrigieron por no ser verificables**: descripciones de proyectos ("misión crítica", "datos en tiempo real", "animaciones de scroll propias") → ahora solo hechos leídos en el sitio de cada cliente (`src/data/projectDetails.js`). "Seguridad de nivel militar" → "Sin plugins de terceros que mantener". Acculab System / Gravity Studio quedan como Accu-Lab / Gravity Estudio Creativo en el texto. No se encontró copy "sin frameworks / vanilla" en el código del sitio (el sitio usa React; el copy decía "código propio, sin plantillas").
+- **Choca con una decisión anterior tuya**: habías pedido quitar "problema / solución" de cada proyecto. Este brief pide reto, solución, tecnologías y resultado en cada caso (≥300 palabras), así que volvieron como secciones de `/proyectos/[slug]`. Si prefieres lo anterior, se quitan los 4 bloques en `ProyectoDetalle.jsx`.
+- **`prefers-reduced-motion`**: ahora se respeta, pero con **un solo interruptor** (`RESPECT_REDUCED_MOTION` en `src/lib/motion.js`). Con él en `true`, quien tenga "reducir animaciones" activado en Windows/macOS ve el sitio sin reveals ni loops (contenido visible y estático). Tu máquina de pruebas tenía eso activo: si no ves animaciones, es esto; ponlo en `false` para volver a lo que pediste antes.
+- Todo el contenido sigue visible si el JS falla (los reveals son Web Animations creadas desde JS; el HTML prerenderizado no trae `opacity:0`), y si no existe `IntersectionObserver` el reveal se dispara de inmediato.
+
+### Qué se hizo
+
+| Tema | Resultado |
+|---|---|
+| Títulos / descriptions | Fuente única en `src/seo/routes.js`; títulos ≤60 y descriptions 140–155 caracteres en las 19 rutas (lo exige `scripts/verify-build.mjs`). `og:title` = `title`; `og:site_name` = "FS Orbit Ecuador"; `og:type` article en el blog. |
+| Home | H1 "Diseño web en Cuenca que convierte visitas en clientes"; "Tu presencia online, diseñada con precisión" pasó a `<p>` subtítulo. |
+| Rutas nuevas | `/servicios/diseno-ui-ux`, `/servicios/mantenimiento-web` (≈350–420 palabras propias cada una + FAQ + casos), `/sobre-nosotros`, `/politica-de-privacidad`, `/blog` y 3 artículos (≈560–610 palabras de cuerpo). |
+| Casos | Cada `/proyectos/[slug]` ≥300 palabras (reto, solución, tecnologías, resultado verificable), enlace al servicio, a `/precios` y al sitio del cliente. |
+| FAQ | 7–8 preguntas por servicio y en `/precios` (`src/data/faq.js`), respuestas directas; lo que no está confirmado (plazos, hosting, formas de pago, propiedad del código) responde "se acuerda con cada cliente" — ver TODOs. |
+| Navegación | Migas visibles (`Breadcrumbs.jsx`) con el mismo arreglo que el JSON-LD; footer con Servicios (5) y Empresa (6); enlaces internos reales `<a href>` desde datos (`[texto](/ruta)`). |
+| JSON-LD | Un solo `@graph` por página con `@id` estables (`/#organization`, `/#website`, `…#webpage`, `#breadcrumb`, `#service`, `#faq`, `#work`, `#article`). Organización `ProfessionalService` "FS Orbit" (alternateName "FS Orbit Ecuador", teléfono, email, areaServed, sameAs), WebSite + WebPage en todas, BreadcrumbList, Service + Offer USD, FAQPage, CreativeWork con la URL del cliente, Article. El email del JSON-LD (`fsorbitt@gmail.com`) coincide con el visible (lo verifica el build). |
+| Imágenes | WebP 480/960/1440 con `srcset`/`sizes`/`width`/`height`; hero de caso `eager` + `fetchpriority=high`; logo 128/512 WebP y og-image JPG (los PNG originales quedaron en `scripts/source/`). |
+| Decorativo | Odómetro y bloque `fs-orbit.config.js`: `aria-hidden="true"` + `data-nosnippet`. |
+| Sitemap / llms | `dist/sitemap.xml` con `lastmod` real por URL (commit de git → mtime si hay cambios locales → `src/seo/lastmod.json` en builds sin historial) y 19 rutas; `llms.txt` se genera en el build desde los mismos datos (se eliminó `public/llms.txt`). |
+| Seguridad | `vercel.json`: CSP **enforced** (antes Report-Only) compatible con Vercel Analytics (`script-src 'self'`, `connect-src 'self'`), `frame-src` solo para los 4 sitios de clientes, `frame-ancestors 'none'` + `X-Frame-Options: DENY`, HSTS, Referrer-Policy, Permissions-Policy, COOP. `trailingSlash:false` + `cleanUrls` coherentes con los canonical; www→apex 308; 404 real. |
+| Code splitting | Entrada de 143 → 110 KB: el texto largo de servicios y blog vive en `serviceContent.js` / `blogContent.js`, cargados solo por esas rutas; una sola ruta lazy `/servicios/:slug`. `main.jsx` espera el chunk de la ruta antes de hidratar (`preloadRoute`). |
+| Calidad | `scripts/verify-build.mjs` (parte de `npm run build`): title/description, canonical, un solo H1, JSON-LD válido con `@id` resueltos, email, palabras mínimas, `<img>` con width/height/alt, sin `127.0.0.1`, sitemap ↔ archivos. `npm run smoke` (`ALL=1 MOBILE=1`): sirve `dist/` con las cabeceras reales y recorre las 19 rutas sin violaciones de CSP ni errores de hidratación. `scripts/serve-dist.mjs`: servidor tipo Vercel para auditar (ver abajo). |
+
+### Bugs encontrados y corregidos en el camino
+
+- **Errores de hidratación (React #418)** en 7 páginas: el HTML capturado funde los nodos de texto vecinos (`{fecha} · {min}`), React los espera separados. Regla: un solo string por elemento (template literal).
+- **No auditar rutas internas con `vite preview`**: entrega la home en cualquier ruta sin extensión y fabrica errores de hidratación y CLS falsos. Usar `LIGHTHOUSE=1 PORT=4180 node scripts/serve-dist.mjs`.
+- `Cross-Origin-Opener-Policy` hace que Lighthouse pierda el inicio de navegación (`NO_NAVSTART`); `serve-dist.mjs` lo omite solo con `LIGHTHOUSE=1`. En producción sigue activo.
+
+### Lighthouse móvil (13.5.0, build local servido con brotli y cabeceras reales)
+
+| Página | Perf | A11y | Best practices | SEO | LCP | CLS | TBT |
+|---|---|---|---|---|---|---|---|
+| `/` | 85 | 100 | 100 | 100 | 3.5s | 0 | 60ms |
+| `/servicios/diseno-ui-ux` | 86 | 100 | 100 | 100 | 3.4s | 0 | 0ms |
+| `/proyectos/acculab-system` | 82 | 100 | 100 | 100 | 4.0s | 0 | 0ms |
+
+El LCP depende de que el Preloader (decisión del cliente, 2000ms + 1350ms) tape la pantalla en la primera visita; volver a medir en producción tras el deploy.
+
+### Pendiente de ti (TODO)
+
+- **Resend**: variables `RESEND_API_KEY` y `CONTACT_TO_EMAIL` en Vercel y dominio verificado; sin eso el formulario no envía.
+- **FAQ y servicios** (`src/data/faq.js`): plazos de entrega, si hosting/dominio van incluidos, formas de pago, propiedad del código. Hoy dicen "se acuerda con cada cliente".
+- **Casos** (`src/data/projectDetails.js`): métricas reales (visitas, consultas, posiciones) y el brief original de cada cliente; hoy el resultado cita solo lo que el sitio del cliente declara.
+- **Sobre nosotros**: nombres/roles/foto del equipo, año de inicio, trayectoria (no se inventó nada).
+- **Política de privacidad**: revisión legal, plazo de conservación, razón social/RUC si aplica.
+- **Laboratorio Diesel MG**: su sitio responde `X-Frame-Options: DENY` y `frame-ancestors 'none'`, por eso la vista previa de `/proyectos` queda en blanco. Hay que permitir a `https://fsorbit.com` en el `vercel.json` de ese proyecto (o mostrar solo el enlace).
+- **Fuera del código**: Google Business Profile, Search Console y Bing (enviar el sitemap nuevo), reseñas reales, enlaces desde los sitios de clientes, correo profesional con dominio.
+- **Rich Results Test** (no se puede automatizar): probar en https://search.google.com/test/rich-results las URLs `/`, `/precios`, `/servicios/diseno-web-cuenca`, `/proyectos/acculab-system` y `/blog/cuanto-cuesta-una-pagina-web-en-ecuador` tras el deploy. El build ya valida estructura, `@id` y referencias.

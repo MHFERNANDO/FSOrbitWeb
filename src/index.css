@@ -417,6 +417,24 @@ h4 {
        @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto } }
    que quita el mareo mas fuerte sin apagar nada visual. */
 
+/* MOVIMIENTO REDUCIDO — controlado por el interruptor RESPECT_REDUCED_MOTION
+   de src/lib/motion.js (que pone <html data-reduce-motion> solo cuando el
+   sistema pide reducir animaciones Y el interruptor esta en true). Con
+   RESPECT_REDUCED_MOTION = false este bloque nunca se activa y el sitio
+   vuelve a animarse siempre, como pidio el cliente (ver comentario de
+   arriba). Solo se apagan transiciones y animaciones CSS; las de JS
+   (reveals, orbita, parallax) consultan el mismo interruptor. */
+html[data-reduce-motion],
+html[data-reduce-motion] *,
+html[data-reduce-motion] *::before,
+html[data-reduce-motion] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  transition-delay: 0ms !important;
+  scroll-behavior: auto !important;
+}
+
 /* Mapea los tokens semanticos (ya remapeados arriba a la paleta FS Orbit)
    a utilidades de Tailwind: bg-background, text-foreground, bg-primary,
    border-border, rounded-lg... Sin bloque .dark aparte — el sitio no

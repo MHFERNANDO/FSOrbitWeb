@@ -116,10 +116,10 @@ export default function Navbar() {
       <div className="mx-auto flex w-full max-w-(--maxw) items-center justify-between gap-s5 px-(--gutter)">
         <Link to="/" viewTransition className="flex items-center" aria-label="FS Orbit — inicio">
           <img
-            src="/assets/Logo.png"
+            src="/assets/Logo-128.webp"
             alt="FS Orbit"
-            width={90}
-            height={90}
+            width={128}
+            height={128}
             decoding="async"
             className="h-[42px] w-auto opacity-[.92] transition-[transform,opacity] duration-(--d4) hover:rotate-[-8deg] hover:scale-[1.06] hover:opacity-100"
             style={{ filter: 'brightness(0) invert(1)' }}

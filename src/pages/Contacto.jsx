@@ -2,12 +2,16 @@ import { useState } from 'react';
 import Reveal from '@/components/Reveal';
 import SplitHeading from '@/components/SplitHeading';
 import Icon from '@/components/Icon';
-import { useSeo } from '@/hooks/useSeo';
-import { breadcrumbs } from '@/seo/jsonld';
+import Breadcrumbs from '@/components/Breadcrumbs';
+import { usePageSeo } from '@/hooks/usePageSeo';
 import { contact } from '@/data/content';
 import { trackClick, trackFormSubmit } from '@/lib/analytics';
 
 const WA_BASE = 'https://wa.me/593983113942?text=';
+const CRUMBS = [
+  { name: 'Inicio', path: '/' },
+  { name: 'Contacto', path: '/contacto' },
+];
 
 const FIELD_CLASS =
   'w-full rounded-r2 border border-[color:var(--line-2)] bg-ink-900 px-s4 py-s3 text-text placeholder:text-text-3 outline-none transition-colors focus:border-signal';
@@ -22,15 +26,7 @@ function Field({ label, children }) {
 }
 
 export default function Contacto() {
-  useSeo({
-    title: 'Contacto | FS Orbit — Desarrollo Web en Cuenca, Ecuador',
-    description: 'Contáctanos para tu proyecto web: formulario, WhatsApp, correo o teléfono. FS Orbit — base en Cuenca, atendemos cualquier ubicación en Ecuador.',
-    path: '/contacto',
-    jsonLd: breadcrumbs([
-      { name: 'Inicio', path: '/' },
-      { name: 'Contacto', path: '/contacto' },
-    ]),
-  });
+  usePageSeo({ path: '/contacto', crumbs: CRUMBS, type: 'ContactPage' });
 
   const [status, setStatus] = useState('idle'); // idle | sending | sent | error
 
@@ -59,6 +55,7 @@ export default function Contacto() {
   return (
     <main id="main">
       <header className="mx-auto max-w-(--maxw) px-(--gutter) pb-[clamp(56px,7vw,96px)] pt-[clamp(72px,10vw,152px)]">
+        <Breadcrumbs crumbs={CRUMBS} />
         <Reveal as="span" type="fade" className="mb-s5 inline-block font-mono text-[length:var(--fs-mono)] uppercase tracking-[var(--tr-mono)] text-text-3">
           Contacto
         </Reveal>

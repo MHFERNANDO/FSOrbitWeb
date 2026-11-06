@@ -2,45 +2,38 @@ import { Link } from 'react-router-dom';
 import Reveal from '@/components/Reveal';
 import SplitHeading from '@/components/SplitHeading';
 import Icon from '@/components/Icon';
-import { useSeo } from '@/hooks/useSeo';
-import { breadcrumbs, service, faqPage } from '@/seo/jsonld';
+import Breadcrumbs from '@/components/Breadcrumbs';
+import { usePageSeo } from '@/hooks/usePageSeo';
+import { serviceNode, faqNode } from '@/seo/jsonld';
+import { renderInline } from '@/lib/inlineLinks';
 import { trackClick } from '@/lib/analytics';
+import { projects } from '@/data/content';
 
 const WA_BASE = 'https://wa.me/593983113942?text=';
 
-// Plantilla compartida por las 3 landings de /servicios/*. Cada pagina
-// solo aporta datos (titulo, intro, highlights reales de content.js,
-// FAQ verdadero) — la estructura visual es la misma para que las tres
-// se sientan parte del mismo sitio en vez de paginas sueltas.
-export default function ServicePage({
-  path,
-  seoTitle,
-  seoDescription,
-  kicker,
-  h1Segments,
-  intro,
-  highlights,
-  faq,
-  ctaWhatsappText,
-  breadcrumbLabel,
-}) {
-  useSeo({
-    title: seoTitle,
-    description: seoDescription,
+// Plantilla compartida por las 5 landings de /servicios/*. Cada servicio
+// es un objeto de src/data/servicePages.js: la estructura visual es la
+// misma para que las cinco se sientan parte del mismo sitio.
+export default function ServicePage({ service }) {
+  const { path, breadcrumbLabel, kicker, h1Segments, intro, highlights, sections, faq, ctaWhatsappText, planName, serviceName, seoDescription } = service;
+
+  const crumbs = [
+    { name: 'Inicio', path: '/' },
+    { name: breadcrumbLabel, path },
+  ];
+
+  usePageSeo({
     path,
-    jsonLd: [
-      breadcrumbs([
-        { name: 'Inicio', path: '/' },
-        { name: breadcrumbLabel, path },
-      ]),
-      service({ name: breadcrumbLabel, description: seoDescription, path }),
-      ...(faq?.length ? [faqPage(faq)] : []),
-    ],
+    crumbs,
+    nodes: [serviceNode({ path, name: serviceName, description: seoDescription, planName }), faqNode(path, faq)],
   });
+
+  const related = service.projects.map((slug) => projects.find((p) => p.slug === slug)).filter(Boolean);
 
   return (
     <main id="main">
       <header className="mx-auto max-w-(--maxw) px-(--gutter) pb-[clamp(56px,7vw,96px)] pt-[clamp(72px,10vw,152px)]">
+        <Breadcrumbs crumbs={crumbs} />
         <Reveal as="span" type="fade" className="mb-s5 inline-block font-mono text-[length:var(--fs-mono)] uppercase tracking-[var(--tr-mono)] text-text-3">
           {kicker}
         </Reveal>
@@ -87,6 +80,49 @@ export default function ServicePage({
           </div>
         </div>
       </section>
+
+      {sections.map((s) => (
+        <section key={s.h2} className="border-t border-[color:var(--line)]">
+          <div className="mx-auto grid max-w-(--maxw) gap-s6 px-(--gutter) py-[var(--section-y)] lg:grid-cols-[1fr_1.4fr] lg:gap-s9">
+            <h2 className="max-w-[22ch] font-display text-[length:var(--fs-h3)] font-extrabold leading-[var(--lh-tight)]">{s.h2}</h2>
+            <div className="grid gap-s4">
+              {s.paragraphs.map((p) => (
+                <Reveal as="p" type="rise" key={p.slice(0, 40)} className="max-w-[62ch] text-text-2">
+                  {renderInline(p)}
+                </Reveal>
+              ))}
+            </div>
+          </div>
+        </section>
+      ))}
+
+      {related.length > 0 && (
+        <section className="border-t border-[color:var(--line)]">
+          <div className="mx-auto max-w-(--maxw) px-(--gutter) py-[var(--section-y)]">
+            <h2 className="font-display text-[length:var(--fs-h3)] font-extrabold">Casos relacionados</h2>
+            <ul className="mt-s6 grid gap-s4 md:grid-cols-2">
+              {related.map((p) => (
+                <li key={p.slug}>
+                  <Link
+                    to={`/proyectos/${p.slug}`}
+                    viewTransition
+                    className="group flex items-center justify-between gap-s4 rounded-r3 border border-[color:var(--line)] px-s5 py-s5 transition-colors hover:border-[color:var(--line-2)]"
+                  >
+                    <span className="grid gap-1">
+                      <span className="font-display font-bold text-text">{p.title}</span>
+                      <span className="text-[length:var(--fs-small)] text-text-3">{p.description}</span>
+                    </span>
+                    <Icon name="arrow-right" className="shrink-0 transition-transform group-hover:translate-x-1" />
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            <p className="mt-s5 text-text-2">
+              {renderInline('Mira todos los casos en el [portafolio](/proyectos) o revisa qué incluye cada plan en [precios](/precios).')}
+            </p>
+          </div>
+        </section>
+      )}
 
       {faq?.length > 0 && (
         <section className="border-t border-[color:var(--line)]">

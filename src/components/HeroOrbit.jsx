@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { reducedMotion } from '@/lib/motion';
 
 const TAU = Math.PI * 2;
 
@@ -149,7 +150,14 @@ export default function HeroOrbit() {
       rafId = window.requestAnimationFrame(loop);
     };
 
+    const still = reducedMotion();
+
     const start = () => {
+      // Con "reducir movimiento": un solo cuadro estatico, sin loop.
+      if (still) {
+        render(0);
+        return;
+      }
       if (rafId !== null) return;
       rafId = window.requestAnimationFrame(loop);
     };

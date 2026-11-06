@@ -7,6 +7,9 @@ const LINKS = [
   { to: '/servicios/diseno-web-cuenca', label: 'Diseño Web en Cuenca' },
   { to: '/servicios/tiendas-online', label: 'Tiendas Online' },
   { to: '/servicios/rediseno-y-optimizacion', label: 'Rediseño y Optimización' },
+  { to: '/servicios/diseno-ui-ux', label: 'Diseño UI/UX' },
+  { to: '/servicios/mantenimiento-web', label: 'Mantenimiento Web' },
+  { to: '/blog', label: 'Blog' },
   { to: '/precios', label: 'Precios' },
   { to: '/proyectos', label: 'Proyectos' },
   { to: '/contacto', label: 'Contacto' },
@@ -18,7 +21,7 @@ const LINKS = [
 export default function NotFound() {
   useSeo({
     title: 'Página no encontrada | FS Orbit',
-    description: 'Esta página no existe. Volvé al inicio o explorá nuestros servicios de desarrollo web en Cuenca, Ecuador.',
+    description: 'Esta página no existe. Vuelve al inicio o explora nuestros servicios de desarrollo web en Cuenca, Ecuador.',
     path: '/404',
     noindex: true,
   });
@@ -33,7 +36,7 @@ export default function NotFound() {
           Esta página no existe.
         </Reveal>
         <Reveal as="p" type="rise" index={2} className="max-w-[48ch] text-text-2">
-          Puede que el enlace esté roto o la página se haya movido. Probá con alguno de estos accesos directos:
+          Puede que el enlace esté roto o la página se haya movido. Prueba con alguno de estos accesos directos:
         </Reveal>
 
         <Reveal as="div" type="rise" index={3} className="grid w-full gap-s3 sm:grid-cols-2">

@@ -1,5 +1,6 @@
 import { useLayoutEffect, useRef } from 'react';
 import { observeOnce } from '@/lib/inView';
+import { reducedMotion } from '@/lib/motion';
 
 // Cada linea, ya tokenizada: [{ text, cls }]. cls referencia los mismos
 // nombres que .keyword/.variable/.string/.boolean/.function/.punct de la
@@ -55,6 +56,11 @@ export default function CodeWindow() {
       }
     };
 
+    if (reducedMotion()) {
+      paint(totalChars);
+      return undefined;
+    }
+
     paint(0);
 
     let raf;
@@ -86,7 +92,9 @@ export default function CodeWindow() {
   }, []);
 
   return (
-    <div ref={ref} className="relative overflow-hidden rounded-r4 border border-[color:var(--line-2)] bg-ink-900">
+    // Bloque puramente decorativo (texto que se "descifra"): fuera del
+    // arbol de accesibilidad y fuera de los fragmentos de Google.
+    <div ref={ref} aria-hidden="true" data-nosnippet className="relative overflow-hidden rounded-r4 border border-[color:var(--line-2)] bg-ink-900">
       <div className="flex items-center gap-s2 border-b border-[color:var(--line)] px-s5 py-s3">
         <span className="size-2.5 rounded-full bg-[#FF5F57]" />
         <span className="size-2.5 rounded-full bg-[#FEBC2E]" />
@@ -94,7 +102,7 @@ export default function CodeWindow() {
         <span className="ml-s3 font-mono text-[length:var(--fs-micro)] text-text-3">fs-orbit.config.js</span>
       </div>
 
-      <pre className="overflow-x-auto p-s6 font-mono text-[length:var(--fs-small)] leading-[1.7]">
+      <pre tabIndex={-1} className="overflow-x-auto p-s6 font-mono text-[length:var(--fs-small)] leading-[1.7]">
         <code style={{ counterReset: 'line' }}>
           {LINES.map((line, li) => (
             <span key={li} className="relative block whitespace-pre pl-[62px] before:absolute before:left-0 before:w-11 before:text-right before:text-text-3 before:content-[counter(line,decimal-leading-zero)]" style={{ counterIncrement: 'line' }}>

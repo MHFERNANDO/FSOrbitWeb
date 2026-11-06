@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import HeroOrbit from '@/components/HeroOrbit';
 import Reveal from '@/components/Reveal';
+import ProjectImage from '@/components/ProjectImage';
 import SplitHeading, { Highlight } from '@/components/SplitHeading';
 import Icon from '@/components/Icon';
 import CodeWindow from '@/components/CodeWindow';
@@ -12,8 +13,7 @@ import { useAdvisor } from '@/components/AdvisorModal';
 import { useProjectPreview } from '@/components/ProjectPreviewModal';
 import { useMagnetic } from '@/hooks/useMagnetic';
 import { useCursorTag } from '@/hooks/useCursorTag';
-import { useSeo } from '@/hooks/useSeo';
-import { breadcrumbs, website } from '@/seo/jsonld';
+import { usePageSeo } from '@/hooks/usePageSeo';
 import { trackClick } from '@/lib/analytics';
 import { services, pricingPlans, featuredWork } from '@/data/content';
 
@@ -35,13 +35,7 @@ function AtomReveal({ children }) {
 }
 
 export default function Home() {
-  useSeo({
-    title: 'FS Orbit | Desarrollo Web en Cuenca, Ecuador',
-    description:
-      'Desarrollo web en Cuenca, Ecuador. Código a medida, sin plantillas: landing pages, tiendas online y software con SEO técnico y carga rápida.',
-    path: '/',
-    jsonLd: [website(), breadcrumbs([{ name: 'Inicio', path: '/' }])],
-  });
+  usePageSeo({ path: '/', name: 'Diseño de Páginas Web en Cuenca' });
   const advisor = useAdvisor();
   const preview = useProjectPreview();
   const primaryBtnRef = useRef(null);
@@ -65,9 +59,13 @@ export default function Home() {
 
           <SplitHeading
             as="h1"
-            className="max-w-[15ch] font-display text-[length:var(--fs-h1)] font-extrabold leading-[var(--lh-tight)] tracking-[var(--tr-display)]"
-            segments={[{ text: 'Tu presencia online,' }, { break: true }, { text: 'diseñada con precisión.', highlight: true }]}
+            className="max-w-[22ch] font-display text-[length:var(--fs-h1)] font-extrabold leading-[var(--lh-tight)] tracking-[var(--tr-display)]"
+            segments={[{ text: 'Diseño web en Cuenca' }, { break: true }, { text: 'que convierte visitas en clientes', highlight: true }]}
           />
+
+          <Reveal as="p" type="rise" className="font-display text-[length:var(--fs-h4)] font-bold text-text">
+            Tu presencia online, diseñada con precisión
+          </Reveal>
 
           <Reveal as="p" type="rise" className="max-w-[46ch] text-[length:var(--fs-lead)] text-text-2">
             En FS Orbit creamos sitios web que no solo se ven bien, sino que venden. Convertimos tu visión en una
@@ -133,7 +131,7 @@ export default function Home() {
               <div className="grid gap-s3 rounded-r3 border border-[color:var(--line-2)] bg-ink-850 p-s5">
                 <h3 className="font-display font-bold text-signal">FS Orbit Pure Code</h3>
                 <ul className="grid gap-s2 text-[length:var(--fs-small)] text-text-2">
-                  {['Carga instantánea (Core Web Vitals)', 'Seguridad de nivel militar', 'Escalabilidad ilimitada', 'Diseño 100% a medida'].map((t) => (
+                  {['Carga instantánea (Core Web Vitals)', 'Sin plugins de terceros que mantener', 'Escalabilidad ilimitada', 'Diseño 100% a medida'].map((t) => (
                     <li key={t} className="flex items-center gap-s2">
                       <Icon name="check" className="text-text-2" />
                       {t}
@@ -342,18 +340,7 @@ function WorkCard({ work, index, onOpen }) {
         }}
         className="block aspect-video overflow-hidden"
       >
-        <picture>
-          <source srcSet={`/assets/${work.img}.webp`} type="image/webp" />
-          <img
-            src={`/assets/${work.img}.png`}
-            alt={work.alt}
-            width={work.w}
-            height={work.h}
-            loading="lazy"
-            decoding="async"
-            className="h-full w-full object-cover transition-transform duration-(--d4) group-hover:scale-105"
-          />
-        </picture>
+        <ProjectImage project={work} sizes="(min-width: 768px) 50vw, 100vw" className="h-full w-full object-cover transition-transform duration-(--d4) group-hover:scale-105" />
       </a>
       <div className="flex items-center justify-between p-s5">
         <div>

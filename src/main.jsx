@@ -1,17 +1,23 @@
 import { StrictMode } from 'react';
 import { createRoot, hydrateRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
+import { MotionConfig } from 'framer-motion';
 import { Analytics } from '@vercel/analytics/react';
+import { RESPECT_REDUCED_MOTION, applyMotionPreference } from './lib/motion.js';
 import './index.css';
-import App from './App.jsx';
+import App, { preloadRoute } from './App.jsx';
 import Preloader from './components/Preloader.jsx';
+
+applyMotionPreference();
 
 const app = (
   <StrictMode>
-    <BrowserRouter>
-      <App />
-      <Analytics />
-    </BrowserRouter>
+    <MotionConfig reducedMotion={RESPECT_REDUCED_MOTION ? 'user' : 'never'}>
+      <BrowserRouter>
+        <App />
+        <Analytics />
+      </BrowserRouter>
+    </MotionConfig>
   </StrictMode>
 );
 
@@ -37,5 +43,12 @@ preloaderRoot.render(
 // prerender (dev, o el propio prerender visitando cada ruta) llega con
 // #root vacio y monta normal.
 const rootEl = document.getElementById('root');
-if (rootEl.hasChildNodes()) hydrateRoot(rootEl, app);
-else createRoot(rootEl).render(app);
+if (rootEl.hasChildNodes()) {
+  // Se espera al chunk de la ruta antes de hidratar (ver preloadRoute en
+  // App.jsx); si la precarga fallara, se hidrata igual.
+  preloadRoute(window.location.pathname)
+    .catch(() => {})
+    .then(() => hydrateRoot(rootEl, app));
+} else {
+  createRoot(rootEl).render(app);
+}

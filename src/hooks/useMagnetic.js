@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { reducedMotion } from '@/lib/motion';
 
 // Puerto de initMagnetic() en core.js: el boton persigue el puntero dentro
 // de un radio. Solo con mouse fino (no touch) — en touch no hay hover que
@@ -7,7 +8,7 @@ import { useEffect } from 'react';
 export function useMagnetic(ref, strength = 10) {
   useEffect(() => {
     const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-    if (!ref.current || !finePointer) return undefined;
+    if (!ref.current || !finePointer || reducedMotion()) return undefined;
     const el = ref.current;
 
     const onMove = (e) => {

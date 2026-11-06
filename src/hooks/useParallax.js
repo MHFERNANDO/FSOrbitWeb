@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { reducedMotion } from '@/lib/motion';
 
 // Parallax vertical de las capturas en /proyectos. Puerto de initParallax()
 // en legacy-static/js/proyectos.js: escribe --shift, el compositor mueve
@@ -8,7 +9,7 @@ export function useParallax() {
   const ref = useRef(null);
 
   useEffect(() => {
-    if (!ref.current) return undefined;
+    if (!ref.current || reducedMotion()) return undefined;
     const frame = ref.current;
     let active = false;
     let ticking = false;

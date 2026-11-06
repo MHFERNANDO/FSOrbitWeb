@@ -4,35 +4,52 @@ import Reveal from './Reveal';
 import { contact } from '@/data/content';
 import { trackClick } from '@/lib/analytics';
 
-const FOOTER_LINKS = [
+const SERVICE_LINKS = [
   { to: '/servicios/diseno-web-cuenca', label: 'Diseño Web en Cuenca' },
+  { to: '/servicios/diseno-ui-ux', label: 'Diseño UI/UX' },
   { to: '/servicios/tiendas-online', label: 'Tiendas Online' },
+  { to: '/servicios/mantenimiento-web', label: 'Mantenimiento Web' },
   { to: '/servicios/rediseno-y-optimizacion', label: 'Rediseño y Optimización' },
+];
+
+const COMPANY_LINKS = [
   { to: '/precios', label: 'Precios' },
   { to: '/proyectos', label: 'Proyectos' },
+  { to: '/blog', label: 'Blog' },
+  { to: '/sobre-nosotros', label: 'Sobre nosotros' },
   { to: '/contacto', label: 'Contacto' },
+  { to: '/politica-de-privacidad', label: 'Política de privacidad' },
 ];
 
 export default function Footer() {
   return (
     <footer className="border-t border-[color:var(--line)]">
-      <div className="mx-auto grid max-w-(--maxw) gap-s8 px-(--gutter) py-s9 md:grid-cols-4">
+      <div className="mx-auto grid max-w-(--maxw) gap-s8 px-(--gutter) py-s9 md:grid-cols-2 lg:grid-cols-5">
         <Reveal as="div" type="rise" className="grid gap-s4">
-          <img src="/assets/Logo.png" alt="FS Orbit" width={50} height={50} loading="lazy" decoding="async"
+          <img src="/assets/Logo-128.webp" alt="FS Orbit" width={128} height={128} loading="lazy" decoding="async"
             className="h-[50px] w-[50px]" style={{ filter: 'brightness(0) invert(1)', opacity: 0.92 }} />
           <p className="max-w-[32ch] text-text-2">Transformando ideas en ecosistemas digitales de alto rendimiento.</p>
         </Reveal>
 
-        <Reveal as="div" type="rise" index={1} className="grid content-start gap-s3">
-          <h2 className="font-display text-[length:var(--fs-h4)] font-extrabold">Enlaces</h2>
-          {FOOTER_LINKS.map((link) => (
+        <Reveal as="nav" aria-label="Servicios" type="rise" index={1} className="grid content-start gap-s3">
+          <h2 className="font-display text-[length:var(--fs-h4)] font-extrabold">Servicios</h2>
+          {SERVICE_LINKS.map((link) => (
             <Link key={link.to} to={link.to} viewTransition className="text-text-2 transition-colors hover:text-text">
               {link.label}
             </Link>
           ))}
         </Reveal>
 
-        <Reveal as="div" type="rise" index={2} className="grid gap-s4">
+        <Reveal as="nav" aria-label="Empresa" type="rise" index={2} className="grid content-start gap-s3">
+          <h2 className="font-display text-[length:var(--fs-h4)] font-extrabold">Empresa</h2>
+          {COMPANY_LINKS.map((link) => (
+            <Link key={link.to} to={link.to} viewTransition className="text-text-2 transition-colors hover:text-text">
+              {link.label}
+            </Link>
+          ))}
+        </Reveal>
+
+        <Reveal as="div" type="rise" index={3} className="grid gap-s4">
           <h2 className="font-display text-[length:var(--fs-h4)] font-extrabold">Contacto Directo</h2>
           <div className="grid gap-s3">
             {[
@@ -59,7 +76,7 @@ export default function Footer() {
           </div>
         </Reveal>
 
-        <Reveal as="div" type="rise" index={3} className="grid gap-s4">
+        <Reveal as="div" type="rise" index={4} className="grid gap-s4">
           <h2 className="font-display text-[length:var(--fs-h4)] font-extrabold">Escríbenos</h2>
           <p className="text-text-2">¿Prefieres el correo o una llamada?</p>
           <a href={`mailto:${contact.email}`} onClick={() => trackClick('email', { source: 'footer' })} className="text-text-2 underline-offset-4 transition-colors hover:text-signal hover:underline">

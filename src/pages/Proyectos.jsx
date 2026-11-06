@@ -2,30 +2,24 @@ import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Reveal from '@/components/Reveal';
+import ProjectImage from '@/components/ProjectImage';
 import SplitHeading from '@/components/SplitHeading';
 import Icon from '@/components/Icon';
 import { useParallax } from '@/hooks/useParallax';
 import { useProjectPreview } from '@/components/ProjectPreviewModal';
-import { useSeo } from '@/hooks/useSeo';
-import { breadcrumbs, projectList } from '@/seo/jsonld';
+import Breadcrumbs from '@/components/Breadcrumbs';
+import { usePageSeo } from '@/hooks/usePageSeo';
+import { projectListNode } from '@/seo/jsonld';
 import { projects } from '@/data/content';
 
 const EASE_OUT = [0.22, 1, 0.36, 1];
+const CRUMBS = [
+  { name: 'Inicio', path: '/' },
+  { name: 'Proyectos', path: '/proyectos' },
+];
 
 export default function Proyectos() {
-  useSeo({
-    title: 'Proyectos | FS Orbit — Desarrollo Web en Cuenca, Ecuador',
-    description:
-      'Proyectos web de FS Orbit: landing pages, tiendas online y plataformas a medida hechas desde Cuenca, Ecuador, con código propio.',
-    path: '/proyectos',
-    jsonLd: [
-      breadcrumbs([
-        { name: 'Inicio', path: '/' },
-        { name: 'Proyectos', path: '/proyectos' },
-      ]),
-      projectList(projects.map((p) => ({ title: p.title, description: p.description, path: `/proyectos/${p.slug}`, img: p.img }))),
-    ],
-  });
+  usePageSeo({ path: '/proyectos', crumbs: CRUMBS, type: 'CollectionPage', nodes: [projectListNode('/proyectos', projects)] });
   const preview = useProjectPreview();
 
   useEffect(() => {
@@ -35,6 +29,7 @@ export default function Proyectos() {
   return (
     <main id="main">
       <header className="mx-auto max-w-(--maxw) px-(--gutter) pb-[clamp(56px,7vw,104px)] pt-[clamp(72px,11vw,168px)]">
+        <Breadcrumbs crumbs={CRUMBS} />
         <Reveal
           as="span"
           type="fade"
@@ -66,19 +61,7 @@ function ProjectBlock({ project, even, onOpen }) {
       ref={parallaxRef}
       className="group relative aspect-[16/9.6] overflow-hidden rounded-r3 border border-[color:var(--line)] bg-ink-850"
     >
-      <picture>
-        <source srcSet={`/assets/${project.img}.webp`} type="image/webp" />
-        <img
-          src={`/assets/${project.img}.png`}
-          alt={project.alt}
-          width={project.w}
-          height={project.h}
-          loading="lazy"
-          decoding="async"
-          className="h-[106%] w-full object-cover object-top saturate-[.7] contrast-[1.03] brightness-[.94] transition-[transform,filter] duration-1000 group-hover:scale-[1.04] group-hover:saturate-100 group-hover:contrast-100 group-hover:brightness-100"
-          style={{ translate: '0 var(--shift, 0px)' }}
-        />
-      </picture>
+      <ProjectImage project={project} sizes="(min-width: 1024px) 58vw, 100vw" className="h-[106%] w-full object-cover object-top saturate-[.7] contrast-[1.03] brightness-[.94] transition-[transform,filter] duration-1000 group-hover:scale-[1.04] group-hover:saturate-100 group-hover:contrast-100 group-hover:brightness-100" style={{ translate: '0 var(--shift, 0px)' }} />
     </div>
   );
 

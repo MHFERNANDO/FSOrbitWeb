@@ -1,4 +1,4 @@
-// Genera public/assets/og-image.png (1200x630) con Puppeteer: una tarjeta
+// Genera scripts/source/og-image.png (luego scripts/optimize-images.mjs lo convierte a public/assets/og-image.jpg) (1200x630) con Puppeteer: una tarjeta
 // simple con la marca real (mismo fondo/acento que el sitio, mismo logo,
 // mismo copy ya aprobado) en vez del Logo.png de 414x414 que se usaba
 // como og:image. Se corre a mano (no en cada build) porque es un asset
@@ -15,8 +15,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const LOGO_PATH = path.resolve(__dirname, '../public/assets/Logo.png');
-const OUT_PATH = path.resolve(__dirname, '../public/assets/og-image.png');
+const LOGO_PATH = path.resolve(__dirname, './source/Logo.png');
+const OUT_PATH = path.resolve(__dirname, './source/og-image.png');
 
 async function buildHtml() {
   const logoBuffer = await readFile(LOGO_PATH);

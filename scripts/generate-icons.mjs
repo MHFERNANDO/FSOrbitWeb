@@ -1,4 +1,4 @@
-// Genera los iconos del sitio a partir de public/assets/Logo.png, recortando
+// Genera los iconos del sitio a partir de scripts/source/Logo.png, recortando
 // solo el emblema circular (sin "ORBIT" ni el lema, ilegibles a 16-48px).
 // Google pide un favicon cuadrado y multiplo de 48px para mostrarlo en los
 // resultados. Se corre a mano: node scripts/generate-icons.mjs
@@ -8,7 +8,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const logo = await readFile(path.join(root, 'public/assets/Logo.png'));
+const logo = await readFile(path.join(root, 'scripts/source/Logo.png'));
 // Recorte del emblema dentro del PNG de 414x414 (medido sobre el archivo).
 const CROP = { x: 80, y: 30, size: 256 };
 const SIZES = [48, 180, 192, 512];

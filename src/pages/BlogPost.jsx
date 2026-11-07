@@ -69,7 +69,7 @@ export default function BlogPost() {
         <header className="mx-auto max-w-[var(--maxw)] px-(--gutter) pb-[clamp(40px,5vw,72px)] pt-[clamp(72px,10vw,152px)]">
           <Breadcrumbs crumbs={crumbs} />
           <span className="font-mono text-[length:var(--fs-mono)] tracking-[var(--tr-mono)] text-text-3">
-            {`${formatDate(post.datePublished)} · ${post.readingMinutes} min de lectura`}
+            {`${post.readingMinutes} min de lectura`}
           </span>
           <h1 className="mt-s4 max-w-[22ch] font-display text-[length:var(--fs-h1)] font-extrabold leading-[var(--lh-tight)] tracking-[var(--tr-display)]">
             {post.title}

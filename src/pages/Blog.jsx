@@ -5,7 +5,6 @@ import Icon from '@/components/Icon';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import { usePageSeo } from '@/hooks/usePageSeo';
 import { blogPosts } from '@/data/blog';
-import { formatDate } from '@/lib/utils';
 
 const CRUMBS = [
   { name: 'Inicio', path: '/' },
@@ -47,9 +46,9 @@ export default function Blog() {
                   viewTransition
                   className="group -mx-s4 grid gap-x-s7 gap-y-s3 px-s4 py-s8 transition-colors duration-(--d3) hover:bg-ink-850 md:grid-cols-[200px_minmax(0,1.3fr)_minmax(0,1fr)_auto] md:items-baseline"
                 >
-                  <time dateTime={post.datePublished} className="font-mono text-[length:var(--fs-small)] text-text-3">
+                  <span className="font-mono text-[length:var(--fs-small)] text-text-3">
                     {`${formatDate(post.datePublished)} · ${post.readingMinutes} min`}
-                  </time>
+                  </span>
                   <h2 className="font-display text-[length:var(--fs-h3)] font-extrabold leading-[var(--lh-tight)] transition-colors group-hover:text-signal">
                     {post.title}
                   </h2>

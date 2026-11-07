@@ -9,7 +9,6 @@ import { renderInline } from '@/lib/inlineLinks';
 import { trackClick } from '@/lib/analytics';
 import { getPost } from '@/data/blog';
 import { getPostContent } from '@/data/blogContent';
-import { formatDate } from '@/lib/utils';
 
 const WA_BASE = 'https://wa.me/593983113942?text=';
 
@@ -69,9 +68,9 @@ export default function BlogPost() {
       <article>
         <header className="mx-auto max-w-[var(--maxw)] px-(--gutter) pb-[clamp(40px,5vw,72px)] pt-[clamp(72px,10vw,152px)]">
           <Breadcrumbs crumbs={crumbs} />
-          <time dateTime={post.datePublished} className="font-mono text-[length:var(--fs-mono)] tracking-[var(--tr-mono)] text-text-3">
+          <span className="font-mono text-[length:var(--fs-mono)] tracking-[var(--tr-mono)] text-text-3">
             {`${formatDate(post.datePublished)} · ${post.readingMinutes} min de lectura`}
-          </time>
+          </span>
           <h1 className="mt-s4 max-w-[22ch] font-display text-[length:var(--fs-h1)] font-extrabold leading-[var(--lh-tight)] tracking-[var(--tr-display)]">
             {post.title}
           </h1>

@@ -90,18 +90,17 @@ export default function Privacidad() {
       </header>
 
       <section className="border-t border-[color:var(--line)]">
-        <div className="mx-auto grid max-w-(--maxw) gap-s5 px-(--gutter) py-[var(--section-y)] lg:grid-cols-2">
+        <div className="mx-auto max-w-(--maxw) px-(--gutter) py-[var(--section-y)]">
           {SECTIONS.map((s, i) => (
             <Reveal
               as="article"
               type="rise"
-              index={i % 2}
               key={s.h2}
-              className="grid content-start gap-s4 rounded-r4 border border-[color:var(--line)] bg-ink-900 p-s7"
+              className="grid gap-x-s7 gap-y-s3 border-b border-[color:var(--line)] py-s7 first:pt-0 md:grid-cols-[72px_minmax(0,1fr)_minmax(0,1.6fr)]"
             >
-              <span className="font-mono text-[length:var(--fs-small)] tracking-[var(--tr-mono)] text-signal">{String(i + 1).padStart(2, '0')}</span>
+              <span className="font-mono text-text-3">{String(i + 1).padStart(2, '0')}</span>
               <h2 className="font-display text-[length:var(--fs-h4)] font-extrabold leading-[var(--lh-tight)]">{s.h2}</h2>
-              <div className="grid gap-s3 text-text-2">
+              <div className="grid max-w-[62ch] gap-s3 text-text-2">
                 {s.paragraphs.map((p) => (
                   <p key={p.slice(0, 40)}>{renderInline(p)}</p>
                 ))}

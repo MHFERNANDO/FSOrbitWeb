@@ -39,29 +39,23 @@ export default function Blog() {
 
       <section className="border-t border-[color:var(--line)]">
         <div className="mx-auto max-w-(--maxw) px-(--gutter) py-[var(--section-y)]">
-          <ul className="grid gap-s6 md:grid-cols-3">
+          <ul className="grid">
             {blogPosts.map((post, i) => (
-              <Reveal as="li" type="rise" index={i} key={post.slug} className="grid">
-                <article className="group relative grid content-start gap-s4 rounded-r4 border border-[color:var(--line)] bg-ink-900 p-s7 shadow-[inset_0_2px_0_0_var(--line)] transition-all duration-(--d3) hover:-translate-y-1 hover:border-[color:var(--line-2)] hover:bg-ink-850 hover:shadow-[inset_0_2px_0_0_var(--color-signal)]">
-                  <span className="font-display text-[length:var(--fs-h2)] font-extrabold leading-none text-[color:var(--line-2)]" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+              <Reveal as="li" type="rise" index={i} key={post.slug} className="border-b border-[color:var(--line)] first:border-t">
+                <Link
+                  to={`/blog/${post.slug}`}
+                  viewTransition
+                  className="group -mx-s4 grid gap-x-s7 gap-y-s3 px-s4 py-s8 transition-colors duration-(--d3) hover:bg-ink-850 md:grid-cols-[200px_minmax(0,1.3fr)_minmax(0,1fr)_auto] md:items-baseline"
+                >
                   <time dateTime={post.datePublished} className="font-mono text-[length:var(--fs-small)] text-text-3">
-                    {`${formatDate(post.datePublished)} · ${post.readingMinutes} min de lectura`}
+                    {`${formatDate(post.datePublished)} · ${post.readingMinutes} min`}
                   </time>
-                  <h2 className="font-display text-[length:var(--fs-h4)] font-extrabold leading-[var(--lh-tight)]">
-                    <Link to={`/blog/${post.slug}`} viewTransition className="transition-colors hover:text-signal">
-                      {post.title}
-                    </Link>
+                  <h2 className="font-display text-[length:var(--fs-h3)] font-extrabold leading-[var(--lh-tight)] transition-colors group-hover:text-signal">
+                    {post.title}
                   </h2>
-                  <p className="text-text-2">{post.description}</p>
-                  <Link
-                    to={`/blog/${post.slug}`}
-                    viewTransition
-                    className="inline-flex items-center gap-s2 text-[length:var(--fs-small)] text-text-2 transition-colors hover:text-text"
-                  >
-                    Leer artículo
-                    <Icon name="arrow-right" className="transition-transform group-hover:translate-x-1" />
-                  </Link>
-                </article>
+                  <p className="max-w-[46ch] text-text-2">{post.description}</p>
+                  <Icon name="arrow-right" className="hidden text-text-3 transition-transform group-hover:translate-x-1 group-hover:text-signal md:block" />
+                </Link>
               </Reveal>
             ))}
           </ul>

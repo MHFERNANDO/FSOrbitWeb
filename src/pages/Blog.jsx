@@ -39,10 +39,11 @@ export default function Blog() {
 
       <section className="border-t border-[color:var(--line)]">
         <div className="mx-auto max-w-(--maxw) px-(--gutter) py-[var(--section-y)]">
-          <ul className="grid gap-s5 md:grid-cols-3">
+          <ul className="grid gap-s6 md:grid-cols-3">
             {blogPosts.map((post, i) => (
               <Reveal as="li" type="rise" index={i} key={post.slug} className="grid">
-                <article className="group grid content-start gap-s4 rounded-r3 border border-[color:var(--line)] p-s6 transition-colors hover:border-[color:var(--line-2)]">
+                <article className="group relative grid content-start gap-s4 rounded-r4 border border-[color:var(--line)] bg-ink-900 p-s7 shadow-[inset_0_2px_0_0_var(--line)] transition-all duration-(--d3) hover:-translate-y-1 hover:border-[color:var(--line-2)] hover:bg-ink-850 hover:shadow-[inset_0_2px_0_0_var(--color-signal)]">
+                  <span className="font-display text-[length:var(--fs-h2)] font-extrabold leading-none text-[color:var(--line-2)]" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
                   <time dateTime={post.datePublished} className="font-mono text-[length:var(--fs-small)] text-text-3">
                     {`${formatDate(post.datePublished)} · ${post.readingMinutes} min de lectura`}
                   </time>

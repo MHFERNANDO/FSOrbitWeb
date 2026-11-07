@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Reveal from '@/components/Reveal';
@@ -21,10 +20,6 @@ const CRUMBS = [
 export default function Proyectos() {
   usePageSeo({ path: '/proyectos', crumbs: CRUMBS, type: 'CollectionPage', nodes: [projectListNode('/proyectos', projects)] });
   const preview = useProjectPreview();
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
 
   return (
     <main id="main">

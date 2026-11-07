@@ -126,7 +126,7 @@ export const routes = [
     priority: 0.8,
     title: 'Contacto | Cotiza tu Página Web en Cuenca | FS Orbit',
     description:
-      'Cotiza tu página web en Cuenca: escríbenos por formulario, WhatsApp, correo o teléfono. FS Orbit atiende negocios de Cuenca y de todo Ecuador.',
+      'Cotiza tu página web en Cuenca: escríbenos por WhatsApp, teléfono o correo y recibe una propuesta clara. Atendemos negocios de todo Ecuador.',
     files: ['src/pages/Contacto.jsx'],
   },
   {
@@ -135,7 +135,7 @@ export const routes = [
     priority: 0.3,
     title: 'Política de Privacidad | FS Orbit',
     description:
-      'Política de privacidad de FS Orbit: qué datos recibimos mediante el formulario de contacto, cómo usamos la analítica de Vercel y cómo ejercer tus derechos.',
+      'Privacidad de FS Orbit: qué datos recibimos al contactarnos por WhatsApp o correo, cómo usamos la analítica de Vercel y cómo ejercer tus derechos.',
     files: ['src/pages/Privacidad.jsx'],
   },
 ];

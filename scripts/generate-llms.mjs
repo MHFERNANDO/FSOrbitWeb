@@ -50,7 +50,7 @@ ${postLines.join('\n')}
 
 ## Contacto
 
-- Web: ${O}/contacto (formulario, WhatsApp, teléfono, correo)
+- Web: ${O}/contacto (WhatsApp, teléfono, correo)
 - WhatsApp ventas: ${contact.telDisplay}
 - Correo: ${contact.email}
 - Instagram: ${contact.instagram}

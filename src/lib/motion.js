@@ -7,12 +7,13 @@
 //          iteracion anterior (ver el bloque "DECISION DEL CLIENTE" de
 //          src/index.css).
 //
-// Es true porque la auditoria de accesibilidad/SEO lo pide (WCAG 2.3.3).
+// Esta en false por pedido del cliente (2026-11-07): las animaciones se ven siempre.
+// Poner true para respetar el ajuste del sistema (WCAG 2.3.3).
 // OJO: una maquina de pruebas con "reducir animaciones" activado en
 // Windows (Configuracion > Accesibilidad > Efectos visuales > Efectos de
 // animacion = apagado) vera el sitio sin animaciones. Para ver las
 // animaciones ahi, activa ese ajuste o pon esta constante en false.
-export const RESPECT_REDUCED_MOTION = true;
+export const RESPECT_REDUCED_MOTION = false;
 
 const query = typeof window !== 'undefined' && window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
 

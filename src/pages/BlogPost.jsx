@@ -15,15 +15,20 @@ const WA_BASE = 'https://wa.me/593983113942?text=';
 
 function Block({ block }) {
   if (block.h2) {
-    return <h2 className="mt-s7 font-display text-[length:var(--fs-h3)] font-extrabold leading-[var(--lh-tight)] first:mt-0">{block.h2}</h2>;
+    return (
+      <h2 className="mt-s8 flex items-start gap-s3 font-display text-[length:var(--fs-h3)] font-extrabold leading-[var(--lh-tight)] first:mt-0">
+        <span aria-hidden="true" className="mt-[0.3em] h-[0.9em] w-1 shrink-0 rounded-full bg-signal" />
+        {block.h2}
+      </h2>
+    );
   }
   if (block.p) {
-    return <p className="text-text-2">{renderInline(block.p)}</p>;
+    return <p className="text-[1.0625rem] leading-[1.75] text-text-2">{renderInline(block.p)}</p>;
   }
   const Tag = block.ol ? 'ol' : 'ul';
   const items = block.ol || block.ul;
   return (
-    <Tag className={`grid gap-s3 pl-s6 text-text-2 marker:text-text-3 ${block.ol ? 'list-decimal' : 'list-disc'}`}>
+    <Tag className={`grid gap-s3 rounded-r3 border border-[color:var(--line)] bg-ink-900 py-s6 pl-[calc(var(--space-s6,1.5rem)+1.25rem)] pr-s6 leading-[1.7] text-text-2 marker:text-signal ${block.ol ? 'list-decimal' : 'list-disc'}`}>
       {items.map((item) => (
         <li key={item.slice(0, 40)}>{renderInline(item)}</li>
       ))}
@@ -70,7 +75,7 @@ export default function BlogPost() {
           <h1 className="mt-s4 max-w-[22ch] font-display text-[length:var(--fs-h1)] font-extrabold leading-[var(--lh-tight)] tracking-[var(--tr-display)]">
             {post.title}
           </h1>
-          <p className="mt-s5 max-w-[60ch] text-[length:var(--fs-lead)] text-text-2">{content.intro}</p>
+          <p className="mt-s6 max-w-[60ch] rounded-r3 border-l-2 border-signal bg-ink-900 py-s4 pl-s5 pr-s5 text-[length:var(--fs-lead)] text-text-2">{content.intro}</p>
         </header>
 
         <div className="border-t border-[color:var(--line)]">

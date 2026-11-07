@@ -1,4 +1,5 @@
 import { lazy, Suspense } from 'react';
+import { useEffect } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import IconSprite from './components/IconSprite';
 import SiteBg from './components/SiteBg';
@@ -61,6 +62,38 @@ export function preloadRoute(pathname) {
   return route.preload();
 }
 
+// Al navegar entre rutas: sin hash va al inicio de la pagina; con hash
+// (/#servicios) baja a esa seccion en cuanto exista en el DOM.
+function ScrollManager() {
+  const { pathname, hash } = useLocation();
+  useEffect(() => {
+    const root = document.documentElement;
+    const prev = root.style.scrollBehavior;
+    root.style.scrollBehavior = 'auto';
+    let tries = 0;
+    let timer;
+    const go = () => {
+      if (!hash) {
+        window.scrollTo(0, 0);
+        return;
+      }
+      const el = document.getElementById(decodeURIComponent(hash.slice(1)));
+      if (el) el.scrollIntoView({ block: 'start' });
+      else if (tries++ < 20) timer = setTimeout(go, 100);
+    };
+    go();
+    const restore = setTimeout(() => {
+      root.style.scrollBehavior = prev;
+    }, 50);
+    return () => {
+      clearTimeout(timer);
+      clearTimeout(restore);
+      root.style.scrollBehavior = prev;
+    };
+  }, [pathname, hash]);
+  return null;
+}
+
 export default function App() {
   const location = useLocation();
 
@@ -73,6 +106,7 @@ export default function App() {
         Ir al contenido
       </a>
 
+      <ScrollManager />
       <IconSprite />
       <SiteBg />
 

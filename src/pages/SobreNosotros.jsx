@@ -26,15 +26,15 @@ const CRUMBS = [
 const PILLARS = [
   {
     title: 'Quiénes somos',
-    text: 'FS Orbit es una agencia de desarrollo web con base en Cuenca, Ecuador. Diseñamos y programamos páginas web, tiendas online y software a medida para negocios de la ciudad y de todo el país. Aunque nuestra base está en Cuenca, atendemos proyectos en cualquier ubicación de Ecuador.',
+    text: 'FS Orbit es un estudio de desarrollo web de Cuenca, Ecuador. Nos concentramos en pocos servicios y los trabajamos proyecto por proyecto: páginas web, tiendas online y software a medida para negocios de la ciudad y de todo el país.',
   },
   {
     title: 'Cómo trabajamos',
-    text: 'Escribimos el código de cada proyecto: no partimos de plantillas ni de constructores de páginas. Así incluimos solo lo que tu sitio necesita, cuidamos la velocidad de carga y dejamos bien resuelta la parte técnica del SEO: títulos, descripciones, encabezados y datos estructurados.',
+    text: 'Hablas directamente con quien diseña y programa tu sitio, sin intermediarios. Escribimos el código en lugar de partir de plantillas, para incluir solo lo que tu negocio necesita y cuidar la velocidad y el SEO técnico desde el primer día.',
   },
   {
-    title: 'Qué buscamos',
-    text: 'Que un negocio pase de una presencia improvisada a un sitio claro, rápido y fácil de encontrar en Google, en Google Maps y en las herramientas de búsqueda con inteligencia artificial. Cada proyecto empieza por entender qué quieres que haga tu web y a quién le habla.',
+    title: 'Hacia dónde vamos',
+    text: 'Construimos sitios pensados para crecer contigo: una base técnica ordenada a la que se puede sumar después una tienda, un sistema a medida o mantenimiento, cuando tu negocio lo pida. Queremos que cada proyecto nos recomiende al siguiente.',
   },
 ];
 

@@ -44,11 +44,8 @@ export default function Blog() {
                 <Link
                   to={`/blog/${post.slug}`}
                   viewTransition
-                  className="group -mx-s4 grid gap-x-s7 gap-y-s3 px-s4 py-s8 transition-colors duration-(--d3) hover:bg-ink-850 md:grid-cols-[200px_minmax(0,1.3fr)_minmax(0,1fr)_auto] md:items-baseline"
+                  className="group -mx-s4 grid gap-x-s7 gap-y-s3 px-s4 py-s8 transition-colors duration-(--d3) hover:bg-ink-850 md:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_auto] md:items-baseline"
                 >
-                  <span className="font-mono text-[length:var(--fs-small)] text-text-3">
-                    {`${post.readingMinutes} min`}
-                  </span>
                   <h2 className="font-display text-[length:var(--fs-h3)] font-extrabold leading-[var(--lh-tight)] transition-colors group-hover:text-signal">
                     {post.title}
                   </h2>

@@ -9,7 +9,6 @@ const LINKS = [
   { to: '/servicios/rediseno-y-optimizacion', label: 'Rediseño y Optimización' },
   { to: '/servicios/diseno-ui-ux', label: 'Diseño UI/UX' },
   { to: '/servicios/mantenimiento-web', label: 'Mantenimiento Web' },
-  { to: '/blog', label: 'Blog' },
   { to: '/precios', label: 'Precios' },
   { to: '/proyectos', label: 'Proyectos' },
   { to: '/contacto', label: 'Contacto' },

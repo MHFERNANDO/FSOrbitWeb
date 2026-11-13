@@ -39,8 +39,6 @@ const ProyectoDetalle = lazyRoute(() => import('./pages/ProyectoDetalle'));
 const Servicio = lazyRoute(() => import('./pages/Servicio'));
 const SobreNosotros = lazyRoute(() => import('./pages/SobreNosotros'));
 const Privacidad = lazyRoute(() => import('./pages/Privacidad'));
-const Blog = lazyRoute(() => import('./pages/Blog'));
-const BlogPost = lazyRoute(() => import('./pages/BlogPost'));
 const Precios = lazyRoute(() => import('./pages/Precios'));
 const Contacto = lazyRoute(() => import('./pages/Contacto'));
 const NotFound = lazyRoute(() => import('./pages/NotFound'));
@@ -55,8 +53,6 @@ export function preloadRoute(pathname) {
   else if (/^\/servicios\/[^/]+$/.test(p)) route = Servicio;
   else if (p === '/sobre-nosotros') route = SobreNosotros;
   else if (p === '/politica-de-privacidad') route = Privacidad;
-  else if (p === '/blog') route = Blog;
-  else if (/^\/blog\/[^/]+$/.test(p)) route = BlogPost;
   else if (p === '/precios') route = Precios;
   else if (p === '/contacto') route = Contacto;
   return route.preload();
@@ -120,8 +116,6 @@ export default function App() {
               <Route path="/proyectos/:slug" element={<ProyectoDetalle />} />
               <Route path="/servicios/:slug" element={<Servicio />} />
               <Route path="/sobre-nosotros" element={<SobreNosotros />} />
-              <Route path="/blog" element={<Blog />} />
-              <Route path="/blog/:slug" element={<BlogPost />} />
               <Route path="/politica-de-privacidad" element={<Privacidad />} />
               <Route path="/precios" element={<Precios />} />
               <Route path="/contacto" element={<Contacto />} />

@@ -69,6 +69,26 @@
   "trailingSlash": false,
   "redirects": [
     {
+      "source": "/blog",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/cuanto-cuesta-una-pagina-web-en-ecuador",
+      "destination": "/precios",
+      "permanent": true
+    },
+    {
+      "source": "/blog/pagina-web-vs-solo-instagram",
+      "destination": "/servicios/diseno-web-cuenca",
+      "permanent": true
+    },
+    {
+      "source": "/blog/como-aparecer-en-google-maps-cuenca",
+      "destination": "/servicios/diseno-web-cuenca",
+      "permanent": true
+    },
+    {
       "source": "/:path*",
       "has": [
         {

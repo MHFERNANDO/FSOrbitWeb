@@ -101,7 +101,7 @@ export default function SobreNosotros() {
             ))}
           </ul>
           <p className="mt-s7 max-w-[62ch] text-text-2">
-            {renderInline('Mira sitios reales en el [portafolio](/proyectos), los valores de cada plan en [precios](/precios) o guías para negocios locales en el [blog](/blog).')}
+            {renderInline('Mira sitios reales en el [portafolio](/proyectos) o los valores de cada plan en [precios](/precios).')}
           </p>
         </div>
       </section>

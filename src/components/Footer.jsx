@@ -15,7 +15,6 @@ const SERVICE_LINKS = [
 const COMPANY_LINKS = [
   { to: '/precios', label: 'Precios' },
   { to: '/proyectos', label: 'Proyectos' },
-  { to: '/blog', label: 'Blog' },
   { to: '/sobre-nosotros', label: 'Sobre nosotros' },
   { to: '/contacto', label: 'Contacto' },
   { to: '/politica-de-privacidad', label: 'Política de privacidad' },

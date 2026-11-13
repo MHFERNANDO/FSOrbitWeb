@@ -415,3 +415,8 @@ El LCP depende de que el Preloader (decisión del cliente, 2000ms + 1350ms) tape
 - **Laboratorio Diesel MG**: su sitio responde `X-Frame-Options: DENY` y `frame-ancestors 'none'`, por eso la vista previa de `/proyectos` queda en blanco. Hay que permitir a `https://fsorbit.com` en el `vercel.json` de ese proyecto (o mostrar solo el enlace).
 - **Fuera del código**: Google Business Profile, Search Console y Bing (enviar el sitemap nuevo), reseñas reales, enlaces desde los sitios de clientes, correo profesional con dominio.
 - **Rich Results Test** (no se puede automatizar): probar en https://search.google.com/test/rich-results las URLs `/`, `/precios`, `/servicios/diseno-web-cuenca`, `/proyectos/acculab-system` y `/blog/cuanto-cuesta-una-pagina-web-en-ecuador` tras el deploy. El build ya valida estructura, `@id` y referencias.
+
+
+## Cambio: blog retirado (2026-11-13)
+
+Se quito el blog (rutas, pie de pagina, 404, sitemap, llms.txt y smoke test) por decision del cliente. Las 4 URLs que Google ya tenia indexadas redirigen con 308 en vercel.json: /blog a /, el articulo de precios a /precios y los otros dos a /servicios/diseno-web-cuenca. Rutas del sitio: 15.

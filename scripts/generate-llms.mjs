@@ -5,7 +5,6 @@
 import { writeFile } from 'node:fs/promises';
 import { contact, pricingPlans, projects } from '../src/data/content.js';
 import { servicePages } from '../src/data/servicePages.js';
-import { blogPosts } from '../src/data/blog.js';
 
 const O = 'https://fsorbit.com';
 
@@ -17,8 +16,6 @@ const planLines = pricingPlans.map((p) => {
 });
 
 const projectLines = projects.map((p) => `- [${p.title}](${O}/proyectos/${p.slug}): ${p.description} Sitio: ${p.url}`);
-
-const postLines = blogPosts.map((p) => `- [${p.title}](${O}/blog/${p.slug}): ${p.description}`);
 
 const txt = `# FS Orbit
 
@@ -37,10 +34,6 @@ ${planLines.join('\n')}
 ## Proyectos
 
 ${projectLines.join('\n')}
-
-## Blog
-
-${postLines.join('\n')}
 
 ## Empresa
 

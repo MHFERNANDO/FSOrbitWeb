@@ -9,7 +9,6 @@
 // `files`: archivos fuente que determinan el contenido de la ruta; el
 // sitemap usa su ultima fecha de commit (git) como <lastmod>. Para los
 // articulos manda dateModified del propio articulo.
-import { blogPosts } from '../data/blog.js';
 import { servicePages } from '../data/servicePages.js';
 
 const SERVICE_FILES = ['src/data/servicePages.js', 'src/data/serviceContent.js', 'src/data/faq.js', 'src/pages/ServicePage.jsx'];
@@ -100,26 +99,6 @@ export const routes = [
       'Conoce FS Orbit, agencia de desarrollo web con base en Cuenca, Ecuador. Cómo trabajamos, qué hacemos y cómo contactarnos para tu proyecto web.',
     files: ['src/pages/SobreNosotros.jsx'],
   },
-  {
-    path: '/blog',
-    changefreq: 'weekly',
-    priority: 0.7,
-    title: 'Blog de Páginas Web y SEO Local en Ecuador | FS Orbit',
-    description:
-      'Guías prácticas sobre páginas web, precios, Instagram vs web y Google Maps para negocios de Cuenca y Ecuador. Aprende qué necesita tu negocio para crecer.',
-    files: ['src/pages/Blog.jsx', 'src/data/blog.js'],
-    lastmod: blogPosts.map((p) => p.dateModified).sort().at(-1),
-  },
-  ...blogPosts.map((p) => ({
-    path: `/blog/${p.slug}`,
-    changefreq: 'monthly',
-    priority: 0.7,
-    title: p.seoTitle,
-    description: p.description,
-    files: ['src/pages/BlogPost.jsx', 'src/data/blog.js', 'src/data/blogContent.js'],
-    lastmod: p.dateModified,
-    post: p.slug,
-  })),
   {
     path: '/contacto',
     changefreq: 'monthly',

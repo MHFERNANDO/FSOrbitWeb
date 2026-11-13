@@ -54,7 +54,7 @@ await page.evaluateOnNewDocument(() => {
 });
 
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
-const routes = process.env.ALL ? ["/","/proyectos","/servicios/diseno-web-cuenca","/servicios/diseno-ui-ux","/servicios/tiendas-online","/servicios/mantenimiento-web","/servicios/rediseno-y-optimizacion","/precios","/sobre-nosotros","/blog","/blog/cuanto-cuesta-una-pagina-web-en-ecuador","/blog/pagina-web-vs-solo-instagram","/blog/como-aparecer-en-google-maps-cuenca","/proyectos/acculab-system","/proyectos/gravity-studio","/proyectos/jf-vapes-store","/proyectos/laboratorio-diesel-mg","/contacto","/politica-de-privacidad"] : [];
+const routes = process.env.ALL ? ["/","/proyectos","/servicios/diseno-web-cuenca","/servicios/diseno-ui-ux","/servicios/tiendas-online","/servicios/mantenimiento-web","/servicios/rediseno-y-optimizacion","/precios","/sobre-nosotros","/proyectos/acculab-system","/proyectos/gravity-studio","/proyectos/jf-vapes-store","/proyectos/laboratorio-diesel-mg","/contacto","/politica-de-privacidad"] : [];
 for (const r of routes) {
   const before = problems.length;
   const resp = await page.goto(`http://127.0.0.1:4555${r}`, { waitUntil: 'networkidle0' });

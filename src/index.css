@@ -226,7 +226,7 @@
 @font-face {
   font-family: "Archivo Fallback";
   src: local("Arial"), local("Helvetica"), local("Segoe UI");
-  size-adjust: 97%;
+  size-adjust: 110.5%;
   ascent-override: 92%;
   descent-override: 24%;
   line-gap-override: 0%;

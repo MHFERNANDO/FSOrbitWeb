@@ -1,107 +1,94 @@
 import { Link } from 'react-router-dom';
-import Icon from './Icon';
-import Reveal from './Reveal';
-import { contact } from '@/data/content';
+import { contact, services, waLink } from '@/data/content';
 import { trackClick } from '@/lib/analytics';
-
-const SERVICE_LINKS = [
-  { to: '/servicios/diseno-web-cuenca', label: 'Diseño Web en Cuenca' },
-  { to: '/servicios/diseno-ui-ux', label: 'Diseño UI/UX' },
-  { to: '/servicios/tiendas-online', label: 'Tiendas Online' },
-  { to: '/servicios/mantenimiento-web', label: 'Mantenimiento Web' },
-  { to: '/servicios/rediseno-y-optimizacion', label: 'Rediseño y Optimización' },
-];
-
-const COMPANY_LINKS = [
-  { to: '/precios', label: 'Precios' },
-  { to: '/proyectos', label: 'Proyectos' },
-  { to: '/blog', label: 'Blog' },
-  { to: '/sobre-nosotros', label: 'Sobre nosotros' },
-  { to: '/contacto', label: 'Contacto' },
-  { to: '/politica-de-privacidad', label: 'Política de privacidad' },
-];
 
 export default function Footer() {
   return (
-    <footer className="border-t border-[color:var(--line)]">
-      <div className="mx-auto grid max-w-(--maxw) gap-s8 px-(--gutter) py-s9 md:grid-cols-2 lg:grid-cols-5">
-        <Reveal as="div" type="rise" className="grid gap-s4">
-          <img src="/assets/Logo-128.webp" alt="FS Orbit" width={128} height={128} loading="lazy" decoding="async"
-            className="h-[50px] w-[50px]" style={{ filter: 'brightness(0) invert(1)', opacity: 0.92 }} />
-          <p className="max-w-[32ch] text-text-2">Transformando ideas en ecosistemas digitales de alto rendimiento.</p>
-        </Reveal>
-
-        <Reveal as="nav" aria-label="Servicios" type="rise" index={1} className="grid content-start gap-s3">
-          <h2 className="font-display text-[length:var(--fs-h4)] font-extrabold">Servicios</h2>
-          {SERVICE_LINKS.map((link) => (
-            <Link key={link.to} to={link.to} viewTransition className="text-text-2 transition-colors hover:text-text">
-              {link.label}
+    <footer className="site-foot">
+      <div className="wrap">
+        <div className="foot-grid">
+          <div className="foot-about">
+            <Link to="/" className="brand" aria-label="FS Orbit, inicio">
+              <img src="/assets/Emblem-96.webp" width="34" height="34" alt="" loading="lazy" />
+              FS Orbit
             </Link>
-          ))}
-        </Reveal>
-
-        <Reveal as="nav" aria-label="Empresa" type="rise" index={2} className="grid content-start gap-s3">
-          <h2 className="font-display text-[length:var(--fs-h4)] font-extrabold">Empresa</h2>
-          {COMPANY_LINKS.map((link) => (
-            <Link key={link.to} to={link.to} viewTransition className="text-text-2 transition-colors hover:text-text">
-              {link.label}
-            </Link>
-          ))}
-        </Reveal>
-
-        <Reveal as="div" type="rise" index={3} className="grid gap-s4">
-          <h2 className="font-display text-[length:var(--fs-h4)] font-extrabold">Contacto Directo</h2>
-          <div className="grid gap-s3">
-            {[
-              { number: contact.whatsappSales, label: '098 311 3942' },
-              { number: contact.whatsappSupport, label: '098 758 2463' },
-            ].map((wa) => (
-              <a
-                key={wa.number}
-                href={`https://wa.me/${wa.number}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => trackClick('whatsapp', { source: 'footer' })}
-                className="group flex items-center gap-s4 transition-transform duration-(--d3) hover:translate-x-1"
-              >
-                <span className="grid size-10 place-items-center rounded-r2 border border-[color:var(--line-2)] text-text-2 transition-colors group-hover:text-signal">
-                  <Icon name="whatsapp" fill className="text-lg" />
-                </span>
-                <span className="grid">
-                  <span className="text-[length:var(--fs-small)] text-text-3">WhatsApp</span>
-                  <strong className="text-text">{wa.label}</strong>
-                </span>
-              </a>
-            ))}
+            <p>
+              Estudio de desarrollo web de Cuenca, Azuay. Trabajamos de forma remota con negocios de todo Ecuador; no atendemos en
+              una oficina abierta al público.
+            </p>
           </div>
-        </Reveal>
-
-        <Reveal as="div" type="rise" index={4} className="grid gap-s4">
-          <h2 className="font-display text-[length:var(--fs-h4)] font-extrabold">Escríbenos</h2>
-          <p className="text-text-2">¿Prefieres el correo o una llamada?</p>
-          <a href={`mailto:${contact.email}`} onClick={() => trackClick('email', { source: 'footer' })} className="text-text-2 underline-offset-4 transition-colors hover:text-signal hover:underline">
-            {contact.email}
-          </a>
-          <a href={`tel:${contact.tel}`} onClick={() => trackClick('tel', { source: 'footer' })} className="text-text-2 underline-offset-4 transition-colors hover:text-signal hover:underline">
-            {contact.telDisplay}
-          </a>
-          <a
-            href={contact.instagram}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-s2 text-text-2 transition-colors hover:text-signal"
-          >
-            <Icon name="instagram" fill />
-            Síguenos
-          </a>
-        </Reveal>
-      </div>
-
-      <div className="mx-auto flex max-w-(--maxw) flex-col items-center justify-between gap-s4 border-t border-[color:var(--line)] px-(--gutter) py-s5 text-[length:var(--fs-small)] text-text-3 sm:flex-row">
-        <p>&copy; 2026 FS Orbit. Todos los derechos reservados.</p>
-        <div className="flex items-center gap-s2">
-          <span className="size-1.5 rounded-full bg-[color:var(--line-2)]" />
-          Sistemas Operativos Online
+          <nav aria-label="Servicios">
+            <h2>Servicios</h2>
+            <ul>
+              {services.map((s) => (
+                <li key={s.href}>
+                  <Link to={s.href}>{s.title}</Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+          <nav aria-label="Sitio">
+            <h2>Sitio</h2>
+            <ul>
+              <li>
+                <Link to="/proyectos">Casos</Link>
+              </li>
+              <li>
+                <Link to="/precios">Planes y precios</Link>
+              </li>
+              <li>
+                <Link to="/proceso">Proceso</Link>
+              </li>
+              <li>
+                <Link to="/sobre-nosotros">Sobre nosotros</Link>
+              </li>
+              <li>
+                <Link to="/blog">Blog</Link>
+              </li>
+              <li>
+                <Link to="/politica-de-privacidad">Política de privacidad</Link>
+              </li>
+            </ul>
+          </nav>
+          <div>
+            <h2>Contacto</h2>
+            <ul>
+              <li>
+                <a
+                  href={waLink('Hola, quiero cotizar un proyecto web')}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => trackClick('whatsapp', { source: 'footer_ventas' })}
+                >
+                  WhatsApp ventas: {contact.salesDisplay}
+                </a>
+              </li>
+              <li>
+                <a
+                  href={waLink('Hola, necesito soporte técnico', contact.whatsappSupport)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => trackClick('whatsapp', { source: 'footer_soporte' })}
+                >
+                  WhatsApp soporte: {contact.supportDisplay}
+                </a>
+              </li>
+              <li>
+                <a href={`mailto:${contact.email}`} onClick={() => trackClick('email', { source: 'footer' })}>
+                  {contact.email}
+                </a>
+              </li>
+              <li>
+                <a href={contact.instagram} target="_blank" rel="noopener noreferrer">
+                  Instagram @fs_orbit
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div className="foot-legal">
+          <span>© {new Date().getFullYear()} FS Orbit. Cuenca, Ecuador.</span>
+          <span>Este sitio está escrito a mano, sin plantillas.</span>
         </div>
       </div>
     </footer>

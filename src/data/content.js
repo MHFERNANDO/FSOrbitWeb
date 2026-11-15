@@ -1,129 +1,155 @@
-// Todo el copy del sitio, sacado literal de legacy-static/index.html y
-// legacy-static/proyectos.html — ni un texto, precio o link reescrito.
+// Datos del sitio: contacto, servicios, planes, casos y proceso.
+// Precios, nombres de plan y hechos de cada caso son la fuente de verdad;
+// no se agregan cifras, clientes ni resultados que no esten confirmados.
 
 export const contact = {
   whatsappSales: '593983113942',
   whatsappSupport: '593987582463',
-  // Mismo numero de ventas, para el link tel: del header/footer (el
-  // cliente confirmo que no hay otra linea fija).
+  // Mismo numero de ventas para el link tel: (no hay otra linea fija).
   tel: '+593983113942',
   telDisplay: '+593 98 311 3942',
+  salesDisplay: '098 311 3942',
+  supportDisplay: '098 758 2463',
   email: 'fsorbitt@gmail.com',
   instagram: 'https://www.instagram.com/fs_orbit/',
-  // Base en Cuenca, pero el cliente atiende cualquier ubicacion (no solo
-  // Azuay/Cuenca) — confirmado, no hay direccion publica de oficina.
+  // Base en Cuenca; se atiende cualquier ubicacion del pais. No hay
+  // direccion publica de oficina.
   city: 'Cuenca',
   region: 'Azuay',
   country: 'Ecuador',
 };
 
+export const waLink = (text, number = contact.whatsappSales) => `https://wa.me/${number}?text=${encodeURIComponent(text)}`;
+
 export const services = [
   {
-    number: '01',
+    slug: 'diseno-web-cuenca',
     href: '/servicios/diseno-web-cuenca',
-    icon: 'globe',
     title: 'Diseño de páginas web',
-    description: 'Sitios de alto rendimiento, seguros y optimizados para SEO. Construimos la base sólida que tu empresa necesita para escalar.',
-    features: ['Código liviano', 'Adaptada a celular'],
+    short: 'Landing pages y sitios de varias páginas escritos a medida.',
+    description:
+      'Diseñamos y programamos tu sitio con código propio: liviano, adaptado a celular y con la estructura que leen los buscadores.',
+    features: ['Código liviano', 'Adaptada a celular', 'SEO on-page'],
+    from: 'Desde $200',
   },
   {
-    number: '02',
+    slug: 'diseno-ui-ux',
     href: '/servicios/diseno-ui-ux',
-    icon: 'layout',
     title: 'Diseño UI/UX',
-    description: 'Interfaces modernas centradas en el usuario. No solo diseñamos cosas bonitas, creamos experiencias que convierten visitas en clientes.',
+    short: 'Estructura, prototipo e interfaz antes de programar.',
+    description:
+      'Ordenamos el contenido, definimos el recorrido de la página y te mostramos un prototipo para que ajustes antes de que se construya.',
     features: ['Prototipos', 'Experiencia de usuario'],
+    from: 'Se cotiza con el proyecto',
   },
   {
-    number: '03',
+    slug: 'tiendas-online',
     href: '/servicios/tiendas-online',
-    icon: 'bag',
     title: 'Tiendas online',
-    description: 'Sistemas de venta online robustos y escalables. Gestiona inventario, pagos y envíos en una plataforma diseñada para vender 24/7.',
-    features: ['Pagos Seguros', 'Gestión de Stock'],
+    short: 'Catálogo, inventario y pedidos directos a WhatsApp.',
+    description:
+      'Una tienda de hasta 4 vistas con catálogo dinámico, panel de inventario y un botón de pedido que abre la conversación por WhatsApp.',
+    features: ['Catálogo dinámico', 'Gestión de stock', 'Pedido por WhatsApp'],
+    from: 'Desde $500',
   },
   {
-    number: '04',
+    slug: 'mantenimiento-web',
     href: '/servicios/mantenimiento-web',
-    icon: 'shield',
-    title: 'Mantenimiento Web',
-    description: 'Protegemos tu inversión con soporte técnico continuo. Corrección de errores, actualizaciones de seguridad y respaldos constantes para que nunca dejes de estar online.',
-    features: ['Parches de Seguridad', 'Soporte Técnico', 'Backup Diario'],
+    title: 'Mantenimiento web',
+    short: 'Parches de seguridad, soporte técnico y backup diario.',
+    description:
+      'Corregimos errores, aplicamos actualizaciones de seguridad y guardamos respaldos diarios para que tu sitio siga en línea.',
+    features: ['Parches de seguridad', 'Soporte técnico', 'Backup diario'],
+    from: 'Se cotiza según el sitio',
   },
   {
-    number: '05',
+    slug: 'rediseno-y-optimizacion',
     href: '/servicios/rediseno-y-optimizacion',
-    icon: 'bolt',
     title: 'Rediseño y optimización',
-    description: '¿Tu web se quedó en el pasado? Transformamos sitios lentos y antiguos en plataformas rápidas y modernas, mejorando el código y la experiencia móvil sin perder tu esencia.',
+    short: 'Tu sitio actual, más rápido y bien resuelto en celular.',
+    description:
+      'Tomamos un sitio lento o antiguo y mejoramos su velocidad, su código y su experiencia en celular sin perder tu identidad.',
     features: ['Más velocidad', 'Rediseño adaptativo', 'Limpieza de código'],
+    from: 'Se cotiza caso por caso',
   },
 ];
 
+// Los tres planes publicados. `includes` es la lista vigente de cada plan,
+// sin agregados. "Desde" = precio base; el final depende del alcance.
 export const pricingPlans = [
   {
-    icon: 'target',
+    slug: 'orbit-impact',
     name: 'Orbit Impact',
     price: '$200',
-    period: '/desde',
-    description: 'Perfecto para servicios profesionales que buscan autoridad visual y velocidad.',
-    features: [
-      '1 Landing Page Principal',
-      'Diseño de Autor (Sin Plantillas)',
+    priceLabel: 'Desde $200',
+    kind: 'Landing page',
+    description: 'Una landing page para servicios profesionales que necesitan presencia y velocidad.',
+    scope: 'Una sola vista',
+    includes: [
+      'Una landing page principal',
+      'Diseño de autor, sin plantillas',
       'Animaciones al desplazar la página',
-      'Código propio, sin plugins ("Pure Code")',
-      'SEO On-Page Estructural',
-      'Formulario de captación avanzado',
+      'Código propio, sin plugins (Pure Code)',
+      'SEO on-page estructural',
+      'Formulario de captación',
     ],
-    cta: 'Iniciar Proyecto',
-    ctaVariant: 'secondary',
+    cta: 'Escribir por WhatsApp sobre Orbit Impact',
     whatsappText: 'Me interesa el plan Orbit Impact',
-    popular: false,
+    servicePath: '/servicios/diseno-web-cuenca',
   },
   {
-    icon: 'bag',
+    slug: 'orbit-commerce',
     name: 'Orbit Commerce',
     price: '$500',
-    period: '/desde',
-    description: 'E-commerce robusto diseñado para vender 24/7 sin fricciones.',
-    features: [
-      'Hasta 4 Vistas (Tienda Completa)',
+    priceLabel: 'Desde $500',
+    kind: 'Tienda online',
+    description: 'Una tienda online para vender por catálogo y recibir los pedidos por WhatsApp.',
+    scope: 'Hasta 4 vistas',
+    includes: [
+      'Hasta 4 vistas (tienda completa)',
       'Catálogo de productos dinámico',
-      'Botón de Pedido Directo a WhatsApp',
+      'Botón de pedido directo a WhatsApp',
       'Panel de gestión de inventario',
-      'SEO On-Page Estructural',
-      'Capacitación de uso de plataforma',
+      'SEO on-page estructural',
+      'Capacitación de uso de la plataforma',
     ],
-    cta: 'Lanzar Tienda',
-    ctaVariant: 'primary',
+    cta: 'Escribir por WhatsApp sobre Orbit Commerce',
     whatsappText: 'Me interesa el plan Orbit Commerce',
-    popular: true,
+    servicePath: '/servicios/tiendas-online',
   },
   {
-    icon: 'chip',
+    slug: 'deep-space-system',
     name: 'Deep Space System',
     price: 'Custom',
-    period: '',
-    description: 'Software a medida: Portales médicos, sistemas internos o apps web.',
-    features: [
-      'Arquitectura de Vistas Ilimitada',
+    priceLabel: 'Se cotiza',
+    kind: 'Software a medida',
+    description: 'Software a medida: portales médicos, sistemas internos o aplicaciones web.',
+    scope: 'Vistas sin límite',
+    includes: [
+      'Arquitectura de vistas ilimitada',
       'Desarrollo con React / Next.js',
-      'Gestión de Base de Datos',
-      'Roles de Usuario y Autenticación',
+      'Gestión de base de datos',
+      'Roles de usuario y autenticación',
       'Integración con APIs de terceros',
-      'Arquitectura Escalable (Misión Crítica)',
+      'Arquitectura escalable',
     ],
-    cta: 'Consultar Ingeniería',
-    ctaVariant: 'secondary',
+    cta: 'Escribir por WhatsApp sobre un sistema a medida',
     whatsappText: 'Necesito una consultoría para un Sistema Custom',
-    popular: false,
+    servicePath: null,
   },
 ];
 
-// Dimensiones reales de cada PNG en public/assets (leidas del header del
-// archivo) — se usan como width/height en <img> para que el navegador
-// reserve el espacio antes de que cargue la imagen y no haya salto de
-// layout (CLS), ademas de lo que ya hace aspect-* en las clases.
+// Lo que vale para los tres planes (sale de la FAQ de precios).
+export const planNotes = {
+  all: ['Diseño propio, sin plantillas', 'Código optimizado', 'SEO on-page estructural: metadatos, estructura semántica y velocidad de carga'],
+  notIncluded: [
+    'Dominio y hosting. Son servicios anuales de otro proveedor; antes de empezar te decimos qué contratar.',
+    'Mantenimiento después de la entrega. Es un servicio aparte que se cotiza según el sitio.',
+  ],
+  priceMoves: ['El número de vistas', 'Las integraciones que necesites', 'El contenido que haya que preparar'],
+};
+
+// Dimensiones reales de cada captura (para width/height y evitar CLS).
 const IMG_SIZE = {
   GravityPreview: { w: 1918, h: 927 },
   AccuLabPreview: { w: 1902, h: 930 },
@@ -131,93 +157,97 @@ const IMG_SIZE = {
   LabDieselPreview: { w: 1896, h: 908 },
 };
 
-// Portada (index) — solo los dos destacados
-export const featuredWork = [
-  {
-    title: 'Accu-Lab',
-    slug: 'acculab-system',
-    tag: 'Laboratorio clínico en Cuenca',
-    img: 'AccuLabPreview',
-    ...IMG_SIZE.AccuLabPreview,
-    alt: 'Sitio web de Accu-Lab, laboratorio clínico en Cuenca',
-    url: 'https://acculab.bio',
-  },
-  {
-    title: 'Gravity Studio',
-    slug: 'gravity-studio',
-    tag: 'Estudio creativo en Cuenca',
-    img: 'GravityPreview',
-    ...IMG_SIZE.GravityPreview,
-    alt: 'Sitio web de Gravity Estudio Creativo, estudio creativo en Cuenca',
-    url: 'https://gravityestudiocreativo.com',
-  },
-];
-
-// Galeria completa (proyectos) — orden y datos identicos al HTML original
+// Casos. `pending: true` = el cliente existe pero falta material para
+// publicar el caso (URL, capturas, texto aprobado). No se inventa nada.
 export const projects = [
   {
-    slug: 'gravity-studio',
-    code: '// 01_GRAVITY_STUDIO',
-    title: 'Gravity Studio',
-    description: 'Sitio de un estudio creativo de Cuenca: cinco servicios, cuatro planes de redes sociales y contacto por formulario, WhatsApp y chat.',
-    tags: ['JS_ENGINE', 'MARKETING'],
-    img: 'GravityPreview',
-    ...IMG_SIZE.GravityPreview,
-    alt: 'Sitio web de Gravity Estudio Creativo, estudio creativo en Cuenca',
-    url: 'https://gravityestudiocreativo.com',
-  },
-  {
     slug: 'acculab-system',
-    code: '// 02_ACCULAB_SYSTEM',
     title: 'Accu-Lab',
-    description: 'Sitio web de un laboratorio clínico en Cuenca: catálogo de exámenes con precios referenciales, paquetes, toma a domicilio y agenda por WhatsApp.',
-    tags: ['JS_ENGINE', 'HEALTH_TECH'],
+    tag: 'Laboratorio clínico en Cuenca',
+    description:
+      'Sitio web de un laboratorio clínico en Cuenca: catálogo de exámenes con precios referenciales, paquetes, toma a domicilio y agenda por WhatsApp.',
     img: 'AccuLabPreview',
     ...IMG_SIZE.AccuLabPreview,
     alt: 'Sitio web de Accu-Lab, laboratorio clínico en Cuenca',
     url: 'https://acculab.bio',
   },
   {
-    slug: 'jf-vapes-store',
-    code: '// 03_JF_VAPES_STORE',
-    title: 'JF Vapes Store',
-    description: 'Tienda online con catálogo por categorías, precios visibles, preguntas frecuentes y pedidos por WhatsApp, con entrega en Cuenca.',
-    tags: ['ECOMMERCE', 'UI_PRECISION'],
-    img: 'JFVapesPreview',
-    ...IMG_SIZE.JFVapesPreview,
-    alt: 'Sitio web de la tienda online JF Vapes, con entrega en Cuenca',
-    url: 'https://jf-vapes-pagina-web-w6bo.vercel.app',
+    slug: 'cmr-inmobiliaria',
+    title: 'CMR Inmobiliaria',
+    tag: 'Inmobiliaria, recorridos 360',
+    description: 'Recorridos 360 para una inmobiliaria. Caso en preparación: publicaremos el detalle cuando tengamos el material aprobado.',
+    pending: true,
   },
   {
     slug: 'laboratorio-diesel-mg',
-    code: '// 04_LAB_DIESEL_MG',
     title: 'Laboratorio Diesel MG',
-    description: 'Sitio de un laboratorio de inyección diésel en Cuenca: servicios, sistemas que reparan, equipos de prueba y consultas por WhatsApp.',
-    tags: ['CORPORATIVE', 'AUTOMOTIVE'],
+    tag: 'Inyección diésel en Cuenca',
+    description:
+      'Sitio de un laboratorio de inyección diésel en Cuenca: servicios, sistemas que reparan, equipos de prueba y consultas por WhatsApp.',
     img: 'LabDieselPreview',
     ...IMG_SIZE.LabDieselPreview,
     alt: 'Sitio web de Laboratorio Diesel MG, laboratorio de inyección diésel en Cuenca',
     url: 'https://laboratorio-diesel-mg.vercel.app/',
   },
+  {
+    slug: 'gravity-studio',
+    title: 'Gravity Studio',
+    tag: 'Estudio creativo en Cuenca',
+    description:
+      'Sitio de un estudio creativo de Cuenca: cinco servicios, cuatro planes de redes sociales y contacto por formulario, WhatsApp y chat.',
+    img: 'GravityPreview',
+    ...IMG_SIZE.GravityPreview,
+    alt: 'Sitio web de Gravity Estudio Creativo, estudio creativo en Cuenca',
+    url: 'https://gravityestudiocreativo.com',
+  },
+  {
+    slug: 'jf-vapes-store',
+    title: 'JF Vapes Store',
+    tag: 'Tienda online con entrega en Cuenca',
+    description:
+      'Tienda online con catálogo por categorías, precios visibles, preguntas frecuentes y pedidos por WhatsApp, con entrega en Cuenca.',
+    img: 'JFVapesPreview',
+    ...IMG_SIZE.JFVapesPreview,
+    alt: 'Sitio web de la tienda online JF Vapes, con entrega en Cuenca',
+    url: 'https://jf-vapes-pagina-web-w6bo.vercel.app',
+  },
 ];
 
-export const advisorSteps = {
-  step1: {
-    label: '01/02',
-    question: '¿Qué servicio necesitas?',
-    options: [
-      { icon: 'globe', value: 'Web Nueva', label: 'Crear Web desde cero' },
-      { icon: 'bolt', value: 'Optimización', label: 'Optimizar mi web actual' },
-      { icon: 'bag', value: 'E-commerce', label: 'Tienda Online' },
-    ],
+export const getProject = (slug) => projects.find((p) => p.slug === slug);
+export const publishedProjects = projects.filter((p) => !p.pending);
+// Los tres casos que recorre la home.
+export const homeCases = ['acculab-system', 'cmr-inmobiliaria', 'laboratorio-diesel-mg'].map(getProject);
+
+// Proceso: cada paso sale de lo que el sitio ya promete (FAQ y servicios).
+export const processSteps = [
+  {
+    title: 'Nos escribes por WhatsApp',
+    text: 'Cuéntanos qué necesita tu negocio, para qué sirve la página y si ya tienes dominio, logo o fotos. Si ya tienes un sitio, envíanos su dirección.',
+    youGet: 'Una respuesta de Pablo o Fernando, que son quienes diseñan y programan.',
   },
-  step2: {
-    label: '02/02',
-    question: '¿Cuál es tu prioridad?',
-    options: [
-      { icon: 'target', value: 'Ventas', label: 'Vender más' },
-      { icon: 'bolt', value: 'Velocidad', label: 'Que cargue rápido' },
-      { icon: 'layout', value: 'Diseño', label: 'Imagen Profesional' },
-    ],
+  {
+    title: 'Te enviamos una propuesta',
+    text: 'Definimos el alcance: cuántas vistas, qué integraciones y qué contenido hace falta. Con eso te damos el precio, un plazo estimado y la forma de pago antes de empezar.',
+    youGet: 'Precio, plazo estimado y condiciones de pago. También qué dominio y hosting contratar.',
   },
-};
+  {
+    title: 'Ordenamos el contenido y armamos un prototipo',
+    text: 'Partimos de una pregunta: qué quieres que haga la persona que entra a tu sitio. Desde ahí ordenamos el contenido y definimos el recorrido de la página.',
+    youGet: 'Un prototipo para ver y probar. Opinas y ajustamos antes de construir.',
+  },
+  {
+    title: 'Escribimos el código',
+    text: 'Programamos el sitio a medida, sin plantillas ni constructores. Cada página lleva sus títulos, sus descripciones y una jerarquía de encabezados correcta, y se adapta a celular desde el primer día.',
+    youGet: 'El sitio funcionando, igual al prototipo que aprobaste.',
+  },
+  {
+    title: 'Publicamos',
+    text: 'Subimos el sitio a tu dominio y enviamos el sitemap a Google Search Console para revisar que no aparezcan errores. Si es un rediseño, mantenemos las direcciones o redirigimos cada una con un 301.',
+    youGet: 'Tu página en línea. En una tienda, también la capacitación para administrarla.',
+  },
+  {
+    title: 'Seguimos si lo necesitas',
+    text: 'Con el servicio de mantenimiento aplicamos parches de seguridad, damos soporte técnico y guardamos un backup diario. Es opcional y se cotiza según el sitio.',
+    youGet: 'Alguien pendiente de que tu sitio siga funcionando.',
+  },
+];

@@ -11,7 +11,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const logo = await readFile(path.join(root, 'scripts/source/Logo.png'));
 // Recorte del emblema dentro del PNG de 414x414 (medido sobre el archivo).
 const CROP = { x: 80, y: 30, size: 256 };
-const SIZES = [48, 180, 192, 512];
+const SIZES = [48, 96, 180, 192, 512];
 
 const browser = await puppeteer.launch({ headless: true });
 const page = await browser.newPage();
@@ -26,11 +26,11 @@ const out = await page.evaluate(
       const c = document.createElement('canvas');
       c.width = c.height = s;
       const ctx = c.getContext('2d');
-      ctx.fillStyle = '#0b0d10';
+      ctx.fillStyle = '#000000';
       ctx.fillRect(0, 0, s, s);
       const pad = Math.round(s * 0.06);
       ctx.drawImage(img, crop.x, crop.y, crop.size, crop.size, pad, pad, s - pad * 2, s - pad * 2);
-      result[s] = c.toDataURL('image/png').split(',')[1];
+      result[s] = c.toDataURL(s === 96 ? 'image/webp' : 'image/png', 0.9).split(',')[1];
     }
     return result;
   },
@@ -40,7 +40,8 @@ const out = await page.evaluate(
 );
 await browser.close();
 
-const files = { 48: 'icon-48.png', 180: 'apple-touch-icon.png', 192: 'icon-192.png', 512: 'icon-512.png' };
+// 96: emblema del encabezado y el pie (se muestra a 34 px, 2x-3x).
+const files = { 96: 'assets/Emblem-96.webp', 48: 'icon-48.png', 180: 'apple-touch-icon.png', 192: 'icon-192.png', 512: 'icon-512.png' };
 for (const [size, name] of Object.entries(files)) {
   await writeFile(path.join(root, 'public', name), Buffer.from(out[size], 'base64'));
 }

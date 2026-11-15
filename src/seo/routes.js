@@ -12,7 +12,7 @@
 import { blogPosts } from '../data/blog.js';
 import { servicePages } from '../data/servicePages.js';
 
-const SERVICE_FILES = ['src/data/servicePages.js', 'src/data/serviceContent.js', 'src/data/faq.js', 'src/pages/ServicePage.jsx'];
+const SERVICE_FILES = ['src/data/servicePages.js', 'src/data/serviceContent.js', 'src/data/faq.js', 'src/pages/Servicio.jsx'];
 
 const projectMeta = [
   {
@@ -45,6 +45,19 @@ const projectMeta = [
   },
 ];
 
+// Caso sin material publicable todavia: se prerenderiza (para que el enlace
+// de la home no caiga en 404) pero va con noindex y fuera del sitemap.
+const draftRoutes = [
+  {
+    path: '/proyectos/cmr-inmobiliaria',
+    draft: true,
+    title: 'CMR Inmobiliaria: Caso en Preparación | FS Orbit',
+    description:
+      'Caso en preparación: recorridos 360 para CMR Inmobiliaria. Publicaremos el detalle del proyecto cuando tengamos el material aprobado por el cliente.',
+    files: ['src/pages/ProyectoDetalle.jsx', 'src/data/content.js'],
+  },
+];
+
 export const routes = [
   {
     path: '/',
@@ -73,6 +86,15 @@ export const routes = [
     files: ['src/pages/ProyectoDetalle.jsx', 'src/data/projectDetails.js', 'src/data/content.js'],
     project: p,
   })),
+  {
+    path: '/servicios',
+    changefreq: 'monthly',
+    priority: 0.8,
+    title: 'Servicios Web en Cuenca: Diseño y Tiendas | FS Orbit',
+    description:
+      'Servicios de FS Orbit en Cuenca: diseño de páginas web, UI/UX, tiendas online, mantenimiento y rediseño. Mira qué resuelve cada uno y cuánto cuesta.',
+    files: ['src/pages/Servicios.jsx', 'src/data/content.js'],
+  },
   ...servicePages.map((s) => ({
     path: s.path,
     changefreq: 'monthly',
@@ -140,4 +162,7 @@ export const routes = [
   },
 ];
 
-export const routeMeta = (path) => routes.find((r) => r.path === path);
+// Todo lo que se prerenderiza (rutas publicas + borradores).
+export const allRoutes = [...routes, ...draftRoutes];
+
+export const routeMeta = (path) => allRoutes.find((r) => r.path === path);

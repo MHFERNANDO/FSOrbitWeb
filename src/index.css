@@ -1,498 +1,1170 @@
-@import "tailwindcss";
-@import "tw-animate-css";
-@import "shadcn/tailwind.css";
+@import 'tailwindcss';
 
-/* El sitio es siempre oscuro, sin toggle de tema — <html class="dark">
-   se deja fijo en index.html solo para que cualquier componente de
-   21st.dev/shadcn que use variantes dark: (en vez de los tokens
-   semanticos de abajo) tambien caiga del lado correcto. */
-@custom-variant dark (&:is(.dark *));
-
-/* ==========================================================================
-   FS ORBIT · tema de Tailwind v4
-   --------------------------------------------------------------------------
-   Los mismos tokens que ya se probaron y ajustaron en la version estatica
-   (legacy-static/css/style.css), ahora expuestos via @theme para que
-   generen utilidades (bg-ink-900, text-signal, font-display...) y, a la
-   vez, sigan disponibles como variables CSS crudas para el canvas del
-   hero, el odometro y cualquier animacion que no pueda expresarse con
-   clases de Tailwind.
-   ========================================================================== */
-@theme {
-  /* --- Superficies: tinta neutra, nunca negro puro. Valores del sistema
-     de tokens --bg/--surface-1/--surface-2 (ver AUDITORIA.md "Paleta —
-     reduccion del acento cian"). ink-850/750/700/600 son pasos
-     intermedios interpolados, no vienen del spec pero mantienen la
-     escalera de elevacion que ya usaban los componentes. --- */
-  --color-ink-1000: #0b0d10; /* --bg */
-  --color-ink-900: #121417; /* --surface-1: tarjetas, bloques */
-  --color-ink-850: #15171b;
-  --color-ink-800: #171a1e; /* --surface-2: tarjetas elevadas / hover */
-  --color-ink-750: #1b1e22;
-  --color-ink-700: #202327;
-  --color-ink-600: #2a2d32;
-
-  /* --- Texto: nunca blanco/negro puro. Los valores exactos que pedia el
-     spec (--text-secondary #7d8187, --text-muted #55595e) fallan AA
-     (< 4.5:1) contra las superficies de tarjeta mas claras del sitio
-     (bg-ink-800 #171a1e: ChatDock, CodeWindow, tarjetas de precios).
-     Se ajustaron ambos un poco mas claros para que pasen 4.5:1 incluso
-     ahi — contraste verificado contra --bg, --color-ink-900 y
-     --color-ink-800 (ver AUDITORIA.md, nunca baja de 4.5:1 en ningun
-     caso real del sitio). --color-text-4 queda definido pero sin uso
-     en texto legible: no pasa AA ni siquiera contra --bg. --- */
-  --color-text: #d4d7db; /* --text-primary: 12.09-13.47:1 */
-  --color-text-2: #868a90; /* --text-secondary (ajustado): 5.03-5.61:1 */
-  --color-text-3: #808488; /* --text-muted (ajustado): 4.63-5.16:1 */
-  --color-text-4: #5b5f65; /* reservado, NO usar para texto: no pasa AA */
-
-  /* --- Acento: EXCLUSIVAMENTE el cian del logo (#22e4f5), reservado a
-     2-3 puntos de atencion por pantalla — nunca fondo, nunca borde
-     grueso, nunca glow difuminado en reposo. Ya no hay variante
-     secundaria de cian (--color-signal-2 se elimino): un solo tono, sin
-     gradaciones de marca. --color-signal-ink es el texto que va SOBRE
-     un relleno de acento (variante --filled del CTA, ver abajo). --- */
-  --color-signal: #22e4f5;
-  --color-signal-ink: #06262a;
-  --color-warn: #ff7a4d;
-
-  /* --- Tipografia --- */
-  --font-display: "Archivo", "Archivo Fallback", system-ui, sans-serif;
-  --font-text: "Instrument Sans", "Instrument Fallback", system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
-
-  /* --- Radios: casi rectos. El futurismo aqui no es redondez --- */
-  --radius-r1: 2px;
-  --radius-r2: 4px;
-  --radius-r3: 8px;
-  --radius-r4: 14px;
-
-  /* --- Espacio (base 4), ademas de la escala default de Tailwind --- */
-  --spacing-s1: 4px;
-  --spacing-s2: 8px;
-  --spacing-s3: 12px;
-  --spacing-s4: 16px;
-  --spacing-s5: 24px;
-  --spacing-s6: 32px;
-  --spacing-s7: 48px;
-  --spacing-s8: 64px;
-  --spacing-s9: 96px;
-  --spacing-s10: 128px;
-}
-
-/* --------------------------------------------------------------------------
-   Tokens que Tailwind v4 no modela vía @theme (hairlines con alpha,
-   sombras, curvas de easing, breakpoints propios de layout) se quedan
-   como variables CSS planas — igual que en la version estatica.
-   -------------------------------------------------------------------------- */
-:root {
-  /* --border / --border-strong: antes hairlines con alpha sobre blanco
-     (rgba(255,255,255,X)); ahora colores solidos propios, como pide el
-     sistema de tokens nuevo — un borde ya no se "enciende" solo por
-     subir la opacidad de blanco, es un color de superficie en si. */
-  --line: #1c2024; /* --border */
-  --line-2: #272c31; /* --border-strong */
-
-  /* --- Acento: solo queda el glow minimo (--accent-glow), para el
-     hover del CTA principal, y a12 para el estado "seleccionado" de un
-     control (ver AdvisorModal). a24/a48 (glow amplio) se eliminaron —
-     ningun box-shadow/drop-shadow del acento debe pasar de esto. --- */
-  --signal-a08: rgba(34, 228, 245, .08); /* --accent-glow */
-  --signal-a12: rgba(34, 228, 245, .12);
-  --warn-a12: rgba(255, 122, 77, .12);
-
-  --fs-micro: .625rem;
-  --fs-mono: .6875rem;
-  --fs-small: .8125rem;
-  --fs-body: 1.0625rem;
-  --fs-lead: clamp(1.0625rem, .96rem + .45vw, 1.3125rem);
-  --fs-h4: clamp(1.0625rem, 1rem + .3vw, 1.25rem);
-  --fs-h3: clamp(1.375rem, 1.15rem + .95vw, 2rem);
-  --fs-h2: clamp(2.125rem, 1.45rem + 2.9vw, 4rem);
-  --fs-h1: clamp(2.75rem, 1.5rem + 5.4vw, 6.25rem);
-
-  --lh-tight: .96;
-  --lh-snug: 1.12;
-  --lh-body: 1.62;
-  --tr-display: -.042em;
-  --tr-title: -.03em;
-  --tr-mono: .16em;
-
-  /* Ancho de contenido y margenes: version corregida y ya verificada
-     visualmente (la version estatica se habia quedado en un valor mas
-     angosto por un desfase de commits — este es el valor bueno). */
-  --gutter: clamp(16px, 3.5vw, 48px);
-  --maxw: 1480px;
-  --section-y: clamp(88px, 9.5vw, 168px);
-  --nav-h: 74px;
-
-  /* --- Movimiento: pausado a proposito, ver sesion de ajuste anterior --- */
-  --d1: 170ms;
-  --d2: 280ms;
-  --d3: 480ms;
-  --d4: 780ms;
-  --d5: 1300ms;
-  --e-out: cubic-bezier(.22, 1, .36, 1);
-  --e-io: cubic-bezier(.76, 0, .24, 1);
-  --e-spring: cubic-bezier(.34, 1.4, .5, 1);
-
-  --z-bg: 0;
-  --z-body: 1;
-  --z-nav: 100;
-  --z-dock: 200;
-  --z-modal: 300;
-  --z-grain: 400;
-  --z-preloader: 900;
-
-  --shadow-lift: 0 24px 60px -20px rgba(0, 0, 0, .8);
-  --shadow-panel: 0 40px 120px -32px rgba(0, 0, 0, .9);
-
-  /* Tokens semanticos de shadcn, remapeados a la paleta FS Orbit en vez
-     de a los grises OKLCH genericos que trae el CLI. Cualquier
-     componente instalado desde 21st.dev que use bg-background,
-     text-foreground, bg-primary, etc. cae automaticamente en tinta +
-     lima, sin retocar cada componente a mano uno por uno. */
-  --background: var(--color-ink-1000);
-  --foreground: var(--color-text);
-  --card: var(--color-ink-900);
-  --card-foreground: var(--color-text);
-  --popover: var(--color-ink-900);
-  --popover-foreground: var(--color-text);
-  --primary: var(--color-signal);
-  --primary-foreground: var(--color-signal-ink);
-  --secondary: var(--color-ink-800);
-  --secondary-foreground: var(--color-text);
-  --muted: var(--color-ink-800);
-  --muted-foreground: var(--color-text-3);
-  --accent: var(--color-ink-700);
-  --accent-foreground: var(--color-text);
-  --destructive: var(--color-warn);
-  --destructive-foreground: var(--color-ink-1000);
-  --border: var(--line-2);
-  --input: var(--line-2);
-  --ring: var(--color-signal);
-  --radius: var(--radius-r3);
-}
-
-/* Todo lo de aqui abajo vive en @layer base a proposito: asi cualquier
-   utilidad de Tailwind (bg-ink-800, text-signal...) escrita en un
-   componente sigue pudiendo pisar estos estilos globales, que es el
-   comportamiento normal que se espera de Tailwind. La unica excepcion
-   real es el bloque de movimiento reducido al final de este archivo,
-   que se deja fuera de cualquier @layer justamente para que nada pueda
-   ganarle sin necesidad de !important — igual que en la version
-   estatica, solo que alli el truco era "ultima capa declarada" y aqui
-   es "sin capa alguna", que en cascade layers siempre gana. */
-@layer base {
-
-/* Fuentes autoalojadas (public/fonts/, descargadas de Google Fonts):
-   antes se pedian via <link> a fonts.googleapis.com en index.html —
-   una conexion cross-origin extra (DNS+TLS) solo para arrancar la
-   descarga de la fuente, bloqueando el primer pintado de texto.
-   Subset "latin" unicamente (cubre español: ñ, vocales acentuadas,
-   todo dentro de U+0000-00FF) en vez de los 6-10 subsets que Google
-   sirve por defecto (cirilico, vietnamita, griego...) que este sitio
-   nunca necesita. */
+/* ------------------------------------------------------------------ fuentes
+   Autoalojadas, subset latin, display swap. Anybody trae dos ejes: peso
+   (100-900) y ancho (50-150); el ancho es el que se mueve con el scroll. */
 @font-face {
-  font-family: "Archivo";
-  font-style: normal;
-  font-weight: 400 900;
-  font-stretch: 85% 118%;
+  font-family: 'Anybody';
+  src: url('/fonts/anybody-variable-latin.woff2') format('woff2');
+  font-weight: 100 900;
+  font-stretch: 50% 150%;
   font-display: swap;
-  src: url("/fonts/archivo-variable-latin.woff2") format("woff2");
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122;
 }
-
 @font-face {
-  font-family: "Instrument Sans";
-  font-style: normal;
+  font-family: 'Instrument Sans';
+  src: url('/fonts/instrument-sans-variable-latin.woff2') format('woff2');
+  font-weight: 400 700;
+  font-stretch: 75% 100%;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('/fonts/jetbrains-mono-variable-latin.woff2') format('woff2');
   font-weight: 400 700;
   font-display: swap;
-  src: url("/fonts/instrument-sans-variable-latin.woff2") format("woff2");
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122;
 }
-
+/* Respaldo calibrado para que el cuerpo no cambie de lineas al cargar. */
 @font-face {
-  font-family: "JetBrains Mono";
-  font-style: normal;
-  font-weight: 400 700;
-  font-display: swap;
-  src: url("/fonts/jetbrains-mono-variable-latin.woff2") format("woff2");
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122;
-}
-
-/* Metricas de respaldo: evitan el salto de layout mientras cargan las
-   fuentes variables (el navegador reserva el mismo alto). */
-@font-face {
-  font-family: "Archivo Fallback";
-  src: local("Arial"), local("Helvetica"), local("Segoe UI");
-  size-adjust: 110.5%;
-  ascent-override: 92%;
+  font-family: 'Instrument Fallback';
+  src: local('Arial');
+  size-adjust: 97%;
+  ascent-override: 97%;
   descent-override: 24%;
   line-gap-override: 0%;
 }
 
-@font-face {
-  font-family: "Instrument Fallback";
-  src: local("Arial"), local("Helvetica"), local("Segoe UI");
-  size-adjust: 101%;
-  ascent-override: 95%;
-  descent-override: 25%;
-  line-gap-override: 0%;
+/* ------------------------------------------------------------------- tokens */
+@theme {
+  --color-black: #000000;
+  --color-carbon: #0d1416;
+  --color-carbon-2: #152023;
+  --color-cyan: #00f3fb; /* muestreado del wordmark del logo */
+  --color-cyan-soft: #8dfbff;
+  --color-cyan-deep: #0b6f74;
+  --color-bone: #eaf2f2;
+  --color-mist: #93a6a8;
+  --color-lead: #4a5557;
+  --color-line: #1d292b;
+  --color-warn: #ffb38a;
+
+  --font-display: 'Anybody', 'Arial Narrow', system-ui, sans-serif;
+  --font-body: 'Instrument Sans', 'Instrument Fallback', system-ui, sans-serif;
+  --font-code: 'JetBrains Mono', ui-monospace, 'Cascadia Mono', Menlo, monospace;
 }
 
+:root {
+  --gutter: clamp(20px, 5vw, 72px);
+  --maxw: 1320px;
+  --head-h: 64px;
+  --section-y: clamp(72px, 11vw, 168px);
+
+  --fs-body: 1.0625rem;
+  --fs-small: 0.9375rem;
+  --fs-lead: clamp(1.125rem, 0.6vw + 1rem, 1.375rem);
+  --fs-h3: clamp(1.25rem, 0.9vw + 1rem, 1.75rem);
+  --fs-h2: clamp(2rem, 3.6vw + 0.6rem, 4rem);
+
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+/* --------------------------------------------------------------------- base */
 html {
-  overflow-x: clip;
-  scroll-behavior: smooth;
-  scroll-padding-top: calc(var(--nav-h) + var(--spacing-s5));
+  background: var(--color-black);
+  color-scheme: dark;
   -webkit-text-size-adjust: 100%;
+  scroll-padding-top: calc(var(--head-h) + 16px);
 }
-
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-text);
+  margin: 0;
+  background: var(--color-black);
+  color: var(--color-bone);
+  font-family: var(--font-body);
   font-size: var(--fs-body);
-  line-height: var(--lh-body);
-  font-synthesis-weight: none;
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
   overflow-x: clip;
-  min-height: 100svh;
-  scrollbar-width: thin;
-  /* Barra de scroll neutra: es chrome persistente, visible todo el
-     tiempo, no uno de los 2-3 puntos de atencion de la pantalla. */
-  scrollbar-color: var(--color-ink-600) transparent;
 }
-
-/* Scrollbar styles for Chrome, Edge, Safari */
-::-webkit-scrollbar {
-  width: 12px;
+::selection {
+  background: var(--color-cyan);
+  color: var(--color-black);
 }
-
-::-webkit-scrollbar-track {
-  background: transparent;
+:focus-visible {
+  outline: 2px solid var(--color-cyan);
+  outline-offset: 3px;
+  border-radius: 2px;
 }
-
-::-webkit-scrollbar-thumb {
-  background: var(--color-ink-600);
-  border-radius: 6px;
-  border: 2px solid transparent;
-  background-clip: padding-box;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--line-2);
-  background-clip: padding-box;
-}
-
-body.is-loading {
-  overflow: hidden;
-  height: 100svh;
-}
-
-/* Grano de pelicula: rompe el degradado plano que delata al render
-   generado. */
-body::after {
-  content: "";
-  position: fixed;
-  inset: -200%;
-  z-index: var(--z-grain);
-  pointer-events: none;
-  opacity: .038;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  animation: grainShift 6s steps(6) infinite;
-  will-change: transform;
-}
-
-@keyframes grainShift {
-
-  0%,
-  100% {
-    transform: translate(0, 0);
-  }
-
-  20% {
-    transform: translate(-2%, 3%);
-  }
-
-  40% {
-    transform: translate(3%, -2%);
-  }
-
-  60% {
-    transform: translate(-3%, -3%);
-  }
-
-  80% {
-    transform: translate(2%, 2%);
-  }
-}
-
-/* Anillo del preloader (src/components/Preloader.jsx) */
-@keyframes preloaderTrack {
-  0% {
-    transform: rotate(0deg);
-    stroke-dashoffset: 126;
-  }
-
-  50% {
-    stroke-dashoffset: 34;
-  }
-
-  100% {
-    transform: rotate(360deg);
-    stroke-dashoffset: 126;
-  }
-}
-
-@keyframes preloaderCore {
-
-  0%,
-  100% {
-    transform: scale(1);
-  }
-
-  50% {
-    transform: scale(1.6);
-  }
-}
-
-/* Cursor de terminal parpadeante (src/pages/Proyectos.jsx) */
-@keyframes caret {
-
-  0%,
-  100% {
-    opacity: 1;
-  }
-
-  50% {
-    opacity: 0;
-  }
-}
-
 h1,
 h2,
 h3,
-h4 {
-  font-family: var(--font-display);
-  font-weight: 800;
-  letter-spacing: var(--tr-title);
-  line-height: var(--lh-snug);
-  text-wrap: balance;
+h4,
+p,
+ul,
+ol,
+dl,
+dd,
+figure {
+  margin: 0;
+}
+ul,
+ol {
+  padding: 0;
+  list-style: none;
+}
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+a {
+  color: inherit;
+  text-decoration: none;
+}
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
 }
 
-::selection {
-  background: var(--signal-a12);
-  color: var(--color-text);
+/* Lenis (scroll suave) */
+html.lenis,
+html.lenis body {
+  height: auto;
 }
-
-* {
-  @apply border-border outline-ring/50;
-}
-
-} /* fin @layer base */
-
-/* DECISION DEL CLIENTE — no volver a poner el bloque de movimiento
-   reducido sin hablarlo antes.
-   --------------------------------------------------------------------
-   Aqui vivia un @media (prefers-reduced-motion: reduce) que acortaba las
-   animaciones a 240ms, cortaba los loops (animation-iteration-count: 1)
-   y apagaba el grano. En paralelo, cada componente animado consultaba
-   useReducedMotion() de Framer Motion y renderizaba una version estatica.
-
-   El cliente revisa el sitio en un Windows que tiene "reducir movimiento"
-   activado a nivel de sistema, asi que veia la pagina completamente
-   plana — sin reveals, sin shine en los CTA, sin parallax, sin efecto
-   magnetico — y pidio de forma explicita y repetida que las animaciones
-   no se apaguen nunca, en ningun caso. Por eso se quitaron tanto este
-   bloque como todos los useReducedMotion() del arbol (Reveal, hero,
-   modales, ShinyButton, useMagnetic, useCursorTag, useParallax).
-
-   Contrapartida asumida a conciencia: un visitante con sensibilidad
-   vestibular ve el sitio con todo el movimiento, incluido el
-   scroll-behavior: smooth de los anclas. Si algun dia se quiere
-   recuperar el respeto a la preferencia, el punto de entrada minimo y
-   menos invasivo es volver a poner solo:
-       @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto } }
-   que quita el mareo mas fuerte sin apagar nada visual. */
-
-/* MOVIMIENTO REDUCIDO — controlado por el interruptor RESPECT_REDUCED_MOTION
-   de src/lib/motion.js (que pone <html data-reduce-motion> solo cuando el
-   sistema pide reducir animaciones Y el interruptor esta en true). Con
-   RESPECT_REDUCED_MOTION = false este bloque nunca se activa y el sitio
-   vuelve a animarse siempre, como pidio el cliente (ver comentario de
-   arriba). Solo se apagan transiciones y animaciones CSS; las de JS
-   (reveals, orbita, parallax) consultan el mismo interruptor. */
-html[data-reduce-motion],
-html[data-reduce-motion] *,
-html[data-reduce-motion] *::before,
-html[data-reduce-motion] *::after {
-  animation-duration: 0.01ms !important;
-  animation-iteration-count: 1 !important;
-  transition-duration: 0.01ms !important;
-  transition-delay: 0ms !important;
+.lenis.lenis-smooth {
   scroll-behavior: auto !important;
 }
-
-/* Mapea los tokens semanticos (ya remapeados arriba a la paleta FS Orbit)
-   a utilidades de Tailwind: bg-background, text-foreground, bg-primary,
-   border-border, rounded-lg... Sin bloque .dark aparte — el sitio no
-   tiene modo claro, asi que :root ya es el unico estado que existe. */
-@theme inline {
-  --color-ring: var(--ring);
-  --color-input: var(--input);
-  --color-border: var(--border);
-  --color-destructive-foreground: var(--destructive-foreground);
-  --color-destructive: var(--destructive);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-accent: var(--accent);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-muted: var(--muted);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-secondary: var(--secondary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-primary: var(--primary);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-popover: var(--popover);
-  --color-card-foreground: var(--card-foreground);
-  --color-card: var(--card);
-  --color-foreground: var(--foreground);
-  --color-background: var(--background);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
+.lenis.lenis-stopped {
+  overflow: hidden;
 }
 
-/* ==========================================================================
-   TRANSICION ENTRE PAGINAS (/ <-> /proyectos)
-   --------------------------------------------------------------------------
-   Ya no es navegacion MPA — React Router dispara document.startViewTransition()
-   via el prop `viewTransition` en <Link>, pero las pseudo-clases de salida
-   y entrada son las mismas que en la version estatica.
-   ========================================================================== */
-::view-transition-old(root) {
-  animation: vtOut 340ms cubic-bezier(.76, 0, .24, 1) both;
+/* ------------------------------------------------------------------- layout */
+.wrap {
+  width: 100%;
+  max-width: var(--maxw);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+.section {
+  padding-block: var(--section-y);
+}
+.section--tight {
+  padding-block: calc(var(--section-y) * 0.6);
+}
+.rule {
+  border-top: 1px solid var(--color-line);
+}
+.skip {
+  position: fixed;
+  left: 16px;
+  top: -200%;
+  z-index: 100;
+  padding: 12px 18px;
+  border-radius: 999px;
+  background: var(--color-cyan);
+  color: var(--color-black);
+  font-weight: 600;
+}
+.skip:focus-visible {
+  top: 12px;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
-::view-transition-new(root) {
-  animation: vtIn 560ms cubic-bezier(.22, 1, .36, 1) both;
+/* --------------------------------------------------------------- tipografia */
+.h2 {
+  font-family: var(--font-display);
+  font-size: var(--fs-h2);
+  font-weight: 800;
+  font-stretch: 78%;
+  line-height: 1.02;
+  letter-spacing: -0.012em;
+  text-wrap: balance;
+}
+.h3 {
+  font-family: var(--font-display);
+  font-size: var(--fs-h3);
+  font-weight: 700;
+  font-stretch: 84%;
+  line-height: 1.15;
+  letter-spacing: -0.005em;
+}
+.lead {
+  font-size: var(--fs-lead);
+  line-height: 1.5;
+  color: var(--color-bone);
+  max-width: 54ch;
+}
+.muted {
+  color: var(--color-mist);
+}
+.small {
+  font-size: var(--fs-small);
+}
+.prose {
+  max-width: 66ch;
+}
+.prose p + p {
+  margin-top: 1em;
+}
+.prose p,
+.prose li {
+  color: var(--color-mist);
+}
+.prose strong {
+  color: var(--color-bone);
+  font-weight: 600;
+}
+.link {
+  color: var(--color-bone);
+  text-decoration: underline;
+  text-decoration-color: var(--color-cyan-deep);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.22em;
+  transition: text-decoration-color 160ms ease, color 160ms ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  .link:hover {
+    color: var(--color-cyan);
+    text-decoration-color: var(--color-cyan);
+  }
+}
+.code {
+  font-family: var(--font-code);
+  font-size: 0.86em;
+  color: var(--color-cyan-soft);
 }
 
-@keyframes vtOut {
-  to {
-    opacity: 0;
-    transform: translateY(-14px);
+/* Titular de ancho variable. En pantallas anchas cada linea va sin corte
+   y el cuerpo se calcula con el ancho del contenedor (--fit = ems de la
+   linea mas larga en su ancho maximo), asi que al cambiar --wdth con el
+   scroll no se mueve nada alrededor. En celular el titular hace wrap
+   normal, condensado y quieto. */
+.display {
+  container-type: inline-size;
+}
+.display-in {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-stretch: calc(var(--wdth, 70) * 1%);
+  font-size: min(calc(100cqi / var(--fit, 12)), var(--cap, 7.5rem));
+  line-height: 0.98;
+  letter-spacing: -0.012em;
+}
+.display-in > span {
+  display: block;
+  white-space: nowrap;
+}
+@media (max-width: 767px) {
+  .display--wrap .display-in {
+    font-size: clamp(2.125rem, 10.4vw, 3.25rem);
+    font-stretch: 62%;
+    line-height: 1;
+    text-wrap: balance;
+  }
+  .display--wrap .display-in > span {
+    display: inline;
+    white-space: normal;
   }
 }
 
-@keyframes vtIn {
-  from {
+/* ------------------------------------------------------------------ botones */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 50px;
+  padding: 0 26px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: var(--color-cyan);
+  color: var(--color-black);
+  font-weight: 600;
+  font-size: 1rem;
+  line-height: 1.1;
+  text-align: center;
+  transition: transform 140ms var(--ease-out), background-color 160ms ease, border-color 160ms ease;
+}
+.btn:active {
+  transform: scale(0.97);
+}
+.btn--ghost {
+  background: transparent;
+  border-color: var(--color-lead);
+  color: var(--color-bone);
+}
+.btn--small {
+  min-height: 40px;
+  padding: 0 18px;
+  font-size: 0.9375rem;
+}
+@media (hover: hover) and (pointer: fine) {
+  .btn:hover {
+    background: var(--color-cyan-soft);
+  }
+  .btn--ghost:hover {
+    background: transparent;
+    border-color: var(--color-cyan);
+  }
+}
+.wa-glyph {
+  width: 18px;
+  height: 18px;
+  flex: none;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px 28px;
+}
+
+/* ----------------------------------------------------------------- cabecera */
+.site-head {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  height: var(--head-h);
+  background: rgb(0 0 0 / 0.72);
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+}
+@media (prefers-reduced-transparency: reduce) {
+  .site-head {
+    background: var(--color-black);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+.site-head .wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  height: 100%;
+}
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-stretch: 92%;
+  font-size: 1.125rem;
+  letter-spacing: 0.01em;
+}
+.brand img {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+}
+.nav {
+  display: none;
+  align-items: center;
+  gap: clamp(16px, 2.2vw, 34px);
+}
+.nav a:not(.btn) {
+  padding: 8px 0;
+  color: var(--color-mist);
+  font-size: 0.9375rem;
+  transition: color 160ms ease;
+}
+.nav a:not(.btn)[aria-current='page'] {
+  color: var(--color-bone);
+  box-shadow: inset 0 -1px 0 var(--color-cyan);
+}
+@media (hover: hover) and (pointer: fine) {
+  .nav a:not(.btn):hover {
+    color: var(--color-bone);
+  }
+}
+.menu-btn {
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid var(--color-lead);
+  border-radius: 999px;
+  background: transparent;
+  font-weight: 600;
+  font-size: 0.9375rem;
+}
+@media (min-width: 900px) {
+  .nav {
+    display: flex;
+  }
+  .menu-btn {
+    display: none;
+  }
+}
+
+/* Menu de celular: hoja a pantalla completa. Se anima porque responde a
+   una accion (abrir / cerrar). */
+.sheet {
+  width: 100vw;
+  max-width: none;
+  height: 100dvh;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: var(--color-black);
+  color: var(--color-bone);
+  opacity: 0;
+  transform: translateY(-12px);
+  transition:
+    opacity 180ms ease,
+    transform 180ms var(--ease-out),
+    overlay 180ms allow-discrete,
+    display 180ms allow-discrete;
+}
+.sheet[open] {
+  opacity: 1;
+  transform: none;
+  transition-duration: 260ms;
+}
+@starting-style {
+  .sheet[open] {
     opacity: 0;
-    transform: translateY(18px);
+    transform: translateY(-12px);
+  }
+}
+.sheet::backdrop {
+  background: var(--color-black);
+}
+.sheet-in {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 0 var(--gutter) max(28px, env(safe-area-inset-bottom));
+}
+.sheet-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--head-h);
+  flex: none;
+}
+.sheet-links {
+  display: grid;
+  gap: 2px;
+  margin-top: 6vh;
+}
+.sheet-links a {
+  display: block;
+  padding: 10px 0;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-stretch: 64%;
+  font-size: clamp(2.25rem, 11vw, 3.5rem);
+  line-height: 1.05;
+}
+.sheet-links a[aria-current='page'] {
+  color: var(--color-cyan);
+}
+.sheet-foot {
+  margin-top: auto;
+  display: grid;
+  gap: 14px;
+}
+
+/* Barra fija de WhatsApp en celular (aparece cuando el boton del inicio
+   sale de pantalla). */
+.dock {
+  position: fixed;
+  inset: auto 0 0 0;
+  z-index: 30;
+  padding: 10px var(--gutter) max(10px, env(safe-area-inset-bottom));
+  background: rgb(0 0 0 / 0.86);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-top: 1px solid var(--color-line);
+  transform: translateY(110%);
+  transition: transform 260ms var(--ease-drawer);
+}
+.dock[data-on='true'] {
+  transform: none;
+}
+.dock .btn {
+  width: 100%;
+}
+@media (min-width: 900px) {
+  .dock {
+    display: none;
+  }
+}
+
+/* --------------------------------------------------------------------- pie */
+.site-foot {
+  border-top: 1px solid var(--color-line);
+  padding-block: clamp(48px, 7vw, 96px) 40px;
+}
+.foot-grid {
+  display: grid;
+  gap: 40px 32px;
+}
+.foot-grid h2 {
+  font-size: var(--fs-small);
+  font-weight: 600;
+  color: var(--color-bone);
+  margin-bottom: 12px;
+}
+.foot-grid li {
+  padding: 3px 0;
+}
+.foot-grid a,
+.foot-grid li {
+  color: var(--color-mist);
+  font-size: var(--fs-small);
+}
+.foot-grid a {
+  display: inline-block;
+  padding: 3px 0;
+  transition: color 160ms ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  .foot-grid a:hover {
+    color: var(--color-cyan);
+  }
+}
+.foot-about p {
+  max-width: 34ch;
+  margin-top: 14px;
+  color: var(--color-mist);
+  font-size: var(--fs-small);
+}
+.foot-legal {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 28px;
+  justify-content: space-between;
+  margin-top: 56px;
+  padding-top: 20px;
+  border-top: 1px solid var(--color-line);
+  color: var(--color-mist);
+  font-size: 0.875rem;
+}
+@media (min-width: 720px) {
+  .foot-grid {
+    grid-template-columns: 1.6fr 1fr 1fr 1.2fr;
+  }
+}
+@media (max-width: 899px) {
+  .site-foot {
+    padding-bottom: 104px; /* espacio para la barra fija */
+  }
+}
+
+/* -------------------------------------------------- cabecera de pagina interior */
+.page-head {
+  padding-block: clamp(56px, 9vw, 128px) clamp(40px, 6vw, 80px);
+}
+.crumbs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  margin-bottom: clamp(28px, 4vw, 48px);
+  color: var(--color-mist);
+  font-size: 0.875rem;
+}
+.crumbs li + li::before {
+  content: '/';
+  margin-right: 10px;
+  color: var(--color-lead);
+}
+.crumbs a {
+  padding: 4px 0;
+}
+.crumbs [aria-current] {
+  color: var(--color-bone);
+}
+.page-head .lead {
+  margin-top: clamp(20px, 2.4vw, 32px);
+}
+.page-head .actions {
+  margin-top: 28px;
+}
+
+/* ------------------------------------------------------- preguntas (details) */
+.faq {
+  border-top: 1px solid var(--color-line);
+}
+.faq details {
+  border-bottom: 1px solid var(--color-line);
+  interpolate-size: allow-keywords;
+}
+.faq summary {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 22px 0;
+  cursor: pointer;
+  list-style: none;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-stretch: 84%;
+  font-size: clamp(1.0625rem, 0.5vw + 1rem, 1.3125rem);
+  line-height: 1.25;
+}
+.faq summary::-webkit-details-marker {
+  display: none;
+}
+.faq summary::after {
+  content: '+';
+  flex: none;
+  font-family: var(--font-code);
+  font-weight: 400;
+  color: var(--color-cyan);
+  transition: transform 220ms var(--ease-out);
+}
+.faq details[open] summary::after {
+  transform: rotate(45deg);
+}
+.faq details::details-content {
+  block-size: 0;
+  overflow: clip;
+  transition:
+    block-size 280ms var(--ease-out),
+    content-visibility 280ms allow-discrete;
+}
+.faq details[open]::details-content {
+  block-size: auto;
+}
+.faq details p {
+  max-width: 68ch;
+  padding: 0 0 24px;
+  color: var(--color-mist);
+}
+
+/* ---------------------------------------------------------- libro de planes */
+.ledger {
+  border-top: 1px solid var(--color-line);
+}
+.ledger-row {
+  display: grid;
+  gap: 20px 40px;
+  padding: clamp(28px, 4vw, 52px) 0;
+  border-bottom: 1px solid var(--color-line);
+}
+.ledger-price {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-stretch: 66%;
+  font-size: clamp(2.5rem, 4.4vw, 4.25rem);
+  line-height: 1;
+  color: var(--color-cyan);
+  white-space: nowrap;
+}
+.ledger-name {
+  margin-top: 10px;
+  color: var(--color-bone);
+  font-weight: 600;
+}
+.ledger-kind {
+  color: var(--color-mist);
+  font-size: var(--fs-small);
+}
+.ledger-desc {
+  max-width: 40ch;
+}
+.ledger-desc .btn,
+.ledger-desc .link {
+  margin-top: 20px;
+}
+.ticks {
+  display: grid;
+  gap: 8px;
+  color: var(--color-mist);
+  font-size: var(--fs-small);
+}
+.ticks li {
+  position: relative;
+  padding-left: 22px;
+}
+.ticks li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.62em;
+  width: 10px;
+  height: 1px;
+  background: var(--color-cyan);
+}
+.ticks--no li::before {
+  background: var(--color-lead);
+}
+@media (min-width: 900px) {
+  .ledger-row {
+    grid-template-columns: minmax(200px, 0.9fr) 1.2fr 1.3fr;
+    align-items: start;
+  }
+}
+
+/* ------------------------------------------------------------ filas de lista */
+.rows {
+  border-top: 1px solid var(--color-line);
+}
+.row {
+  display: grid;
+  gap: 8px 32px;
+  padding: clamp(22px, 3vw, 36px) 0;
+  border-bottom: 1px solid var(--color-line);
+}
+a.row {
+  transition: color 160ms ease;
+}
+.row-title {
+  transition: color 160ms ease;
+}
+.row-meta {
+  color: var(--color-mist);
+  font-size: var(--fs-small);
+}
+.row p {
+  color: var(--color-mist);
+  max-width: 58ch;
+}
+@media (hover: hover) and (pointer: fine) {
+  a.row:hover .row-title {
+    color: var(--color-cyan);
+  }
+}
+@media (min-width: 900px) {
+  .row--3 {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr) auto;
+    align-items: baseline;
+  }
+  .row--2 {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr);
+    align-items: baseline;
+  }
+}
+
+/* ----------------------------------------------------------- columnas texto */
+.split {
+  display: grid;
+  gap: 32px clamp(32px, 6vw, 96px);
+}
+@media (min-width: 900px) {
+  .split {
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.4fr);
+    align-items: start;
+  }
+  .split > .sticky {
+    position: sticky;
+    top: calc(var(--head-h) + 32px);
+  }
+}
+.stack {
+  display: grid;
+  gap: clamp(40px, 5vw, 72px);
+}
+.stack-sm {
+  display: grid;
+  gap: 16px;
+}
+
+/* --------------------------------------------------------------------- casos */
+.shot {
+  position: relative;
+  overflow: hidden;
+  background: var(--color-carbon);
+  border: 1px solid var(--color-line);
+}
+.shot img {
+  width: 100%;
+  height: auto;
+}
+.shot[data-failed='true'] img {
+  visibility: hidden;
+}
+.shot-fallback {
+  position: absolute;
+  inset: 0;
+  display: none;
+  place-content: center;
+  padding: 24px;
+  text-align: center;
+  color: var(--color-mist);
+  font-size: var(--fs-small);
+}
+.shot[data-failed='true'] .shot-fallback {
+  display: grid;
+}
+/* Caso sin capturas: lamina dibujada, no una imagen inventada. */
+.plate {
+  display: grid;
+  place-content: center;
+  gap: 6px;
+  aspect-ratio: 2.06;
+  padding: 24px;
+  border: 1px dashed var(--color-cyan-deep);
+  background: var(--color-carbon);
+  text-align: center;
+}
+.plate strong {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-stretch: 70%;
+  font-size: clamp(1.5rem, 3vw, 2.5rem);
+  line-height: 1;
+}
+.plate span {
+  color: var(--color-mist);
+  font-size: var(--fs-small);
+}
+.case-list {
+  display: grid;
+  gap: clamp(64px, 9vw, 144px);
+}
+.case-item {
+  display: grid;
+  gap: 24px 48px;
+}
+.case-item .h2 {
+  font-size: clamp(1.75rem, 3vw, 3rem);
+}
+.case-item p {
+  margin-top: 12px;
+  color: var(--color-mist);
+  max-width: 46ch;
+}
+.case-item .actions {
+  margin-top: 20px;
+}
+@media (min-width: 900px) {
+  .case-item {
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+    align-items: end;
+  }
+  .case-item:nth-child(even) {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr);
+  }
+  .case-item:nth-child(even) .case-media {
+    order: 2;
+  }
+  .case-item:nth-child(3n) .case-media {
+    margin-inline-start: 8%;
+  }
+}
+.facts {
+  display: grid;
+  gap: 0;
+  border-top: 1px solid var(--color-line);
+}
+.facts > div {
+  display: grid;
+  gap: 2px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--color-line);
+}
+.facts dt {
+  color: var(--color-mist);
+  font-size: 0.875rem;
+}
+.facts dd {
+  color: var(--color-bone);
+}
+
+/* -------------------------------------------------------------------- proceso */
+.steps {
+  position: relative;
+  display: grid;
+  counter-reset: paso;
+}
+.steps-line {
+  position: absolute;
+  left: 19px;
+  top: 12px;
+  bottom: 12px;
+  width: 1px;
+  background: var(--color-line);
+}
+.steps-line i {
+  position: absolute;
+  inset: 0;
+  background: var(--color-cyan);
+  transform-origin: top;
+  transform: scaleY(var(--fill, 0));
+}
+.step {
+  position: relative;
+  display: grid;
+  gap: 10px 48px;
+  padding: 0 0 clamp(48px, 6vw, 88px) 64px;
+  counter-increment: paso;
+}
+.step::before {
+  content: counter(paso);
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: grid;
+  place-content: center;
+  width: 39px;
+  height: 39px;
+  border: 1px solid var(--color-cyan-deep);
+  border-radius: 50%;
+  background: var(--color-black);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-stretch: 80%;
+  color: var(--color-cyan);
+}
+.step:last-child {
+  padding-bottom: 0;
+}
+.step p {
+  color: var(--color-mist);
+  max-width: 56ch;
+}
+.step-get {
+  padding: 16px 20px;
+  background: var(--color-carbon);
+  color: var(--color-bone);
+  font-size: var(--fs-small);
+}
+.step-get b {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--color-mist);
+  font-weight: 400;
+}
+@media (min-width: 900px) {
+  .step {
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+    align-items: start;
+  }
+  .step .h3 {
+    grid-column: 1 / -1;
+  }
+}
+
+/* ------------------------------------------------------------------- contacto */
+.composer {
+  display: grid;
+  gap: 28px;
+  padding: clamp(24px, 4vw, 48px);
+  background: var(--color-carbon);
+}
+.composer legend {
+  padding: 0;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+.composer fieldset {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.chip {
+  position: relative;
+}
+.chip input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.chip span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid var(--color-lead);
+  border-radius: 999px;
+  color: var(--color-bone);
+  transition: border-color 160ms ease, background-color 160ms ease, color 160ms ease;
+}
+.chip input:checked + span {
+  border-color: var(--color-cyan);
+  background: var(--color-cyan);
+  color: var(--color-black);
+}
+.chip input:focus-visible + span {
+  outline: 2px solid var(--color-cyan);
+  outline-offset: 3px;
+}
+.field label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+.field textarea {
+  display: block;
+  width: 100%;
+  min-height: 112px;
+  padding: 14px 16px;
+  border: 1px solid var(--color-lead);
+  border-radius: 4px;
+  background: var(--color-black);
+  color: var(--color-bone);
+  font: inherit;
+  resize: vertical;
+}
+.field textarea::placeholder {
+  color: var(--color-mist);
+}
+.field textarea[aria-invalid='true'] {
+  border-color: var(--color-warn);
+}
+.field-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 8px;
+  color: var(--color-mist);
+  font-size: 0.875rem;
+}
+.field-error {
+  color: var(--color-warn);
+}
+.preview {
+  padding: 16px 18px;
+  border-left: 2px solid var(--color-cyan);
+  background: var(--color-black);
+  color: var(--color-bone);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.preview-label {
+  margin-bottom: 8px;
+  color: var(--color-mist);
+  font-size: 0.875rem;
+}
+.status {
+  min-height: 1.6em;
+  color: var(--color-mist);
+  font-size: var(--fs-small);
+}
+.status[data-kind='ok'] {
+  color: var(--color-cyan);
+}
+.status[data-kind='error'] {
+  color: var(--color-warn);
+}
+.channels {
+  display: grid;
+  gap: 0;
+  border-top: 1px solid var(--color-line);
+}
+.channels > div {
+  display: grid;
+  gap: 4px 24px;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--color-line);
+}
+.channels dt {
+  color: var(--color-mist);
+  font-size: var(--fs-small);
+}
+@media (min-width: 560px) {
+  .channels > div {
+    grid-template-columns: 200px 1fr;
+    align-items: baseline;
+  }
+}
+
+/* --------------------------------------------------------------- articulo */
+.article {
+  max-width: 68ch;
+}
+.article h2 {
+  margin: 2em 0 0.6em;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-stretch: 80%;
+  font-size: clamp(1.5rem, 1.6vw + 1rem, 2.125rem);
+  line-height: 1.12;
+}
+.article p,
+.article li {
+  color: var(--color-mist);
+}
+.article p + p,
+.article ul + p,
+.article ol + p {
+  margin-top: 1em;
+}
+.article ul,
+.article ol {
+  display: grid;
+  gap: 10px;
+  margin: 1em 0;
+  padding-left: 22px;
+}
+.article ul {
+  list-style: disc;
+}
+.article ol {
+  list-style: decimal;
+}
+.article li::marker {
+  color: var(--color-cyan);
+}
+
+/* Cierre de pagina: una frase y el camino de contacto. */
+.closing {
+  display: grid;
+  gap: 28px;
+  justify-items: start;
+}
+.closing p {
+  max-width: 50ch;
+  color: var(--color-mist);
+}
+
+/* Estado de error / vacio */
+.state {
+  display: grid;
+  gap: 20px;
+  justify-items: start;
+  padding-block: clamp(72px, 14vh, 160px);
+}
+.state p {
+  max-width: 52ch;
+  color: var(--color-mist);
+}
+.state code {
+  font-family: var(--font-code);
+  font-size: 0.875rem;
+  color: var(--color-mist);
+  overflow-wrap: anywhere;
+}
+
+/* ---------------------------------------------------------- movimiento reducido
+   Menos y mas suave: se quedan los cambios de color y opacidad; se van
+   los desplazamientos. El 3D ni se carga (ver src/lib/capability.js). */
+@media (prefers-reduced-motion: reduce) {
+  html:not([data-motion='on']) *,
+  html:not([data-motion='on']) *::before,
+  html:not([data-motion='on']) *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
+  html:not([data-motion='on']) .sheet,
+  html:not([data-motion='on']) .dock,
+  html:not([data-motion='on']) .btn {
+    transition-property: opacity, background-color, border-color;
+    transform: none;
+  }
+  html:not([data-motion='on']) .dock:not([data-on='true']) {
+    display: none;
   }
 }

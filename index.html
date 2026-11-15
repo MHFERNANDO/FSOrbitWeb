@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="es-EC" class="dark">
+<html lang="es-EC">
 
 <head>
     <meta charset="UTF-8" />
@@ -18,7 +18,7 @@
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta property="og:image:type" content="image/jpeg">
-    <meta property="og:image:alt" content="FS Orbit — Desarrollo web de alto rendimiento en Cuenca, Ecuador">
+    <meta property="og:image:alt" content="FS Orbit: páginas web a medida en Cuenca, Ecuador">
     <meta property="og:locale" content="es_EC">
     <meta property="og:site_name" content="FS Orbit Ecuador">
     <meta property="twitter:card" content="summary_large_image">
@@ -26,7 +26,7 @@
     <meta property="twitter:title" content="Diseño de Páginas Web en Cuenca | FS Orbit Ecuador">
     <meta property="twitter:description" content="Diseñamos páginas web, tiendas online y software a medida en Cuenca, Ecuador. Código propio, sin plantillas, SEO técnico y carga rápida. Cotiza hoy.">
     <meta property="twitter:image" content="https://fsorbit.com/assets/og-image.jpg">
-    <meta property="twitter:image:alt" content="FS Orbit — Desarrollo web de alto rendimiento en Cuenca, Ecuador">
+    <meta property="twitter:image:alt" content="FS Orbit: páginas web a medida en Cuenca, Ecuador">
 
     <meta name="geo.placename" content="Cuenca, Ecuador">
     <meta name="geo.region" content="EC-A">
@@ -36,17 +36,16 @@
     <link rel="icon" href="/icon-192.png" type="image/png" sizes="192x192">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#0b0d10">
+    <meta name="theme-color" content="#000000">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
     <title>Diseño de Páginas Web en Cuenca | FS Orbit Ecuador</title>
 
-    <!-- Fuentes autoalojadas (public/fonts/, @font-face en src/index.css)
-         en vez de <link> a fonts.googleapis.com: sin conexion
-         cross-origin extra antes de poder empezar a descargar la
-         fuente. Se precarga la variable font de titulares (Archivo),
-         que es la que pinta el H1 del hero — el elemento de LCP. -->
-    <link rel="preload" href="/fonts/archivo-variable-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <!-- Fuentes autoalojadas (public/fonts, @font-face en src/index.css).
+         Se precargan las dos que pintan el primer viewport: Anybody
+         (el H1, que es el elemento de LCP) e Instrument Sans (el cuerpo). -->
+    <link rel="preload" href="/fonts/anybody-variable-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="/fonts/instrument-sans-variable-latin.woff2" as="font" type="font/woff2" crossorigin>
 </head>
 
 <body>

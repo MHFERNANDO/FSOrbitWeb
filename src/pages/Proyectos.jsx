@@ -35,7 +35,7 @@ export default function Proyectos() {
         <SplitHeading
           as="h1"
           className="max-w-[16ch] font-display text-[length:var(--fs-h1)] font-extrabold leading-[var(--lh-tight)] tracking-[var(--tr-display)]"
-          segments={[{ text: 'Ingeniería de' }, { text: 'Alto Rendimiento', highlight: true }]}
+          segments={[{ text: 'Páginas web que hicimos' }, { text: 'en Cuenca', highlight: true }]}
         />
       </header>
 

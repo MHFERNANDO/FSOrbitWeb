@@ -10,7 +10,6 @@
 // TODO(cliente): definir y publicar estas politicas cuando las tengas
 // claras; entonces se pueden reemplazar las respuestas genericas:
 //  - plazos de entrega por tipo de proyecto
-//  - si hosting y dominio van incluidos o por cuenta del cliente
 //  - formas de pago aceptadas y esquema (anticipo / pagos parciales)
 //  - quien conserva la propiedad del codigo y que se entrega al final
 
@@ -21,9 +20,9 @@ const tiempo = {
 };
 
 const hosting = {
-  question: '¿Qué incluye el hosting y el dominio?',
+  question: '¿El precio incluye hosting y dominio?',
   answer:
-    'Publicamos los sitios con certificado HTTPS sobre infraestructura moderna; nuestros propios proyectos corren en Vercel. Si el hosting y el dominio van incluidos en tu proyecto o los contratas tú, se define en la cotización antes de empezar.',
+    'No. El dominio y el hosting se pagan aparte del diseño, porque son servicios anuales de otro proveedor. Antes de empezar te decimos qué necesitas contratar para tu proyecto.',
 };
 
 const mantenimiento = {
@@ -42,6 +41,12 @@ const codigo = {
   question: '¿De quién es el código de mi página?',
   answer:
     'La entrega del código y quién lo conserva se acuerdan con cada cliente al contratar. Pregúntanos antes de empezar y te lo dejamos claro para tu proyecto.',
+};
+
+const redisenoSeo = {
+  question: '¿Puedo rediseñar mi web sin perder el posicionamiento en Google?',
+  answer:
+    'Sí, si se cuida en el cambio. Mantenemos las mismas direcciones (URL) o redirigimos cada una con un 301 a su nueva página, conservamos títulos y textos que ya posicionan, y al publicar enviamos el sitemap nuevo a Google Search Console para revisar que no aparezcan errores.',
 };
 
 const seo = {
@@ -120,6 +125,7 @@ export const faqRediseno = [
     answer:
       'Depende del estado de tu sitio y de lo que haya que cambiar, por eso se cotiza caso por caso. Escríbenos por WhatsApp con la dirección de tu web y te orientamos.',
   },
+  redisenoSeo,
   tiempo,
   mantenimiento,
   seo,
@@ -202,4 +208,22 @@ export const faqPrecios = [
   pagos,
   mantenimiento,
   codigo,
+];
+
+// FAQ visible en la home (con FAQPage en el JSON-LD): precio, plazo,
+// que incluye, rediseno sin perder SEO y hosting.
+export const faqHome = [
+  {
+    question: '¿Cuánto cuesta una página web en Cuenca?',
+    answer:
+      'Con FS Orbit, una landing page parte desde $200 y una tienda online desde $500. El software a medida se cotiza según el proyecto. El dominio y el hosting van aparte.',
+  },
+  tiempo,
+  {
+    question: '¿Qué incluye una página web de FS Orbit?',
+    answer:
+      'Diseño propio sin plantillas, código escrito para tu negocio, adaptación a celular, SEO on-page (títulos, descripciones, estructura y velocidad) y un botón para que te escriban por WhatsApp. La tienda online suma catálogo, panel de inventario y capacitación.',
+  },
+  redisenoSeo,
+  hosting,
 ];

@@ -420,3 +420,13 @@ El LCP depende de que el Preloader (decisión del cliente, 2000ms + 1350ms) tape
 ## Cambio: blog retirado (2026-11-13)
 
 Se quito el blog (rutas, pie de pagina, 404, sitemap, llms.txt y smoke test) por decision del cliente. Las 4 URLs que Google ya tenia indexadas redirigen con 308 en vercel.json: /blog a /, el articulo de precios a /precios y los otros dos a /servicios/diseno-web-cuenca. Rutas del sitio: 15.
+
+## Cambio: SEO local y GEO (2026-11-14)
+
+- Home: H1 "Diseño de páginas web en Cuenca para tu negocio"; hero con para quién, "desde $200", dominio y hosting aparte y CTA a WhatsApp. Se quitó la ventana `fs-orbit.config.js` y el claim "Carga < 1s" / "instantánea" / "ultra-rápida" (Lighthouse móvil medido: 93, LCP 2,8 s).
+- FAQ visible en la home con FAQPage (precio, plazo, qué incluye, rediseño sin perder SEO, hosting). Hosting y dominio: aparte (dato confirmado por el cliente).
+- H1 con palabra clave en las 5 landings, /proyectos y /blog; subtítulos de servicios en forma de pregunta; tarjetas de servicios sin inglés.
+- Schema: ContactPoint de WhatsApp y OfferCatalog con los planes. Sin horario (no confirmado).
+- robots.txt nombra Googlebot, Bingbot y los rastreadores de IA que faltaban.
+- Blog reactivado por decisión del cliente: se quitaron las 308 de /blog. 5 artículos (3 anteriores + clínicas/laboratorios + inmobiliarias). 21 rutas.
+- No se nombra a CMR Inmobiliaria (proyecto no concretado) ni hay resultados por cliente todavía.

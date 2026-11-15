@@ -54,7 +54,29 @@ function organizationNode() {
         areaServed: 'EC',
         availableLanguage: 'es',
       },
+      {
+        '@type': 'ContactPoint',
+        contactType: 'customer service',
+        name: 'WhatsApp',
+        url: `https://wa.me/${contact.whatsappSales}`,
+        telephone: contact.tel,
+        areaServed: 'EC',
+        availableLanguage: 'es',
+      },
     ],
+    hasOfferCatalog: {
+      '@type': 'OfferCatalog',
+      name: 'Planes de páginas web',
+      itemListElement: pricingPlans.map((plan) => ({
+        '@type': 'Offer',
+        name: plan.name,
+        description: plan.description,
+        ...(/\$(\d+)/.test(plan.price)
+          ? { priceSpecification: { '@type': 'PriceSpecification', minPrice: Number(/\$(\d+)/.exec(plan.price)[1]), priceCurrency: 'USD' } }
+          : {}),
+        url: `${ORIGIN}/precios`,
+      })),
+    },
     sameAs: [contact.instagram],
     knowsAbout: ['Desarrollo web', 'Diseño UI/UX', 'Tiendas online', 'SEO técnico', 'Optimización de rendimiento web', 'Mantenimiento web'],
   };

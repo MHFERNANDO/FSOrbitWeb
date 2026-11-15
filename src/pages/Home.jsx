@@ -6,7 +6,6 @@ import Reveal from '@/components/Reveal';
 import ProjectImage from '@/components/ProjectImage';
 import SplitHeading, { Highlight } from '@/components/SplitHeading';
 import Icon from '@/components/Icon';
-import CodeWindow from '@/components/CodeWindow';
 import Odometer from '@/components/Odometer';
 import { ShinyButton } from '@/components/ui/shiny-button';
 import { useAdvisor } from '@/components/AdvisorModal';
@@ -16,6 +15,8 @@ import { useCursorTag } from '@/hooks/useCursorTag';
 import { usePageSeo } from '@/hooks/usePageSeo';
 import { trackClick } from '@/lib/analytics';
 import { services, pricingPlans, featuredWork } from '@/data/content';
+import { faqHome } from '@/data/faq';
+import { faqNode } from '@/seo/jsonld';
 
 const WA_BASE = 'https://wa.me/593983113942?text=';
 
@@ -35,7 +36,7 @@ function AtomReveal({ children }) {
 }
 
 export default function Home() {
-  usePageSeo({ path: '/', name: 'Diseño de Páginas Web en Cuenca' });
+  usePageSeo({ path: '/', name: 'Diseño de Páginas Web en Cuenca', nodes: [faqNode('/', faqHome)] });
   const advisor = useAdvisor();
   const preview = useProjectPreview();
   const primaryBtnRef = useRef(null);
@@ -54,22 +55,23 @@ export default function Home() {
         <div className="relative grid gap-s5">
           <AtomReveal>
             <span className="size-1.5 rounded-full bg-[color:var(--line-2)]" />
-            Impulsando negocios en la era digital
+            Clínicas, laboratorios, inmobiliarias y comercios
           </AtomReveal>
 
           <SplitHeading
             as="h1"
             className="max-w-[22ch] font-display text-[length:var(--fs-h1)] font-extrabold leading-[var(--lh-tight)] tracking-[var(--tr-display)]"
-            segments={[{ text: 'Diseño web en Cuenca' }, { break: true }, { text: 'que convierte visitas en clientes', highlight: true }]}
+            segments={[{ text: 'Diseño de páginas web en Cuenca' }, { break: true }, { text: 'para tu negocio', highlight: true }]}
           />
 
           <Reveal as="p" type="rise" className="font-display text-[length:var(--fs-h4)] font-bold text-text">
-            Tu presencia online, diseñada con precisión
+            Desde $200. El dominio y el hosting van aparte.
           </Reveal>
 
           <Reveal as="p" type="rise" className="max-w-[46ch] text-[length:var(--fs-lead)] text-text-2">
-            En FS Orbit creamos sitios web que no solo se ven bien, sino que venden. Convertimos tu visión en una
-            experiencia digital única.
+            Hacemos con código propio la página web de clínicas, laboratorios, inmobiliarias, comercios y negocios
+            locales de Cuenca y de todo Ecuador. Para empezar, cuéntanos por WhatsApp qué necesitas y te enviamos
+            una propuesta.
           </Reveal>
 
           <div className="mt-s2 flex flex-wrap gap-s4">
@@ -81,7 +83,7 @@ export default function Home() {
               onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 4px 18px var(--signal-a08)'}
               onMouseLeave={(e) => e.currentTarget.style.boxShadow = 'none'}
             >
-              Empezar ahora
+              Empezar por WhatsApp
             </Reveal>
             <Reveal as="a" type="rise" index={1}
               href="#proyectos"
@@ -100,7 +102,7 @@ export default function Home() {
 
       {/* ------------------------------------------------------- ARQUITECTURA */}
       <section id="superioridad" className="border-t border-[color:var(--line)]">
-        <div className="mx-auto grid max-w-(--maxw) gap-s9 px-(--gutter) py-[var(--section-y)] lg:grid-cols-2">
+        <div className="mx-auto grid max-w-(--maxw) gap-s9 px-(--gutter) py-[var(--section-y)]">
           <div className="grid gap-s5">
             <Reveal as="span" type="fade" className="font-mono text-[length:var(--fs-mono)] uppercase tracking-[var(--tr-mono)] text-text-3">
               Arquitectura Limpia
@@ -116,7 +118,7 @@ export default function Home() {
               código basura).
             </Reveal>
 
-            <Reveal as="div" type="rise" className="mt-s4 grid gap-s5 sm:grid-cols-2">
+            <Reveal as="div" type="rise" className="mt-s4 grid max-w-[880px] gap-s5 sm:grid-cols-2">
               <div className="grid gap-s3 rounded-r3 border border-[color:var(--line)] p-s5">
                 <h3 className="font-display font-bold text-text-2">WordPress / Builders</h3>
                 <ul className="grid gap-s2 text-[length:var(--fs-small)] text-text-3">
@@ -131,7 +133,7 @@ export default function Home() {
               <div className="grid gap-s3 rounded-r3 border border-[color:var(--line-2)] bg-ink-850 p-s5">
                 <h3 className="font-display font-bold text-signal">FS Orbit Pure Code</h3>
                 <ul className="grid gap-s2 text-[length:var(--fs-small)] text-text-2">
-                  {['Carga instantánea (Core Web Vitals)', 'Sin plugins de terceros que mantener', 'Escalabilidad ilimitada', 'Diseño 100% a medida'].map((t) => (
+                  {['Optimizado para Core Web Vitals', 'Sin plugins de terceros que mantener', 'Escalabilidad ilimitada', 'Diseño 100% a medida'].map((t) => (
                     <li key={t} className="flex items-center gap-s2">
                       <Icon name="check" className="text-text-2" />
                       {t}
@@ -142,9 +144,6 @@ export default function Home() {
             </Reveal>
           </div>
 
-          <Reveal as="div" type="scale" className="flex items-center">
-            <CodeWindow />
-          </Reveal>
         </div>
       </section>
 
@@ -281,6 +280,25 @@ export default function Home() {
           <div className="mt-s8 grid gap-s6 md:grid-cols-2">
             {featuredWork.map((work, i) => (
               <WorkCard key={work.title} work={work} index={i} onOpen={preview?.open} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ------------------------------------------------------------------ FAQ */}
+      <section id="preguntas" className="border-t border-[color:var(--line)]">
+        <div className="mx-auto max-w-(--maxw) px-(--gutter) py-[var(--section-y)]">
+          <SplitHeading
+            as="h2"
+            className="font-display text-[length:var(--fs-h2)] font-extrabold tracking-[var(--tr-display)]"
+            segments={[{ text: 'Preguntas' }, { text: 'Frecuentes', highlight: true }]}
+          />
+          <div className="mt-s8 grid gap-px overflow-hidden rounded-r3 bg-[color:var(--line)]">
+            {faqHome.map((item, i) => (
+              <Reveal as="div" type="rise" index={i} key={item.question} className="grid gap-s2 bg-ink-900 p-s6">
+                <h3 className="font-display font-bold text-text">{item.question}</h3>
+                <p className="max-w-[72ch] text-text-2">{item.answer}</p>
+              </Reveal>
             ))}
           </div>
         </div>

@@ -16,13 +16,14 @@ export default defineConfig({
   build: {
     rolldownOptions: {
       output: {
-        // Vendor aparte del codigo del sitio: react/router y framer-motion
+        // Vendor aparte del codigo del sitio: react/router, gsap/lenis y three
         // cambian solo al actualizar dependencias, asi que un deploy que
         // toca contenido o estilos no invalida su cache en el navegador.
         codeSplitting: {
           groups: [
             { name: 'react', test: /node_modules[\\/](react|react-dom|scheduler|react-router|react-router-dom)[\\/]/ },
-            { name: 'motion', test: /node_modules[\\/](framer-motion|motion|motion-dom|motion-utils)[\\/]/ },
+            { name: 'scroll', test: /node_modules[\/](gsap|lenis)[\/]/ },
+            { name: 'three', test: /node_modules[\/]three[\/]/ },
           ],
         },
       },

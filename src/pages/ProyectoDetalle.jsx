@@ -1,177 +1,156 @@
-import { useParams, Navigate, Link } from 'react-router-dom';
-import Reveal from '@/components/Reveal';
-import ProjectImage from '@/components/ProjectImage';
-import Icon from '@/components/Icon';
-import Breadcrumbs from '@/components/Breadcrumbs';
+import { Link, useParams } from 'react-router-dom';
+import PageHead from '@/components/PageHead';
+import Shot from '@/components/Shot';
+import Closing from '@/components/Closing';
+import NotFound from './NotFound';
 import { usePageSeo } from '@/hooks/usePageSeo';
 import { projectNode } from '@/seo/jsonld';
 import { renderInline } from '@/lib/inlineLinks';
-import { trackClick } from '@/lib/analytics';
-import { projects } from '@/data/content';
+import { getProject, publishedProjects } from '@/data/content';
 import { projectDetails } from '@/data/projectDetails';
+
+const BLOCKS = [
+  ['reto', 'El reto'],
+  ['solucion', 'Qué construimos'],
+  ['tecnologias', 'Con qué está hecho'],
+  ['resultado', 'Qué se puede comprobar hoy'],
+];
 
 export default function ProyectoDetalle() {
   const { slug } = useParams();
-  const project = projects.find((p) => p.slug === slug);
-
-  const details = project ? projectDetails[project.slug] : null;
+  const project = getProject(slug);
+  const detail = projectDetails[slug];
   const path = `/proyectos/${slug}`;
-  const crumbs = project
-    ? [
-        { name: 'Inicio', path: '/' },
-        { name: 'Proyectos', path: '/proyectos' },
-        { name: project.title, path },
-      ]
-    : [];
+  const crumbs = [
+    { name: 'Inicio', path: '/' },
+    { name: 'Casos', path: '/proyectos' },
+    { name: project?.title ?? 'Caso', path },
+  ];
 
-  // Hook de SEO siempre se llama (reglas de hooks); con slug invalido
-  // el return de abajo redirige antes de pintar nada.
   usePageSeo({
-    path: project ? path : '/proyectos',
+    path,
     crumbs,
-    image: project ? `https://fsorbit.com/assets/${project.img}-1440.webp` : undefined,
-    nodes: project
-      ? [projectNode({ path, name: `${project.title}: sitio web en Cuenca`, description: project.description, img: project.img, siteUrl: project.url })]
-      : [],
+    image: project?.img ? `https://fsorbit.com/assets/${project.img}-1440.webp` : undefined,
+    nodes:
+      project && !project.pending
+        ? [projectNode({ path, name: `${project.title}: sitio web en Cuenca`, description: project.description, img: project.img, siteUrl: project.url })]
+        : [],
   });
 
-  if (!project || !details) return <Navigate to="/proyectos" replace />;
+  if (!project) return <NotFound />;
+
+  // Caso sin material publicable: se dice tal cual, sin relleno.
+  if (project.pending || !detail) {
+    return (
+      <main id="main">
+        <PageHead crumbs={crumbs} lines={[project.title]} lead={project.description} />
+        <section className="wrap section--tight">
+          <div className="split">
+            <Shot project={project} />
+            <div className="prose">
+              <p>
+                Todavía no publicamos este caso. Preferimos esperar a tener las capturas y el texto aprobados por el cliente antes que
+                llenar la página con relleno.
+              </p>
+              <p>
+                Si te interesa un proyecto parecido para tu inmobiliaria, escríbenos y te contamos por WhatsApp cómo lo trabajamos.
+                Mientras tanto puedes revisar los{' '}
+                <Link className="link" to="/proyectos">
+                  casos publicados
+                </Link>
+                .
+              </p>
+            </div>
+          </div>
+        </section>
+        <Closing source={`caso_${slug}`} waText={`Hola, quiero saber más sobre el trabajo para ${project.title}`} />
+      </main>
+    );
+  }
+
+  const others = publishedProjects.filter((p) => p.slug !== slug);
+  const host = new URL(project.url).hostname.replace(/^www\./, '');
 
   return (
     <main id="main">
-      <header className="mx-auto max-w-(--maxw) px-(--gutter) pb-[clamp(40px,5vw,64px)] pt-[clamp(72px,10vw,152px)]">
-        <Breadcrumbs crumbs={crumbs} />
-        <span className="font-mono text-[length:var(--fs-mono)] tracking-[.12em] text-text-3">{project.code}</span>
-        <h1 className="mt-s3 max-w-[20ch] font-display text-[length:var(--fs-h1)] font-extrabold leading-[var(--lh-tight)] tracking-[var(--tr-display)]">
-          {project.title}
-        </h1>
-        <ul className="mt-s5 flex flex-wrap gap-s2">
-          {project.tags.map((tag) => (
-            <li key={tag} className="rounded-r2 border border-[color:var(--line)] px-s3 py-1.5 font-mono text-[length:var(--fs-micro)] tracking-[.1em] text-text-3">
-              {tag}
-            </li>
-          ))}
-        </ul>
-      </header>
-
-      <section className="mx-auto max-w-(--maxw) px-(--gutter)">
-        <Reveal as="div" type="scale" className="aspect-[16/9] overflow-hidden rounded-r3 border border-[color:var(--line)]">
-          <ProjectImage project={project} sizes="(min-width: 1480px) 1400px, 100vw" priority className="h-full w-full object-cover" />
-        </Reveal>
-      </section>
-
-      <section className="border-t border-[color:var(--line)]">
-        <div className="mx-auto max-w-(--maxw) px-(--gutter) py-[var(--section-y)]">
-          <Reveal as="p" type="rise" className="max-w-[64ch] text-[length:var(--fs-lead)] text-text-2">
-            {project.description}
-          </Reveal>
-          <p className="mt-s5 max-w-[64ch] text-text-3">{`${details.sector}.`}</p>
+      <PageHead crumbs={crumbs} lines={[project.title]} lead={project.description}>
+        <div className="actions">
+          <a className="btn btn--ghost" href={project.url} target="_blank" rel="noopener noreferrer">
+            Abrir {host}
+          </a>
         </div>
+      </PageHead>
+
+      <section className="wrap">
+        <Shot project={project} sizes="(min-width: 1320px) 1180px, 92vw" eager />
       </section>
 
-      {[
-        { h2: 'El reto', body: details.reto },
-        { h2: 'La solución', body: details.solucion },
-        { h2: 'Tecnologías', list: details.tecnologias },
-        { h2: 'Resultado', body: details.resultado },
-      ].map((block) => (
-        <section key={block.h2} className="border-t border-[color:var(--line)]">
-          <div className="mx-auto grid max-w-(--maxw) gap-s6 px-(--gutter) py-[var(--section-y)] lg:grid-cols-[1fr_1.4fr] lg:gap-s9">
-            <h2 className="font-display text-[length:var(--fs-h3)] font-extrabold leading-[var(--lh-tight)]">{block.h2}</h2>
-            {block.list ? (
-              <ul className="grid max-w-[62ch] gap-s3 text-text-2">
-                {block.list.map((item) => (
-                  <li key={item} className="flex items-start gap-s2">
-                    <Icon name="check" className="mt-1 shrink-0 text-text-2" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <div className="grid gap-s4">
-                {block.body.map((p) => (
-                  <Reveal as="p" type="rise" key={p.slice(0, 40)} className="max-w-[62ch] text-text-2">
-                    {p}
-                  </Reveal>
-                ))}
+      <section className="wrap section">
+        <div className="split">
+          <dl className="facts sticky">
+            <div>
+              <dt>Cliente</dt>
+              <dd>{detail.sector}</dd>
+            </div>
+            <div>
+              <dt>Servicio</dt>
+              <dd>
+                <Link className="link" to={detail.servicePath}>
+                  {detail.serviceLabel}
+                </Link>
+              </dd>
+            </div>
+            <div>
+              <dt>Sitio publicado</dt>
+              <dd>
+                <a className="link" href={project.url} target="_blank" rel="noopener noreferrer">
+                  {host}
+                </a>
+              </dd>
+            </div>
+          </dl>
+          <div className="stack">
+            {BLOCKS.map(([key, title]) => (
+              <div key={key}>
+                <h2 className="h3" style={{ marginBottom: 16 }}>
+                  {title}
+                </h2>
+                {key === 'tecnologias' || key === 'resultado' ? (
+                  <ul className="ticks" style={{ maxWidth: '66ch', fontSize: 'inherit' }}>
+                    {detail[key].map((t) => (
+                      <li key={t.slice(0, 40)}>{renderInline(t)}</li>
+                    ))}
+                  </ul>
+                ) : (
+                  <div className="prose">
+                    {detail[key].map((t) => (
+                      <p key={t.slice(0, 40)}>{renderInline(t)}</p>
+                    ))}
+                  </div>
+                )}
               </div>
-            )}
+            ))}
           </div>
-        </section>
-      ))}
-
-      <section className="border-t border-[color:var(--line)]">
-        <div className="mx-auto max-w-(--maxw) px-(--gutter) py-s8">
-          <h2 className="font-display text-[length:var(--fs-h3)] font-extrabold">Sigue explorando</h2>
-          <p className="mt-s4 max-w-[62ch] text-text-2">
-            {renderInline(`Este caso corresponde a nuestro servicio de [${details.serviceLabel}](${details.servicePath}). Revisa qué incluye cada plan en [precios](/precios) o visita el sitio real de `)}
-            <a
-              href={project.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-text underline decoration-[color:var(--line-2)] underline-offset-4 transition-colors hover:text-signal"
-            >
-              {project.title}
-            </a>
-            .
-          </p>
         </div>
       </section>
 
-      <section className="border-t border-[color:var(--line)]">
-        <div className="mx-auto max-w-(--maxw) px-(--gutter) py-s8">
-          <h2 className="font-mono text-[length:var(--fs-mono)] uppercase tracking-[var(--tr-mono)] text-text-3">Otros proyectos</h2>
-          <ul className="mt-s5 grid gap-s3 sm:grid-cols-3">
-            {projects
-              .filter((p) => p.slug !== project.slug)
-              .map((p) => (
-                <li key={p.slug}>
-                  <Link
-                    to={`/proyectos/${p.slug}`}
-                    viewTransition
-                    className="group flex items-center justify-between gap-s3 rounded-r3 border border-[color:var(--line)] px-s5 py-s4 transition-colors hover:border-[color:var(--line-2)] hover:text-text"
-                  >
-                    {p.title}
-                    <Icon name="arrow-right" className="transition-transform group-hover:translate-x-1" />
-                  </Link>
-                </li>
-              ))}
-          </ul>
-        </div>
-      </section>
-
-      <section className="border-t border-[color:var(--line)]">
-        <Reveal
-          as="div"
-          type="rise"
-          className="mx-auto flex max-w-(--maxw) flex-col items-start justify-between gap-s6 px-(--gutter) py-[var(--section-y)] md:flex-row md:items-center"
-        >
-          <h2 className="max-w-[24ch] font-display text-[length:var(--fs-h3)] font-extrabold leading-[var(--lh-tight)]">
-            ¿Quieres un proyecto así?
+      <section className="rule">
+        <div className="wrap section--tight">
+          <h2 className="h3" style={{ marginBottom: 24 }}>
+            Otros casos
           </h2>
-          <div className="flex flex-wrap gap-s4">
-            <a
-              href={project.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-s3 rounded-r2 border border-[color:var(--line-2)] px-s6 py-s4 font-mono text-[length:var(--fs-mono)] font-bold uppercase tracking-[var(--tr-mono)] text-text transition-all hover:bg-ink-800"
-            >
-              Ver sitio en vivo
-              <Icon name="arrow-ur" />
-            </a>
-            <a
-              href={`https://wa.me/593983113942?text=${encodeURIComponent(`Vi el proyecto ${project.title} y quiero algo similar`)}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => trackClick('whatsapp', { source: 'proyecto_detalle', project: project.slug })}
-              className="inline-flex items-center gap-s3 rounded-r2 bg-signal px-s6 py-s4 font-mono text-[length:var(--fs-mono)] font-bold uppercase tracking-[var(--tr-mono)] text-signal-ink"
-            >
-              Cotizar por WhatsApp
-              <Icon name="arrow-right" />
-            </a>
+          <div className="rows">
+            {others.map((p) => (
+              <Link className="row row--2" to={`/proyectos/${p.slug}`} key={p.slug}>
+                <h3 className="h3 row-title">{p.title}</h3>
+                <p>{p.tag}</p>
+              </Link>
+            ))}
           </div>
-        </Reveal>
+        </div>
       </section>
+
+      <Closing source={`caso_${slug}`} waText={`Hola, vi el caso de ${project.title} y quiero algo así para mi negocio`} />
     </main>
   );
 }

@@ -1,0 +1,6 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    { "name": "fsorbit-dist", "runtimeExecutable": "node", "runtimeArgs": ["scripts/serve-dist.mjs"], "port": 4173 }
+  ]
+}

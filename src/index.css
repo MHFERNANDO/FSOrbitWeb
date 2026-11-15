@@ -255,7 +255,7 @@ html.lenis body {
   display: block;
   font-family: var(--font-display);
   font-weight: 800;
-  font-stretch: calc(var(--wdth, 70) * 1%);
+  font-stretch: calc(var(--wd, 70) * 1%);
   font-size: min(calc(100cqi / var(--fit, 12)), var(--cap, 7.5rem));
   line-height: 0.98;
   letter-spacing: -0.012em;
@@ -265,6 +265,10 @@ html.lenis body {
   white-space: nowrap;
 }
 @media (max-width: 767px) {
+  .display:not(.display--wrap) .display-in {
+    font-stretch: calc(var(--wm, 60) * 1%);
+    font-size: min(calc(100cqi / var(--fit-m, 12)), var(--cap, 7.5rem));
+  }
   .display--wrap .display-in {
     font-size: clamp(2.125rem, 10.4vw, 3.25rem);
     font-stretch: 62%;
@@ -878,8 +882,10 @@ a.row {
 /* -------------------------------------------------------------------- proceso */
 .steps {
   position: relative;
-  display: grid;
   counter-reset: paso;
+}
+.steps ol {
+  display: grid;
 }
 .steps-line {
   position: absolute;

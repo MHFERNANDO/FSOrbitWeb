@@ -114,6 +114,15 @@ export const routes = [
     files: ['src/pages/Precios.jsx', 'src/data/content.js', 'src/data/faq.js'],
   },
   {
+    path: '/proceso',
+    changefreq: 'monthly',
+    priority: 0.7,
+    title: 'Cómo Hacemos tu Página Web, Paso a Paso | FS Orbit',
+    description:
+      'Así trabaja FS Orbit en Cuenca: escribes por WhatsApp, recibes una propuesta con precio y plazo, revisas un prototipo y publicamos tu página web.',
+    files: ['src/pages/Proceso.jsx', 'src/data/content.js'],
+  },
+  {
     path: '/sobre-nosotros',
     changefreq: 'monthly',
     priority: 0.6,

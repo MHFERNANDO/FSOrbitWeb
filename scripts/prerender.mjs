@@ -13,7 +13,7 @@
 import { preview } from 'vite';
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import path from 'node:path';
-import { routes } from '../src/seo/routes.js';
+import { allRoutes as routes } from '../src/seo/routes.js';
 
 const PORT = 4321;
 
@@ -53,14 +53,10 @@ function absolutize(html, origin) {
 }
 
 async function waitForBoot(page) {
-  // Espera a que el preloader (src/components/Preloader.jsx) termine su
-  // ciclo y quite body.is-loading, para capturar el estado final de la
-  // pagina en vez del overlay de carga. Si por lo que sea nunca se
-  // quita (p. ej. un error de render), no bloquea el build para
-  // siempre: sigue con lo que haya tras el timeout.
-  await page
-    .waitForFunction(() => !document.body.classList.contains('is-loading'), { timeout: 10000 })
-    .catch(() => {});
+  // Espera a que la pagina termine de pintar: el <main> ya esta en el DOM y
+  // las fuentes cargaron (el alto de los titulares depende de ellas).
+  await page.waitForSelector('#root > main', { timeout: 10000 }).catch(() => {});
+  await page.evaluate(() => document.fonts.ready).catch(() => {});
 }
 
 // main.jsx hidrata (hydrateRoot) cuando #root ya trae contenido. React
@@ -76,6 +72,11 @@ async function markSuspenseBoundary(page) {
     // arbol de React): capturado en el HTML, sobra al hidratar y React lo
     // tomaria como mismatch. Se vuelve a crear al montar.
     document.querySelectorAll('#root canvas').forEach((c) => c.remove());
+    // gsap, lenis y three se piden despues del primer pintado; el
+    // modulepreload que deja su import() no debe adelantarlos en el HTML.
+    document.querySelectorAll('link[rel="modulepreload"]').forEach((l) => {
+      if (/[/](scroll|three|journey)-/.test(l.getAttribute('href'))) l.remove();
+    });
     const main = document.querySelector('#root > main');
     if (!main) return false;
     main.before(document.createComment('$'));
@@ -100,6 +101,11 @@ async function main() {
 
   try {
     const page = await browser.newPage();
+    // El HTML base es siempre la version estatica (sin escena 3D): ver
+    // src/lib/capability.js.
+    await page.evaluateOnNewDocument(() => {
+      window.__PRERENDER__ = true;
+    });
     await page.setRequestInterception(true);
     page.on('request', (req) => {
       if (req.resourceType() === 'document') {

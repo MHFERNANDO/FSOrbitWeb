@@ -16,8 +16,7 @@ export function renderInline(text) {
       <Link
         key={`${match.index}-${match[2]}`}
         to={match[2]}
-        viewTransition
-        className="text-text underline decoration-[color:var(--line-2)] underline-offset-4 transition-colors hover:text-signal hover:decoration-signal"
+        className="link"
       >
         {match[1]}
       </Link>,

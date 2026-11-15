@@ -1,18 +1,16 @@
-import Reveal from '@/components/Reveal';
-import SplitHeading from '@/components/SplitHeading';
-import Icon from '@/components/Icon';
-import Breadcrumbs from '@/components/Breadcrumbs';
+import { Link } from 'react-router-dom';
+import PageHead from '@/components/PageHead';
+import WaButton from '@/components/WaButton';
+import Faq from '@/components/Faq';
+import Closing from '@/components/Closing';
 import { usePageSeo } from '@/hooks/usePageSeo';
 import { planNodes, faqNode } from '@/seo/jsonld';
-import { pricingPlans } from '@/data/content';
+import { pricingPlans, planNotes } from '@/data/content';
 import { faqPrecios as faq } from '@/data/faq';
-import { trackClick } from '@/lib/analytics';
-
-const WA_BASE = 'https://wa.me/593983113942?text=';
 
 const CRUMBS = [
   { name: 'Inicio', path: '/' },
-  { name: 'Precios', path: '/precios' },
+  { name: 'Planes y precios', path: '/precios' },
 ];
 
 export default function Precios() {
@@ -20,99 +18,96 @@ export default function Precios() {
 
   return (
     <main id="main">
-      <header className="mx-auto max-w-(--maxw) px-(--gutter) pb-[clamp(56px,7vw,96px)] pt-[clamp(72px,10vw,152px)]">
-        <Breadcrumbs crumbs={CRUMBS} />
-        <Reveal as="span" type="fade" className="mb-s5 inline-block font-mono text-[length:var(--fs-mono)] uppercase tracking-[var(--tr-mono)] text-text-3">
-          Niveles de Despliegue
-        </Reveal>
-        <SplitHeading
-          as="h1"
-          className="max-w-[18ch] font-display text-[length:var(--fs-h1)] font-extrabold leading-[var(--lh-tight)] tracking-[var(--tr-display)]"
-          segments={[{ text: 'Precios claros,' }, { break: true }, { text: 'sin sorpresas.', highlight: true }]}
-        />
-        <Reveal as="p" type="rise" className="mt-s5 max-w-[56ch] text-[length:var(--fs-lead)] text-text-2">
-          Desde sitios de alto impacto hasta ecosistemas digitales complejos. Cada plan incluye SEO técnico y código propio, sin plantillas.
-        </Reveal>
-      </header>
+      <PageHead
+        crumbs={CRUMBS}
+        lines={['Planes y precios', 'de páginas web']}
+        lead="Tres niveles según lo que tu negocio necesita. Aquí está lo que incluye cada uno, lo que no incluye ninguno y qué hace que el precio suba."
+      />
 
-      <section className="border-t border-[color:var(--line)]">
-        <div className="mx-auto max-w-(--maxw) px-(--gutter) py-[var(--section-y)]">
-          <div className="grid gap-px overflow-hidden rounded-r4 bg-[color:var(--line)] lg:grid-cols-3">
-            {pricingPlans.map((plan, i) => (
-              <Reveal
-                as="div"
-                type="rise"
-                index={i}
-                key={plan.name}
-                className={`relative grid gap-s6 p-s7 ${plan.popular ? 'bg-ink-800' : 'bg-ink-900'}`}
-                style={plan.popular ? { boxShadow: 'inset 0 2px 0 0 var(--color-signal)' } : undefined}
-              >
-                {plan.popular && (
-                  <span className="absolute right-s6 top-s5 font-mono text-[length:var(--fs-micro)] font-bold uppercase tracking-[.14em] text-text-2">
-                    EL MÁS SOLICITADO
-                  </span>
+      <section className="wrap" aria-label="Planes">
+        <div className="ledger">
+          {pricingPlans.map((plan) => (
+            <article className="ledger-row" key={plan.slug} id={plan.slug}>
+              <div>
+                <p className="ledger-price">{plan.priceLabel}</p>
+                <h2 className="ledger-name">{plan.name}</h2>
+                <p className="ledger-kind">
+                  {plan.kind}, {plan.scope.toLowerCase()}
+                </p>
+              </div>
+              <div className="ledger-desc">
+                <p className="muted">{plan.description}</p>
+                <WaButton variant="btn--ghost btn--small" text={plan.whatsappText} source={`precios_${plan.slug}`}>
+                  {plan.cta}
+                </WaButton>
+                {plan.servicePath && (
+                  <p>
+                    <Link className="link small" to={plan.servicePath}>
+                      Ver el servicio en detalle
+                    </Link>
+                  </p>
                 )}
-                <div className="grid gap-s4">
-                  <span className="grid size-11 place-items-center rounded-r2 border border-[color:var(--line-2)] text-text-2">
-                    <Icon name={plan.icon} />
-                  </span>
-                  <h2 className="font-display text-[length:var(--fs-h4)] font-extrabold">{plan.name}</h2>
-                  <div className="font-display text-[length:var(--fs-h2)] font-extrabold">
-                    {plan.price}
-                    {plan.period && <span className="ml-s2 text-[length:var(--fs-small)] font-normal text-text-3">{plan.period}</span>}
-                  </div>
-                  <p className="text-text-2">{plan.description}</p>
-                </div>
-                <ul className="grid gap-s3">
-                  {plan.features.map((f) => (
-                    <li key={f} className="flex items-start gap-s2 text-[length:var(--fs-small)] text-text-2">
-                      <Icon name="check" className="mt-1 shrink-0 text-text-2" />
-                      {f}
-                    </li>
+              </div>
+              <div>
+                <h3 className="small muted" style={{ marginBottom: 12 }}>
+                  Incluye
+                </h3>
+                <ul className="ticks">
+                  {plan.includes.map((f) => (
+                    <li key={f}>{f}</li>
                   ))}
                 </ul>
-                <a
-                  href={`${WA_BASE}${encodeURIComponent(plan.whatsappText)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => trackClick('whatsapp', { source: 'precios_page', plan: plan.name })}
-                  className={
-                    plan.ctaVariant === 'primary'
-                      ? 'rounded-r2 bg-signal px-s5 py-s4 text-center font-mono text-[length:var(--fs-mono)] font-bold uppercase tracking-[var(--tr-mono)] text-signal-ink transition-all duration-300 hover:scale-105 active:scale-95'
-                      : 'rounded-r2 border border-[color:var(--line-2)] px-s5 py-s4 text-center font-mono text-[length:var(--fs-mono)] font-bold uppercase tracking-[var(--tr-mono)] text-text transition-all duration-300 hover:bg-ink-800'
-                  }
-                >
-                  {plan.cta}
-                </a>
-              </Reveal>
-            ))}
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="wrap section">
+        <div className="stack">
+          <div className="split">
+            <h2 className="h3">Qué significa “desde”</h2>
+            <div className="prose stack-sm">
+              <p>Es el precio base del plan. El costo final depende del alcance exacto del proyecto, y lo sabes antes de empezar.</p>
+              <ul className="ticks">
+                {planNotes.priceMoves.map((t) => (
+                  <li key={t}>{t}</li>
+                ))}
+              </ul>
+            </div>
           </div>
-          <div className="mt-s5 flex flex-wrap items-baseline justify-between gap-x-s6 gap-y-s2 rounded-r3 border border-[color:var(--line)] px-s6 py-s5">
-            <p className="font-display font-bold text-text">Dominio y hosting: costo aparte</p>
-            <p className="max-w-[60ch] text-[length:var(--fs-small)] text-text-2">
-              No están incluidos en el precio de los planes. Son servicios anuales de otro proveedor; antes de empezar te decimos qué contratar.
-            </p>
+          <div className="split">
+            <h2 className="h3">Lo que traen los tres planes</h2>
+            <ul className="ticks prose">
+              {planNotes.all.map((t) => (
+                <li key={t}>{t}</li>
+              ))}
+            </ul>
+          </div>
+          <div className="split">
+            <h2 className="h3">Lo que no incluye ninguno</h2>
+            <ul className="ticks ticks--no prose">
+              {planNotes.notIncluded.map((t) => (
+                <li key={t}>{t}</li>
+              ))}
+            </ul>
           </div>
         </div>
       </section>
 
-      <section className="border-t border-[color:var(--line)]">
-        <div className="mx-auto max-w-(--maxw) px-(--gutter) py-[var(--section-y)]">
-          <SplitHeading
-            as="h2"
-            className="font-display text-[length:var(--fs-h2)] font-extrabold tracking-[var(--tr-display)]"
-            segments={[{ text: 'Preguntas' }, { text: 'Frecuentes', highlight: true }]}
-          />
-          <div className="mt-s8 grid gap-px overflow-hidden rounded-r3 bg-[color:var(--line)]">
-            {faq.map((item, i) => (
-              <Reveal as="div" type="rise" index={i} key={item.question} className="grid gap-s2 bg-ink-900 p-s6">
-                <h3 className="font-display font-bold text-text">{item.question}</h3>
-                <p className="text-text-2">{item.answer}</p>
-              </Reveal>
-            ))}
-          </div>
+      <section className="rule">
+        <div className="wrap section split">
+          <h2 className="h2 sticky">Preguntas sobre precios</h2>
+          <Faq items={faq} />
         </div>
       </section>
+
+      <Closing
+        source="precios_cierre"
+        title="Pide tu precio exacto"
+        text="Cuéntanos por WhatsApp qué necesitas. Te respondemos con el alcance, el precio final, un plazo estimado y la forma de pago."
+        waText="Hola, quiero cotizar una página web"
+      />
     </main>
   );
 }

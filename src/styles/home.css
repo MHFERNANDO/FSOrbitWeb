@@ -1,0 +1,411 @@
+/* Home: recorrido de cinco escenas.
+   Sin la clase html.gl cada escena es una seccion normal con su figura
+   estatica. Con html.gl las escenas 2 y 3 se fijan mientras el objeto 3D
+   se transforma, y las figuras estaticas ceden su lugar al lienzo. */
+
+.journey {
+  position: relative;
+}
+
+/* Lienzo unico: pegado arriba durante todo el recorrido; al terminar la
+   ultima escena se va con ella (y deja de dibujarse). */
+.stage {
+  display: none;
+  position: sticky;
+  top: 0;
+  z-index: 0;
+  height: 100vh;
+  height: 100svh;
+  margin-bottom: -100vh;
+  margin-bottom: -100svh;
+  overflow: hidden;
+  pointer-events: none;
+}
+html.gl .stage {
+  display: block;
+}
+.stage canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 700ms ease;
+}
+html.gl-on .stage canvas {
+  opacity: 1;
+}
+
+.scene {
+  position: relative;
+  z-index: 1;
+}
+.scene-grid {
+  display: grid;
+  gap: 32px clamp(32px, 5vw, 80px);
+  align-items: center;
+}
+.scene-copy {
+  display: grid;
+  gap: 20px;
+  justify-items: start;
+  min-width: 0;
+}
+.scene-copy > .display {
+  width: 100%;
+}
+.scene-copy > p:not(.lead):not(.small) {
+  max-width: 50ch;
+  color: var(--color-mist);
+}
+.scene-copy .ticks {
+  max-width: 52ch;
+}
+.slot {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1.25;
+  max-height: 62vh;
+  justify-self: center;
+}
+.slot .figure {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* ------------------------------------------------------------- 1. Arranque */
+.scene-1 {
+  display: grid;
+  align-items: center;
+  min-height: calc(100vh - var(--head-h));
+  min-height: calc(100svh - var(--head-h));
+  padding-block: clamp(24px, 5vh, 64px);
+}
+.scene-1 .lead {
+  margin-top: 4px;
+}
+.hero-proof {
+  max-width: 52ch;
+}
+.orbit-figure {
+  overflow: visible;
+  transition: opacity 700ms ease;
+}
+.orbit-figure text {
+  fill: var(--color-cyan);
+  font-family: ui-monospace, 'Cascadia Mono', Menlo, Consolas, monospace;
+  font-size: 7.4px;
+}
+.orbit-figure g g:nth-child(even) text {
+  fill: var(--color-cyan-deep);
+}
+.orbit-core {
+  font-size: 22px !important;
+  font-weight: 700;
+}
+.orbit-spin {
+  transform-origin: center;
+  transform-box: view-box;
+  animation: orbita 90s linear infinite;
+}
+@keyframes orbita {
+  to {
+    transform: rotate(360deg);
+  }
+}
+html.gl-on .orbit-figure {
+  opacity: 0;
+}
+
+/* ------------------------------------------------- 2 y 3. Plantilla / Giro */
+.scene--pin {
+  padding-block: var(--section-y);
+}
+/* La plantilla: nueve cajas identicas, grises. */
+.tpl {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 4%;
+}
+.tpl i {
+  position: relative;
+  border: 1px solid var(--color-lead);
+}
+.tpl i::before,
+.tpl i::after {
+  content: '';
+  position: absolute;
+  left: 10%;
+  background: var(--color-lead);
+}
+.tpl i::before {
+  top: 14%;
+  width: 36%;
+  height: 34%;
+  opacity: 0.5;
+}
+.tpl i::after {
+  bottom: 16%;
+  width: 70%;
+  height: 1px;
+  box-shadow: 0 -8px 0 var(--color-lead);
+}
+/* El layout a medida: bloques desiguales, en cian, con profundidad. */
+.bespoke {
+  transform: perspective(1100px) rotateY(-16deg) rotateX(4deg);
+}
+.bespoke i {
+  position: absolute;
+  border: 1px solid var(--color-cyan);
+}
+.bespoke .b-h1 {
+  left: 0;
+  top: 4%;
+  width: 62%;
+  height: 7%;
+  background: var(--color-cyan);
+}
+.bespoke .b-h2 {
+  left: 0;
+  top: 15%;
+  width: 44%;
+  height: 7%;
+  background: var(--color-cyan);
+}
+.bespoke .b-img {
+  right: 0;
+  top: 0;
+  width: 30%;
+  height: 66%;
+  border-color: var(--color-cyan-deep);
+}
+.bespoke .b-orb {
+  right: 21%;
+  top: 50%;
+  width: 20%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+}
+.bespoke .b-t1,
+.bespoke .b-t2,
+.bespoke .b-t3 {
+  left: 0;
+  height: 0;
+  border-width: 1px 0 0;
+  border-color: var(--color-mist);
+}
+.bespoke .b-t1 {
+  top: 34%;
+  width: 54%;
+}
+.bespoke .b-t2 {
+  top: 40%;
+  width: 48%;
+}
+.bespoke .b-t3 {
+  top: 46%;
+  width: 34%;
+}
+.bespoke .b-btn {
+  left: 0;
+  top: 58%;
+  width: 24%;
+  height: 9%;
+  border-radius: 999px;
+}
+.bespoke .b-f1 {
+  left: 0;
+  bottom: 0;
+  width: 26%;
+  height: 16%;
+  border-color: var(--color-cyan-deep);
+}
+.bespoke .b-f2 {
+  left: 30%;
+  bottom: 0;
+  width: 70%;
+  height: 16%;
+  border-color: var(--color-cyan-deep);
+}
+
+/* ----------------------------------------------------------------- 4. Casos */
+.scene-4 {
+  padding-top: var(--section-y);
+}
+.cases-head {
+  display: grid;
+  gap: 16px;
+  padding-bottom: clamp(40px, 6vw, 80px);
+}
+.cases-head p {
+  max-width: 56ch;
+}
+.cases {
+  position: relative;
+}
+.cases-pin {
+  display: none;
+}
+.case-step {
+  padding-block: clamp(36px, 6vw, 88px);
+}
+.case-step .h2 {
+  font-size: clamp(2rem, 3.4vw, 3.5rem);
+}
+.case-figure {
+  width: 100%;
+}
+
+/* ---------------------------------------------------------------- 5. Cierre */
+.scene-5 {
+  padding-block: var(--section-y);
+}
+.plans-head {
+  padding-bottom: clamp(32px, 5vw, 64px);
+}
+.slot--small {
+  display: none;
+}
+.plans-actions {
+  margin-top: clamp(28px, 4vw, 48px);
+}
+
+/* ---------------------------------------------------------------- escritorio */
+@media (min-width: 900px) {
+  .scene-grid {
+    grid-template-columns: minmax(0, 1.08fr) minmax(0, 1fr);
+  }
+  .scene-1 .scene-grid {
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  }
+  .slot {
+    aspect-ratio: 1.12;
+  }
+  .scene-1 .slot {
+    aspect-ratio: 1;
+  }
+}
+
+/* -------------------------------------------------------------------- celular
+   Version pensada aparte: la figura va arriba, baja, y el texto debajo. */
+@media (max-width: 899px) {
+  .scene-grid > .slot,
+  .scene-grid > .case-figure {
+    order: -1;
+  }
+  .slot {
+    aspect-ratio: auto;
+    height: 30vh;
+    height: 30svh;
+    max-width: 440px;
+  }
+  .scene-1 {
+    align-items: start;
+    padding-top: 8px;
+  }
+  .scene-1 .slot {
+    height: 24vh;
+    height: 24svh;
+  }
+  .scene-1 .slot .figure {
+    inset: -28% 0;
+    height: 156%;
+  }
+  .scene-1 .scene-grid {
+    gap: 12px;
+  }
+  .scene-copy {
+    gap: 16px;
+  }
+}
+
+/* ----------------------------------------------------------- modo 3D (html.gl) */
+html.gl .scene--pin {
+  height: 210vh;
+  height: 210svh;
+  padding-block: 0;
+}
+html.gl .scene--pin .scene-pin {
+  position: sticky;
+  top: 0;
+  display: grid;
+  align-items: center;
+  height: 100vh;
+  height: 100svh;
+}
+/* Las figuras estaticas quedan como hueco: el lienzo dibuja en su lugar. */
+html.gl .slot .figure:not(.orbit-figure) {
+  visibility: hidden;
+}
+html.gl .case-figure {
+  display: none;
+}
+html.gl .cases-pin {
+  display: grid;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100svh;
+  margin-bottom: -100vh;
+  margin-bottom: -100svh;
+  pointer-events: none;
+}
+html.gl .case-step {
+  display: grid;
+  align-items: center;
+  min-height: 100vh;
+  min-height: 100svh;
+  padding-block: 0;
+}
+@media (min-width: 900px) {
+  html.gl .slot--small {
+    display: block;
+    aspect-ratio: 2.4;
+    max-height: 220px;
+  }
+}
+@media (max-width: 899px) {
+  /* En celular el texto se apoya abajo sobre negro solido y el objeto
+     queda arriba, sin pasar por detras de las letras. */
+  html.gl .scene--pin .scene-pin,
+  html.gl .case-step,
+  html.gl .cases-pin {
+    align-items: stretch;
+  }
+  html.gl .scene--pin .scene-grid,
+  html.gl .case-step .scene-grid,
+  html.gl .cases-pin .scene-grid {
+    grid-template-rows: auto 1fr;
+    align-items: end;
+    height: 100%;
+    gap: 0;
+    padding-top: calc(var(--head-h) + 8px);
+  }
+  html.gl .cases-pin .scene-grid > span {
+    display: none;
+  }
+  html.gl .case-step .scene-grid {
+    grid-template-rows: 1fr;
+  }
+  html.gl .scene--pin .scene-copy,
+  html.gl .case-step .scene-copy {
+    align-self: end;
+    padding: 20px 0 max(28px, 9vh);
+    background: var(--color-black);
+    box-shadow: 0 0 0 100vmax var(--color-black);
+    clip-path: inset(0 -100vmax);
+  }
+  html.gl .slot {
+    height: 34vh;
+    height: 34svh;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html:not([data-motion='on']) .orbit-spin {
+    animation: none;
+  }
+}

@@ -1,64 +1,49 @@
-import { Link } from 'react-router-dom';
-import Reveal from '@/components/Reveal';
-import Icon from '@/components/Icon';
+import { Link, useLocation } from 'react-router-dom';
+import Display from '@/components/Display';
+import WaButton from '@/components/WaButton';
 import { useSeo } from '@/hooks/useSeo';
 
 const LINKS = [
-  { to: '/servicios/diseno-web-cuenca', label: 'Diseño Web en Cuenca' },
-  { to: '/servicios/tiendas-online', label: 'Tiendas Online' },
-  { to: '/servicios/rediseno-y-optimizacion', label: 'Rediseño y Optimización' },
-  { to: '/servicios/diseno-ui-ux', label: 'Diseño UI/UX' },
-  { to: '/servicios/mantenimiento-web', label: 'Mantenimiento Web' },
+  { to: '/servicios', label: 'Servicios' },
+  { to: '/proyectos', label: 'Casos' },
+  { to: '/precios', label: 'Planes y precios' },
+  { to: '/proceso', label: 'Proceso' },
   { to: '/blog', label: 'Blog' },
-  { to: '/precios', label: 'Precios' },
-  { to: '/proyectos', label: 'Proyectos' },
   { to: '/contacto', label: 'Contacto' },
 ];
 
-// Se usa tanto para el 404 real (ruta "*" en App.jsx) como para el
-// archivo estatico 404.html que Vercel sirve cuando no hay match —
-// ver scripts/prerender.mjs.
+// Se usa para el 404 de navegacion interna (ruta "*") y para el archivo
+// estatico 404.html que sirve Vercel (scripts/prerender.mjs).
 export default function NotFound() {
+  const { pathname } = useLocation();
   useSeo({
     title: 'Página no encontrada | FS Orbit',
-    description: 'Esta página no existe. Vuelve al inicio o explora nuestros servicios de desarrollo web en Cuenca, Ecuador.',
+    description: 'Esta página no existe. Vuelve al inicio o revisa los servicios de desarrollo web de FS Orbit en Cuenca, Ecuador.',
     path: '/404',
     noindex: true,
   });
 
   return (
-    <main id="main">
-      <div className="mx-auto grid max-w-(--maxw) place-items-start gap-s7 px-(--gutter) py-[clamp(96px,14vw,196px)]">
-        <Reveal as="span" type="fade" className="font-mono text-[length:var(--fs-mono)] uppercase tracking-[var(--tr-mono)] text-text-3">
-          Error 404
-        </Reveal>
-        <Reveal as="h1" type="rise" index={1} className="max-w-[16ch] font-display text-[length:var(--fs-h1)] font-extrabold leading-[var(--lh-tight)]">
-          Esta página no existe.
-        </Reveal>
-        <Reveal as="p" type="rise" index={2} className="max-w-[48ch] text-text-2">
-          Puede que el enlace esté roto o la página se haya movido. Prueba con alguno de estos accesos directos:
-        </Reveal>
-
-        <Reveal as="div" type="rise" index={3} className="grid w-full gap-s3 sm:grid-cols-2">
-          {LINKS.map((link) => (
-            <Link
-              key={link.to}
-              to={link.to}
-              viewTransition
-              className="group flex items-center justify-between gap-s3 rounded-r3 border border-[color:var(--line)] px-s5 py-s4 transition-colors hover:border-[color:var(--line-2)] hover:text-text"
-            >
-              {link.label}
-              <Icon name="arrow-right" className="transition-transform group-hover:translate-x-1" />
+    <main id="main" className="wrap state">
+      <Display lines={['Esta página', 'no existe']} scrub={false} />
+      <p>
+        La dirección puede estar mal escrita o la página se movió. No es algo que hayas hecho mal. Desde aquí llegas a todo el sitio:
+      </p>
+      <code>{pathname}</code>
+      <ul className="actions" aria-label="Páginas principales">
+        {LINKS.map((l) => (
+          <li key={l.to}>
+            <Link className="link" to={l.to}>
+              {l.label}
             </Link>
-          ))}
-        </Reveal>
-
-        <Reveal as="div" type="rise" index={4}>
-          <Link to="/" viewTransition className="inline-flex items-center gap-s2 font-mono text-[length:var(--fs-mono)] font-bold uppercase tracking-[var(--tr-mono)] text-signal">
-            <Icon name="arrow-left" />
-            Volver al inicio
-          </Link>
-        </Reveal>
+          </li>
+        ))}
+      </ul>
+      <div className="actions">
+        <Link className="btn" to="/">
+          Ir al inicio
+        </Link>
+        <WaButton variant="btn--ghost" source="404" text="Hola, buscaba una página de fsorbit.com y no la encontré" />
       </div>
     </main>
   );

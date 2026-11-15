@@ -1174,3 +1174,18 @@ a.row {
     display: none;
   }
 }
+
+/* Enlaces sueltos (no dentro de un parrafo): area tactil de al menos 24 px. */
+.actions .link,
+.channels .link,
+.facts .link,
+.ledger-desc .link,
+.row > .link {
+  display: inline-block;
+  padding-block: 6px;
+}
+@media (min-width: 900px) {
+  .split--wide-first {
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  }
+}

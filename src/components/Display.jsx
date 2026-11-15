@@ -60,8 +60,7 @@ export default function Display({
       >
         {lines.map((line, i) => (
           <span key={line}>
-            {line}
-            {i < lines.length - 1 ? ' ' : ''}
+            {i < lines.length - 1 ? `${line} ` : line}
           </span>
         ))}
       </span>

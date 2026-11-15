@@ -52,7 +52,7 @@ export default function Contacto() {
       />
 
       <section className="wrap" aria-label="Armar el mensaje">
-        <div className="split">
+        <div className="split split--wide-first">
           <form
             className="composer"
             onSubmit={(e) => {

@@ -310,8 +310,8 @@ html.gl-on .orbit-figure {
     height: 24svh;
   }
   .scene-1 .slot .figure {
-    inset: -28% 0;
-    height: 156%;
+    inset: -14% 0;
+    height: 128%;
   }
   .scene-1 .scene-grid {
     gap: 12px;
@@ -368,39 +368,47 @@ html.gl .case-step {
   }
 }
 @media (max-width: 899px) {
-  /* En celular el texto se apoya abajo sobre negro solido y el objeto
-     queda arriba, sin pasar por detras de las letras. */
-  html.gl .scene--pin .scene-pin,
-  html.gl .case-step,
-  html.gl .cases-pin {
-    align-items: stretch;
+  /* En celular el lienzo es una franja fija arriba, opaca: el objeto vive
+     ahi y el texto pasa por debajo, sin fijar escenas (el largo del texto
+     no depende del alto de la pantalla). */
+  html.gl .stage {
+    z-index: 2;
+    height: calc(var(--head-h) + 36vh);
+    height: calc(var(--head-h) + 36svh);
+    margin-bottom: calc(-1 * (var(--head-h) + 36vh));
+    margin-bottom: calc(-1 * (var(--head-h) + 36svh));
+    border-bottom: 1px solid var(--color-line);
   }
-  html.gl .scene--pin .scene-grid,
-  html.gl .case-step .scene-grid,
-  html.gl .cases-pin .scene-grid {
-    grid-template-rows: auto 1fr;
-    align-items: end;
+  html.gl .scene-1 .slot {
+    height: 36vh;
+    height: 36svh;
+  }
+  html.gl .scene-1 .slot .figure {
+    inset: 0;
     height: 100%;
-    gap: 0;
-    padding-top: calc(var(--head-h) + 8px);
   }
-  html.gl .cases-pin .scene-grid > span {
+  html.gl .scene--pin {
+    height: auto;
+    padding-block: 18vh 30vh;
+  }
+  html.gl .scene--pin .scene-pin {
+    position: static;
+    display: block;
+    height: auto;
+  }
+  html.gl .scene--pin .slot,
+  html.gl .cases-pin {
     display: none;
   }
-  html.gl .case-step .scene-grid {
-    grid-template-rows: 1fr;
+  html.gl .case-step {
+    min-height: 72vh;
+    min-height: 72svh;
+    align-items: start;
+    padding-block: 12vh;
   }
-  html.gl .scene--pin .scene-copy,
-  html.gl .case-step .scene-copy {
-    align-self: end;
-    padding: 20px 0 max(28px, 9vh);
+  html.gl .scene-5 {
+    z-index: 3;
     background: var(--color-black);
-    box-shadow: 0 0 0 100vmax var(--color-black);
-    clip-path: inset(0 -100vmax);
-  }
-  html.gl .slot {
-    height: 34vh;
-    height: 34svh;
   }
 }
 

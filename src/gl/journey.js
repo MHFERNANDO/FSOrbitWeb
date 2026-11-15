@@ -216,7 +216,7 @@ function fillOrbits(orb, rnd, n) {
     let size = rand(0.75, 1.25);
     if (r < 0.7) {
       const ring = i % 4;
-      tilt = 1.2 + rand(-0.015, 0.015);
+      tilt = 0.4 + rand(-0.015, 0.015);
       turn = (ring * Math.PI) / 4;
       radius = 1.3 * (1 + rand(-0.03, 0.03));
       speed = (ring % 2 ? -1 : 1) * rand(0.16, 0.24);
@@ -426,8 +426,8 @@ export async function startJourney(root) {
     camera.updateProjectionMatrix();
 
     // Casos: el hueco fijo de la escena 4 define donde y de que tamano.
-    const pin = pinD.getBoundingClientRect();
-    const r = slots.d.getBoundingClientRect();
+    const pin = mobile ? { left: 0, top: 0 } : pinD.getBoundingClientRect();
+    const r = mobile ? band() : slots.d.getBoundingClientRect();
     const vh = visH(FOCUS);
     const vw = vh * camera.aspect;
     const cx = ((r.left - pin.left + r.width / 2) / W - 0.5) * vw;
@@ -448,7 +448,20 @@ export async function startJourney(root) {
 
   // Centro y escala de un hueco del DOM, llevados al plano z = 0.
   const vhBase = visH(CAM_Z);
+  // En celular el lienzo es una franja fija arriba y el objeto vive siempre
+  // en ella (bajo el encabezado); en escritorio sigue el hueco de cada escena.
+  const headH = document.querySelector('.site-head')?.offsetHeight || 64;
+  const band = () => ({ left: W * 0.06, top: headH + 6, width: W * 0.88, height: H - headH - 18 });
   function place(el, target, natW, natH) {
+    if (mobile) {
+      const b = band();
+      const vw = vhBase * camera.aspect;
+      target.x = 0;
+      target.y = (0.5 - (b.top + b.height / 2) / H) * vhBase;
+      target.z = 0;
+      target.w = Math.min(((b.width / W) * vw) / natW, ((b.height / H) * vhBase) / natH);
+      return el !== slots.e;
+    }
     const r = el.getBoundingClientRect();
     if (!r.width || !r.height) {
       target.w = 0.0001;
@@ -499,7 +512,7 @@ export async function startJourney(root) {
     place(slots.a, uniforms.uOffA.value, 3.5, 3.5);
     place(slots.b, uniforms.uOffB.value, 2.9, 2.0);
     place(slots.c, uniforms.uOffC.value, 2.9, 2.1);
-    const eOk = hasE() && place(slots.e, uniforms.uOffE.value, 3.5, 3.5);
+    const eOk = place(slots.e, uniforms.uOffE.value, 3.5, 3.5) && hasE() && place(slots.e, uniforms.uOffE.value, 3.5, 3.5);
     uniforms.uFade.value = eOk ? 1 : 1 - ease((T - 3.1) / 0.7);
 
     const sA = uniforms.uOffA.value.w;
@@ -509,7 +522,7 @@ export async function startJourney(root) {
     const sE = eOk ? uniforms.uOffE.value.w : sD;
     const scale = [sA, sB, sC, sD, sE];
     const i = Math.min(3, Math.floor(T));
-    uniforms.uSize.value = 0.095 * (scale[i] + (scale[i + 1] - scale[i]) * ease(T - i));
+    uniforms.uSize.value = 0.115 * (scale[i] + (scale[i + 1] - scale[i]) * ease(T - i));
 
     // Camara: quieta hasta los casos; ahi avanza en profundidad.
     const inD = ease(T - 2) * (1 - ease(T - 3));

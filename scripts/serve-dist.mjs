@@ -11,10 +11,13 @@ import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
 import zlib from 'node:zlib';
+import { fileURLToPath } from 'node:url';
 
-const dist = path.resolve('dist');
-const port = Number(process.env.PORT || 4173);
-const cfg = JSON.parse(fs.readFileSync('vercel.json', 'utf8'));
+// Rutas relativas al repo (no al directorio desde donde se lance).
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const dist = path.join(root, 'dist');
+const port = Number(process.env.PORT || process.argv[2] || 4173);
+const cfg = JSON.parse(fs.readFileSync(path.join(root, 'vercel.json'), 'utf8'));
 const globalHeaders = Object.fromEntries(cfg.headers[0].headers.map((h) => [h.key, h.value]));
 // Lighthouse pierde el inicio de navegacion (NO_NAVSTART) cuando la pagina trae
 // Cross-Origin-Opener-Policy; para auditar con el: LIGHTHOUSE=1 node scripts/serve-dist.mjs

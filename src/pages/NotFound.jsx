@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import Display from '@/components/Display';
 import WaButton from '@/components/WaButton';
@@ -16,6 +17,10 @@ const LINKS = [
 // estatico 404.html que sirve Vercel (scripts/prerender.mjs).
 export default function NotFound() {
   const { pathname } = useLocation();
+  // La direccion se pinta al montar: el 404.html estatico sirve para
+  // cualquier URL, asi que no puede traerla horneada.
+  const [shown, setShown] = useState('');
+  useEffect(() => setShown(pathname), [pathname]);
   useSeo({
     title: 'Página no encontrada | FS Orbit',
     description: 'Esta página no existe. Vuelve al inicio o revisa los servicios de desarrollo web de FS Orbit en Cuenca, Ecuador.',
@@ -29,7 +34,7 @@ export default function NotFound() {
       <p>
         La dirección puede estar mal escrita o la página se movió. No es algo que hayas hecho mal. Desde aquí llegas a todo el sitio:
       </p>
-      <code>{pathname}</code>
+      <code suppressHydrationWarning>{shown}</code>
       <ul className="actions" aria-label="Páginas principales">
         {LINKS.map((l) => (
           <li key={l.to}>

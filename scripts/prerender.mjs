@@ -77,6 +77,16 @@ async function markSuspenseBoundary(page) {
     document.querySelectorAll('link[rel="modulepreload"]').forEach((l) => {
       if (/[/](scroll|three|journey)-/.test(l.getAttribute('href'))) l.remove();
     });
+    // React crea un nodo de texto por cada tramo ("Abrir " + dominio). Al
+    // serializar, los tramos contiguos se funden en uno y la hidratacion no
+    // coincide. Se separan con un comentario, igual que hace el render de
+    // servidor de React.
+    const walker = document.createTreeWalker(document.getElementById('root'), NodeFilter.SHOW_TEXT);
+    const texts = [];
+    while (walker.nextNode()) texts.push(walker.currentNode);
+    texts.forEach((t) => {
+      if (t.nextSibling && t.nextSibling.nodeType === Node.TEXT_NODE) t.after(document.createComment(' '));
+    });
     const main = document.querySelector('#root > main');
     if (!main) return false;
     main.before(document.createComment('$'));

@@ -7,7 +7,9 @@ const CODE = [
   'export default function Pagina() { return <Sitio sinPlantillas /> } ',
   'h1 { font-stretch: var(--ancho); color: #00f3fb; } @media (pointer) ',
 ];
-const ORBIT = 'M -138 0 a 138 50 0 1 0 276 0 a 138 50 0 1 0 -276 0';
+// Se dibuja a 12 px y se escala a 0.62: el texto conserva un cuerpo
+// legible para las herramientas aunque el dibujo sea pequeno.
+const ORBIT = 'M -222 0 a 222 80 0 1 0 444 0 a 222 80 0 1 0 -444 0';
 
 export default function OrbitFigure() {
   return (
@@ -15,16 +17,18 @@ export default function OrbitFigure() {
       <defs>
         <path id="orbita" d={ORBIT} />
       </defs>
+      <g transform="scale(0.62)">
       <g className="orbit-spin">
         {CODE.map((line, i) => (
           <g key={line} transform={`rotate(${i * 45})`}>
             <text>
-              <textPath href="#orbita" textLength="868" lengthAdjust="spacing">
+              <textPath href="#orbita" textLength="1400" lengthAdjust="spacing">
                 {line.repeat(2)}
               </textPath>
             </text>
           </g>
         ))}
+      </g>
       </g>
       <text className="orbit-core" textAnchor="middle" y="5">
         {'{ }'}

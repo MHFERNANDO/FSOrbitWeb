@@ -91,11 +91,19 @@ html.gl-on .stage canvas {
 .orbit-figure {
   overflow: visible;
   transition: opacity 700ms ease;
+  /* Entra con un fundido: asi el elemento mas grande del primer pintado
+     (LCP) es el titular y no el dibujo decorativo. */
+  animation: aparecer 700ms 60ms ease both;
+}
+@keyframes aparecer {
+  from {
+    opacity: 0;
+  }
 }
 .orbit-figure text {
   fill: var(--color-cyan);
   font-family: ui-monospace, 'Cascadia Mono', Menlo, Consolas, monospace;
-  font-size: 7.4px;
+  font-size: 12px;
 }
 .orbit-figure g g:nth-child(even) text {
   fill: var(--color-cyan-deep);
@@ -373,10 +381,11 @@ html.gl .case-step {
      no depende del alto de la pantalla). */
   html.gl .stage {
     z-index: 2;
-    height: calc(var(--head-h) + 36vh);
-    height: calc(var(--head-h) + 36svh);
-    margin-bottom: calc(-1 * (var(--head-h) + 36vh));
-    margin-bottom: calc(-1 * (var(--head-h) + 36svh));
+    top: var(--head-h);
+    height: calc(36vh + 8px);
+    height: calc(36svh + 8px);
+    margin-bottom: calc(-36vh - 8px);
+    margin-bottom: calc(-36svh - 8px);
     border-bottom: 1px solid var(--color-line);
   }
   html.gl .scene-1 .slot {

@@ -450,8 +450,7 @@ export async function startJourney(root) {
   const vhBase = visH(CAM_Z);
   // En celular el lienzo es una franja fija arriba y el objeto vive siempre
   // en ella (bajo el encabezado); en escritorio sigue el hueco de cada escena.
-  const headH = document.querySelector('.site-head')?.offsetHeight || 64;
-  const band = () => ({ left: W * 0.06, top: headH + 6, width: W * 0.88, height: H - headH - 18 });
+  const band = () => ({ left: W * 0.06, top: 6, width: W * 0.88, height: H - 14 });
   function place(el, target, natW, natH) {
     if (mobile) {
       const b = band();

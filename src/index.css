@@ -625,7 +625,6 @@ html.lenis body {
 .faq summary::after {
   content: '+';
   flex: none;
-  font-family: var(--font-code);
   font-weight: 400;
   color: var(--color-cyan);
   transition: transform 220ms var(--ease-out);

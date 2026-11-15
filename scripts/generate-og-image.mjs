@@ -1,74 +1,69 @@
-// Genera scripts/source/og-image.png (luego scripts/optimize-images.mjs lo convierte a public/assets/og-image.jpg) (1200x630) con Puppeteer: una tarjeta
-// simple con la marca real (mismo fondo/acento que el sitio, mismo logo,
-// mismo copy ya aprobado) en vez del Logo.png de 414x414 que se usaba
-// como og:image. Se corre a mano (no en cada build) porque es un asset
-// de marca estatico, no depende de contenido por ruta:
+// Genera scripts/source/og-image.png (1200x630) con Puppeteer y, de paso,
+// public/assets/og-image.jpg, que es la que se publica. Usa lo mismo que
+// el sitio: negro, el cian del logo, Anybody e Instrument Sans (las
+// fuentes autoalojadas de public/fonts) y el atomo de codigo de la home.
+// Se corre a mano porque es un asset de marca, no depende de cada build:
 //   node scripts/generate-og-image.mjs
-//
-// Usa fuentes del sistema (Arial/Helvetica), no "Archivo" (la tipografia
-// real del sitio via Google Fonts) porque este script no depende de red.
-// Si mas adelante se auto-alojan las fuentes (Fase 6), vale la pena
-// regenerar esta tarjeta con la tipografia real.
 import puppeteer from 'puppeteer';
 import { writeFile, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const LOGO_PATH = path.resolve(__dirname, './source/Logo.png');
-const OUT_PATH = path.resolve(__dirname, './source/og-image.png');
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const b64 = async (file) => (await readFile(path.join(root, file))).toString('base64');
+
+const CODE = [
+  'const sitio = escribir({ para: "tu negocio", en: "Cuenca" }); ',
+  '<main><h1>Páginas web a medida</h1><a href="wa.me">Escribir</a></main> ',
+  'export default function Pagina() { return <Sitio sinPlantillas /> } ',
+  'h1 { font-stretch: var(--ancho); color: #00f3fb; } @media (pointer) ',
+];
 
 async function buildHtml() {
-  const logoBuffer = await readFile(LOGO_PATH);
-  const logoDataUri = `data:image/png;base64,${logoBuffer.toString('base64')}`;
+  const [anybody, instrument, mono, emblem] = await Promise.all([
+    b64('public/fonts/anybody-variable-latin.woff2'),
+    b64('public/fonts/instrument-sans-variable-latin.woff2'),
+    b64('public/fonts/jetbrains-mono-variable-latin.woff2'),
+    b64('public/icon-192.png'),
+  ]);
+  const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+  const orbits = CODE.map(
+    (line, i) =>
+      `<g transform="rotate(${i * 45})"><text class="${i % 2 ? 'dim' : ''}"><textPath href="#o" textLength="1400" lengthAdjust="spacing">${esc(line.repeat(2))}</textPath></text></g>`,
+  ).join('');
 
   return `<!doctype html>
 <html>
 <head>
 <meta charset="utf-8">
 <style>
+  @font-face { font-family: Anybody; src: url(data:font/woff2;base64,${anybody}); font-weight: 100 900; font-stretch: 50% 150%; }
+  @font-face { font-family: Instrument; src: url(data:font/woff2;base64,${instrument}); font-weight: 400 700; }
+  @font-face { font-family: Mono; src: url(data:font/woff2;base64,${mono}); font-weight: 400 700; }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html, body { width: 1200px; height: 630px; overflow: hidden; }
-  body {
-    background: #050609;
-    background-image:
-      radial-gradient(ellipse 900px 600px at 80% 10%, rgba(34, 228, 245, .18), transparent 60%),
-      radial-gradient(ellipse 700px 500px at 5% 105%, rgba(34, 228, 245, .09), transparent 60%);
-    font-family: Arial, Helvetica, sans-serif;
-    display: flex;
-    flex-direction: column;
-    padding: 80px;
-  }
-  .brand { display: flex; align-items: center; gap: 20px; }
-  .brand img { width: 56px; height: 56px; filter: brightness(0) invert(1); opacity: .95; }
-  .brand span {
-    font-size: 24px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
-    color: #edf0f6;
-  }
-  h1 {
-    margin-top: 56px;
-    font-size: 58px; font-weight: 800; color: #edf0f6; line-height: 1.16;
-    letter-spacing: -.01em; max-width: 980px;
-  }
-  h1 .accent { color: #22e4f5; }
-  p {
-    margin-top: 24px; font-size: 25px; color: #a3acbc; max-width: 760px; font-weight: 400;
-    line-height: 1.5;
-  }
-  footer { margin-top: auto; padding-top: 32px; border-top: 1px solid rgba(255,255,255,.12); }
-  footer span {
-    font-size: 18px; letter-spacing: .14em; text-transform: uppercase; color: #22e4f5; font-weight: 700;
-  }
+  body { position: relative; background: #000; color: #eaf2f2; font-family: Instrument, sans-serif; padding: 64px 72px; display: flex; flex-direction: column; }
+  .brand { display: flex; align-items: center; gap: 16px; font-family: Anybody; font-weight: 800; font-stretch: 92%; font-size: 30px; }
+  .brand img { width: 56px; height: 56px; border-radius: 50%; }
+  h1 { margin-top: auto; max-width: 700px; font-family: Anybody; font-weight: 800; font-stretch: 66%; font-size: 80px; line-height: .98; letter-spacing: -.012em; }
+  p { margin-top: 24px; max-width: 680px; font-size: 28px; line-height: 1.4; color: #93a6a8; }
+  .url { margin-top: 28px; font-size: 24px; font-weight: 600; color: #00f3fb; }
+  svg { position: absolute; right: -70px; top: 50%; width: 540px; height: 540px; transform: translateY(-50%); overflow: visible; }
+  svg text { fill: #00f3fb; font-family: Mono, monospace; font-size: 12px; }
+  svg text.dim { fill: #0b6f74; }
+  svg .core { font-size: 24px; font-weight: 700; }
 </style>
 </head>
 <body>
-  <div class="brand">
-    <img src="${logoDataUri}" alt="">
-    <span>FS Orbit</span>
-  </div>
-  <h1>Desarrollo web de <span class="accent">alto rendimiento</span> en Cuenca, Ecuador</h1>
-  <p>Código a medida, sin plantillas. Sitios rápidos, seguros y diseñados para convertir.</p>
-  <footer><span>fsorbit.com</span></footer>
+  <div class="brand"><img src="data:image/png;base64,${emblem}" alt="">FS Orbit</div>
+  <h1>Páginas web<br>a medida para<br>negocios de Cuenca</h1>
+  <p>Código propio, sin plantillas. Planes desde $200.</p>
+  <div class="url">fsorbit.com</div>
+  <svg viewBox="-160 -160 320 320" aria-hidden="true">
+    <defs><path id="o" d="M -222 0 a 222 80 0 1 0 444 0 a 222 80 0 1 0 -444 0"/></defs>
+    <g transform="scale(0.62) rotate(-12)">${orbits}</g>
+    <text class="core" text-anchor="middle" y="6">{ }</text>
+  </svg>
 </body>
 </html>`;
 }
@@ -80,9 +75,10 @@ async function main() {
     const page = await browser.newPage();
     await page.setViewport({ width: 1200, height: 630, deviceScaleFactor: 1 });
     await page.setContent(html, { waitUntil: 'networkidle0' });
-    const buffer = await page.screenshot({ type: 'png' });
-    await writeFile(OUT_PATH, buffer);
-    console.log(`[og-image] guardado en ${OUT_PATH}`);
+    await page.evaluate(() => document.fonts.ready);
+    await writeFile(path.join(root, 'scripts/source/og-image.png'), await page.screenshot({ type: 'png' }));
+    await writeFile(path.join(root, 'public/assets/og-image.jpg'), await page.screenshot({ type: 'jpeg', quality: 86 }));
+    console.log('[og-image] scripts/source/og-image.png y public/assets/og-image.jpg');
   } finally {
     await browser.close();
   }

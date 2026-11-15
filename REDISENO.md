@@ -50,7 +50,7 @@ Las 20 URLs anteriores conservan su dirección; no hizo falta ningún 301 nuevo.
 2. **Plazos típicos** por tipo de proyecto: Proceso solo dice que el plazo se da con la propuesta.
 3. **Condiciones de pago y propiedad del código**: el sitio dice que se acuerdan con cada cliente.
 4. **Métricas de clientes**: ningún caso muestra cifras porque no hay.
-5. **Imagen de Open Graph** (`public/assets/og-image.jpg`): sigue siendo la anterior, con otro titular. Hay que actualizar `scripts/generate-og-image.mjs` y regenerarla.
+5. **Imagen de Open Graph**: regenerada con el diseño nuevo (`node scripts/generate-og-image.mjs`).
 6. **Política de privacidad**: se corrigieron dos párrafos (ya no hay preloader ni vista previa en iframe; se describe el armador de mensajes) y la fecha. Conviene que la leas.
 7. **Precios de servicios sin plan** (UI/UX, mantenimiento, rediseño): figuran como "se cotiza".
 8. `AUDITORIA.md` y `legacy-static/` describen el sitio anterior; no se tocaron.

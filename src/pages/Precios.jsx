@@ -87,6 +87,12 @@ export default function Precios() {
               </Reveal>
             ))}
           </div>
+          <div className="mt-s5 flex flex-wrap items-baseline justify-between gap-x-s6 gap-y-s2 rounded-r3 border border-[color:var(--line)] px-s6 py-s5">
+            <p className="font-display font-bold text-text">Dominio y hosting: costo aparte</p>
+            <p className="max-w-[60ch] text-[length:var(--fs-small)] text-text-2">
+              No están incluidos en el precio de los planes. Son servicios anuales de otro proveedor; antes de empezar te decimos qué contratar.
+            </p>
+          </div>
         </div>
       </section>
 

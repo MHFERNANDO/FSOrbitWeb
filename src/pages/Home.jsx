@@ -55,7 +55,7 @@ export default function Home() {
         <div className="relative grid gap-s5">
           <AtomReveal>
             <span className="size-1.5 rounded-full bg-[color:var(--line-2)]" />
-            Clínicas, laboratorios, inmobiliarias y comercios
+            Para negocios de Cuenca y todo Ecuador
           </AtomReveal>
 
           <SplitHeading
@@ -64,14 +64,9 @@ export default function Home() {
             segments={[{ text: 'Diseño de páginas web en Cuenca' }, { break: true }, { text: 'para tu negocio', highlight: true }]}
           />
 
-          <Reveal as="p" type="rise" className="font-display text-[length:var(--fs-h4)] font-bold text-text">
-            Desde $200. El dominio y el hosting van aparte.
-          </Reveal>
-
           <Reveal as="p" type="rise" className="max-w-[46ch] text-[length:var(--fs-lead)] text-text-2">
-            Hacemos con código propio la página web de clínicas, laboratorios, inmobiliarias, comercios y negocios
-            locales de Cuenca y de todo Ecuador. Para empezar, cuéntanos por WhatsApp qué necesitas y te enviamos
-            una propuesta.
+            Hecha con código propio, sin plantillas. Cuéntanos por WhatsApp qué necesitas y te enviamos una
+            propuesta.
           </Reveal>
 
           <div className="mt-s2 flex flex-wrap gap-s4">
@@ -264,6 +259,12 @@ export default function Home() {
                 </a>
               </Reveal>
             ))}
+          </div>
+          <div className="mt-s5 flex flex-wrap items-baseline justify-between gap-x-s6 gap-y-s2 rounded-r3 border border-[color:var(--line)] px-s6 py-s5">
+            <p className="font-display font-bold text-text">Dominio y hosting: costo aparte</p>
+            <p className="max-w-[60ch] text-[length:var(--fs-small)] text-text-2">
+              No están incluidos en el precio de los planes. Son servicios anuales de otro proveedor; antes de empezar te decimos qué contratar.
+            </p>
           </div>
         </div>
       </section>

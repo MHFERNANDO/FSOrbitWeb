@@ -9,7 +9,6 @@ export default function Dock() {
   const [on, setOn] = useState(false);
 
   useEffect(() => {
-    setOn(false);
     if (pathname === '/contacto') return undefined;
     const visible = new Set();
     const update = () => setOn(visible.size === 0 && window.scrollY > 200);
@@ -28,8 +27,10 @@ export default function Dock() {
     };
   }, [pathname]);
 
+  // En Contacto la pagina entera es el camino a WhatsApp: sin barra.
+  const shown = on && pathname !== '/contacto';
   return (
-    <div className="dock" data-on={on} inert={!on}>
+    <div className="dock" data-on={shown} inert={!shown}>
       <WaButton source="dock" />
     </div>
   );

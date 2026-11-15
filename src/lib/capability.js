@@ -40,6 +40,10 @@ function compute() {
   if (!motionAllowed()) return 'static';
   if (navigator.connection?.saveData) return 'static';
 
+  // En pantallas angostas el objeto no tiene un lugar propio: competiria
+  // con el texto. Ahi va la figura estatica, con la misma informacion.
+  if (window.matchMedia('(max-width: 899px)').matches) return 'static';
+
   const coarse = window.matchMedia('(pointer: coarse)').matches;
   if (coarse) {
     if (navigator.deviceMemory && navigator.deviceMemory <= 3) return 'static';

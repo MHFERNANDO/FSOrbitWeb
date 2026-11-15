@@ -6,7 +6,7 @@ import NotFound from './NotFound';
 import { usePageSeo } from '@/hooks/usePageSeo';
 import { projectNode } from '@/seo/jsonld';
 import { renderInline } from '@/lib/inlineLinks';
-import { getProject, publishedProjects } from '@/data/content';
+import { getProject, projects } from '@/data/content';
 import { projectDetails } from '@/data/projectDetails';
 
 const BLOCKS = [
@@ -30,45 +30,18 @@ export default function ProyectoDetalle() {
   usePageSeo({
     path,
     crumbs,
-    image: project?.img ? `https://fsorbit.com/assets/${project.img}-1440.webp` : undefined,
+    image: project ? `https://fsorbit.com/assets/${project.img}-1440.webp` : undefined,
     nodes:
-      project && !project.pending
+      project
         ? [projectNode({ path, name: `${project.title}: sitio web en Cuenca`, description: project.description, img: project.img, siteUrl: project.url })]
         : [],
   });
 
   if (!project) return <NotFound />;
 
-  // Caso sin material publicable: se dice tal cual, sin relleno.
-  if (project.pending || !detail) {
-    return (
-      <main id="main">
-        <PageHead crumbs={crumbs} lines={[project.title]} lead={project.description} />
-        <section className="wrap section--tight">
-          <div className="split">
-            <Shot project={project} />
-            <div className="prose">
-              <p>
-                Todavía no publicamos este caso. Preferimos esperar a tener las capturas y el texto aprobados por el cliente antes que
-                llenar la página con relleno.
-              </p>
-              <p>
-                Si te interesa un proyecto parecido para tu inmobiliaria, escríbenos y te contamos por WhatsApp cómo lo trabajamos.
-                Mientras tanto puedes revisar los{' '}
-                <Link className="link" to="/proyectos">
-                  casos publicados
-                </Link>
-                .
-              </p>
-            </div>
-          </div>
-        </section>
-        <Closing source={`caso_${slug}`} waText={`Hola, quiero saber más sobre el trabajo para ${project.title}`} />
-      </main>
-    );
-  }
+  if (!detail) return <NotFound />;
 
-  const others = publishedProjects.filter((p) => p.slug !== slug);
+  const others = projects.filter((p) => p.slug !== slug);
   const host = new URL(project.url).hostname.replace(/^www\./, '');
 
   return (

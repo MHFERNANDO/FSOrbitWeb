@@ -16,7 +16,7 @@ const planLines = pricingPlans.map((p) => {
   return `- **${p.name}** — ${price}: ${p.description}`;
 });
 
-const projectLines = projects.filter((p) => !p.pending).map((p) => `- [${p.title}](${O}/proyectos/${p.slug}): ${p.description} Sitio: ${p.url}`);
+const projectLines = projects.map((p) => `- [${p.title}](${O}/proyectos/${p.slug}): ${p.description} Sitio: ${p.url}`);
 
 const postLines = blogPosts.map((p) => `- [${p.title}](${O}/blog/${p.slug}): ${p.description}`);
 

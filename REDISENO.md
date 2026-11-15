@@ -6,17 +6,17 @@ Rama `rediseno-orbita` (no se tocó `main` ni se hizo push). 15 de noviembre de 
 
 - **Stack intacto.** Vite, React 19, React Router 7, Tailwind 4, prerender con Puppeteer, Vercel. Se sumaron `gsap`, `lenis` y `three`. Se quitaron `framer-motion`, radix, lucide, cva y shadcn porque dejaron de usarse.
 - **Marca.** Cian `#00F3FB` muestreado del wordmark del logo, sobre negro literal `#000000`. El sitio anterior usaba un verde lima que no venía del logo.
-- **Tipografía.** Anybody variable (peso y ancho) en titulares; Instrument Sans en el cuerpo; JetBrains Mono solo dentro del lienzo 3D.
+- **Tipografía.** Anybody variable (peso y ancho) en titulares, a peso 700 y con tope de 4.5rem (2.6rem en celular); Instrument Sans en el cuerpo; JetBrains Mono solo dentro del lienzo 3D.
 - **Un solo gesto.** El átomo del logo, hecho con caracteres de código, se transforma con el scroll: órbita, plantilla (nueve cajas idénticas, grises, todos los caracteres iguales), layout a medida (cian, con profundidad), tres casos en fila y de vuelta al átomo junto a los planes.
 - **El ancho de la letra acompaña.** El titular de la escena de la plantilla se comprime y el del giro se abre. En las páginas interiores el H1 se estrecha al empezar a bajar.
 - **El texto no se anima.** Se mueve lo que responde a una acción: menú de celular, preguntas, barra de WhatsApp, estados del mensaje en Contacto. Proceso tiene una única animación: la línea que se llena.
 - **Planes como libro de niveles**, no tres tarjetas con badge: precio, para quién, qué incluye, qué no incluye ninguno y qué hace subir el precio.
 - **Un solo camino de contacto.** Todo botón principal dice "Escribir por WhatsApp". Se eliminaron el preloader, el modal de asesor, el chat flotante y la vista previa en iframe.
-- **Celular pensado aparte.** El objeto 3D vive en una franja fija arriba y el texto pasa por debajo; no hay escenas fijadas. Titulares condensados con wrap normal. Barra fija de WhatsApp cuando no hay otro botón a la vista.
+- **Celular pensado aparte.** Debajo de 900 px no hay lienzo 3D: cada escena muestra su figura estática, para que nada se monte sobre el texto. Titulares condensados con wrap normal. Barra fija de WhatsApp cuando no hay otro botón a la vista.
 
 ## Cómo funciona por dentro
 
-- `src/lib/capability.js` decide una vez entre escena 3D y versión estática. Va a estática con "reducir movimiento", ahorro de datos, sin WebGL2 acelerado, GPU de gama baja conocida, o celular con ≤3 GB o ≤4 núcleos. El HTML es el mismo en ambos casos.
+- `src/lib/capability.js` decide una vez entre escena 3D y versión estática. Va a estática en pantallas de menos de 900 px, con "reducir movimiento", ahorro de datos, sin WebGL2 acelerado, GPU de gama baja conocida, o celular con ≤3 GB o ≤4 núcleos. El HTML es el mismo en ambos casos.
 - `src/lib/scroll.js`: Lenis movido por el ticker de GSAP, un solo ciclo; ScrollTrigger orquesta. Se carga después del primer pintado.
 - `src/gl/journey.js`: un lienzo, ~1500 instancias (850 en celular). Se pausa fuera de pantalla o con la pestaña oculta, baja la resolución si el equipo no sostiene el ritmo y vuelve a la versión estática si se pierde el contexto gráfico.
 - `src/lib/fit.js` + `scripts/measure-display.mjs`: el tamaño de cada titular se calcula con una tabla de anchos de la fuente, sin medir en el navegador.
@@ -24,7 +24,7 @@ Rama `rediseno-orbita` (no se tocó `main` ni se hizo push). 15 de noviembre de 
 
 ## URLs
 
-Las 20 URLs anteriores conservan su dirección; no hizo falta ningún 301 nuevo. Nuevas: `/servicios`, `/proceso` y `/proyectos/cmr-inmobiliaria` (esta última con `noindex` y fuera del sitemap). La página local de Cuenca es `/servicios/diseno-web-cuenca`.
+Las 20 URLs anteriores conservan su dirección; no hizo falta ningún 301 nuevo. Nuevas: `/servicios` y `/proceso`. La página local de Cuenca es `/servicios/diseno-web-cuenca`.
 
 ## Verificación hecha
 
@@ -46,7 +46,6 @@ Las 20 URLs anteriores conservan su dirección; no hizo falta ningún 301 nuevo.
 
 ## Pendiente (necesita datos o decisión)
 
-1. **CMR Inmobiliaria.** No hay URL, capturas ni texto en el repo. Aparece como "caso en preparación". Para publicarlo: agregar la captura en `scripts/source/`, los datos en `src/data/content.js` y `src/data/projectDetails.js`, y mover la ruta de `draftRoutes` a `routes` en `src/seo/routes.js`.
 2. **Plazos típicos** por tipo de proyecto: Proceso solo dice que el plazo se da con la propuesta.
 3. **Condiciones de pago y propiedad del código**: el sitio dice que se acuerdan con cada cliente.
 4. **Métricas de clientes**: ningún caso muestra cifras porque no hay.

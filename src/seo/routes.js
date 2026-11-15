@@ -45,19 +45,6 @@ const projectMeta = [
   },
 ];
 
-// Caso sin material publicable todavia: se prerenderiza (para que el enlace
-// de la home no caiga en 404) pero va con noindex y fuera del sitemap.
-const draftRoutes = [
-  {
-    path: '/proyectos/cmr-inmobiliaria',
-    draft: true,
-    title: 'CMR Inmobiliaria: Caso en Preparación | FS Orbit',
-    description:
-      'Caso en preparación: recorridos 360 para CMR Inmobiliaria. Publicaremos el detalle del proyecto cuando tengamos el material aprobado por el cliente.',
-    files: ['src/pages/ProyectoDetalle.jsx', 'src/data/content.js'],
-  },
-];
-
 export const routes = [
   {
     path: '/',
@@ -171,7 +158,7 @@ export const routes = [
   },
 ];
 
-// Todo lo que se prerenderiza (rutas publicas + borradores).
-export const allRoutes = [...routes, ...draftRoutes];
+// Todo lo que se prerenderiza.
+export const allRoutes = routes;
 
 export const routeMeta = (path) => allRoutes.find((r) => r.path === path);

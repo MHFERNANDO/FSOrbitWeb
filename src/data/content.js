@@ -157,8 +157,7 @@ const IMG_SIZE = {
   LabDieselPreview: { w: 1896, h: 908 },
 };
 
-// Casos. `pending: true` = el cliente existe pero falta material para
-// publicar el caso (URL, capturas, texto aprobado). No se inventa nada.
+// Casos publicados. Solo sitios reales que se pueden visitar.
 export const projects = [
   {
     slug: 'acculab-system',
@@ -170,13 +169,6 @@ export const projects = [
     ...IMG_SIZE.AccuLabPreview,
     alt: 'Sitio web de Accu-Lab, laboratorio clínico en Cuenca',
     url: 'https://acculab.bio',
-  },
-  {
-    slug: 'cmr-inmobiliaria',
-    title: 'CMR Inmobiliaria',
-    tag: 'Inmobiliaria, recorridos 360',
-    description: 'Recorridos 360 para una inmobiliaria. Caso en preparación: publicaremos el detalle cuando tengamos el material aprobado.',
-    pending: true,
   },
   {
     slug: 'laboratorio-diesel-mg',
@@ -214,9 +206,8 @@ export const projects = [
 ];
 
 export const getProject = (slug) => projects.find((p) => p.slug === slug);
-export const publishedProjects = projects.filter((p) => !p.pending);
 // Los tres casos que recorre la home.
-export const homeCases = ['acculab-system', 'cmr-inmobiliaria', 'laboratorio-diesel-mg'].map(getProject);
+export const homeCases = ['acculab-system', 'laboratorio-diesel-mg', 'gravity-studio'].map(getProject);
 
 // Proceso: cada paso sale de lo que el sitio ya promete (FAQ y servicios).
 export const processSteps = [

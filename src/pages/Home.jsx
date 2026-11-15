@@ -178,7 +178,7 @@ export default function Home() {
               Para quién hemos trabajado
             </h2>
             <p className="muted">
-              Tres trabajos de cerca. Los dos publicados se pueden visitar; no mostramos cifras de tráfico ni de ventas que no tengamos.
+              Tres negocios de Cuenca, tres sitios publicados que puedes visitar. No mostramos cifras de tráfico ni de ventas que no tengamos.
             </p>
           </div>
           <div className="cases">
@@ -197,9 +197,9 @@ export default function Home() {
                     <p>{c.description}</p>
                     <div className="actions">
                       <Link className="link" to={`/proyectos/${c.slug}`}>
-                        {c.pending ? `Ver el estado del caso de ${c.title}` : `Ver el caso de ${c.title}`}
+                        Ver el caso de {c.title}
                       </Link>
-                      {c.url && (
+                      {(
                         <a className="link" href={c.url} target="_blank" rel="noopener noreferrer">
                           Abrir {new URL(c.url).hostname.replace(/^www\./, '')}
                         </a>

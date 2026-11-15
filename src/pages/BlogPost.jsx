@@ -48,7 +48,7 @@ export default function BlogPost() {
   return (
     <main id="main">
       <article className="wrap">
-        <header className="page-head" style={{ maxWidth: '24em', fontSize: 'clamp(1rem, 1vw + 0.8rem, 1.25rem)' }}>
+        <header className="page-head" style={{ maxWidth: '34em' }}>
           <Breadcrumbs crumbs={crumbs} />
           <h1 className="h2">{post.title}</h1>
         </header>

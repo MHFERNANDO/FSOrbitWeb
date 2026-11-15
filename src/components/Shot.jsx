@@ -1,17 +1,8 @@
 import { useState } from 'react';
 
-// Captura de un caso. Si el caso aun no tiene material, dibuja una lamina
-// que lo dice; si la imagen falla, lo explica en vez de dejar un hueco.
+// Captura de un caso. Si la imagen falla, lo explica en vez de dejar un hueco.
 export default function Shot({ project, sizes = '100vw', eager = false }) {
   const [failed, setFailed] = useState(false);
-  if (!project.img) {
-    return (
-      <div className="plate">
-        <strong>{project.title}</strong>
-        <span>Caso en preparación</span>
-      </div>
-    );
-  }
   const base = `/assets/${project.img}`;
   return (
     <div className="shot" data-failed={failed}>

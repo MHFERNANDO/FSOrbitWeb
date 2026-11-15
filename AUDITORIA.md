@@ -429,4 +429,4 @@ Se quito el blog (rutas, pie de pagina, 404, sitemap, llms.txt y smoke test) por
 - Schema: ContactPoint de WhatsApp y OfferCatalog con los planes. Sin horario (no confirmado).
 - robots.txt nombra Googlebot, Bingbot y los rastreadores de IA que faltaban.
 - Blog reactivado por decisión del cliente: se quitaron las 308 de /blog. 5 artículos (3 anteriores + clínicas/laboratorios + inmobiliarias). 21 rutas.
-- No se nombra a CMR Inmobiliaria (proyecto no concretado) ni hay resultados por cliente todavía.
+- No hay resultados por cliente todavía.

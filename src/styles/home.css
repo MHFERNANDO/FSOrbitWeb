@@ -260,7 +260,7 @@ html.gl-on .orbit-figure {
   padding-block: clamp(36px, 6vw, 88px);
 }
 .case-step .h2 {
-  font-size: clamp(2rem, 3.4vw, 3.5rem);
+  font-size: clamp(1.625rem, 2.4vw, 2.5rem);
 }
 .case-figure {
   width: 100%;
@@ -375,52 +375,6 @@ html.gl .case-step {
     max-height: 220px;
   }
 }
-@media (max-width: 899px) {
-  /* En celular el lienzo es una franja fija arriba, opaca: el objeto vive
-     ahi y el texto pasa por debajo, sin fijar escenas (el largo del texto
-     no depende del alto de la pantalla). */
-  html.gl .stage {
-    z-index: 2;
-    top: var(--head-h);
-    height: calc(36vh + 8px);
-    height: calc(36svh + 8px);
-    margin-bottom: calc(-36vh - 8px);
-    margin-bottom: calc(-36svh - 8px);
-    border-bottom: 1px solid var(--color-line);
-  }
-  html.gl .scene-1 .slot {
-    height: 36vh;
-    height: 36svh;
-  }
-  html.gl .scene-1 .slot .figure {
-    inset: 0;
-    height: 100%;
-  }
-  html.gl .scene--pin {
-    height: auto;
-    padding-block: 18vh 30vh;
-  }
-  html.gl .scene--pin .scene-pin {
-    position: static;
-    display: block;
-    height: auto;
-  }
-  html.gl .scene--pin .slot,
-  html.gl .cases-pin {
-    display: none;
-  }
-  html.gl .case-step {
-    min-height: 72vh;
-    min-height: 72svh;
-    align-items: start;
-    padding-block: 12vh;
-  }
-  html.gl .scene-5 {
-    z-index: 3;
-    background: var(--color-black);
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   html:not([data-motion='on']) .orbit-spin {
     animation: none;

@@ -101,7 +101,7 @@ const VERT = /* glsl */ `
     // desorden es entre la plantilla y el layout a medida.
     float mid = sin(f1 * 3.1416) * 0.3 + sin(f2 * 3.1416) * 0.95 + sin(f3 * 3.1416) * 0.5 + sin(f4 * 3.1416) * 0.4;
     vec3 n = vec3(sin(seed * 91.7 + uTime * 0.4), cos(seed * 57.3 + uTime * 0.3), sin(seed * 33.1 + 1.7));
-    p += n * mid * 0.6;
+    p += n * mid * 0.16;
 
     float gray = clamp(1.0 - abs(uT - 1.0) * 1.25, 0.0, 1.0);
     vGray = gray;
@@ -130,7 +130,7 @@ const FRAG = /* glsl */ `
     float col = mod(vGlyph, 8.0);
     float row = floor(vGlyph / 8.0);
     vec2 uv = (vec2(col, 7.0 - row) + vUv) / 8.0;
-    float a = texture2D(uAtlas, uv).a * vAlpha * uFade;
+    float a = texture2D(uAtlas, uv).a * vAlpha * uFade * 0.8;
     if (a < 0.01) discard;
     vec3 cyan = vec3(0.0, 0.953, 0.984);
     vec3 lead = vec3(0.36, 0.41, 0.42);
@@ -162,32 +162,6 @@ async function makeAtlas() {
   const tex = new CanvasTexture(canvas);
   tex.minFilter = LinearFilter;
   tex.generateMipmaps = false;
-  return tex;
-}
-
-// Lamina para un caso sin capturas: lo dice, no inventa una imagen.
-function plateTexture(title) {
-  const canvas = document.createElement('canvas');
-  canvas.width = 1024;
-  canvas.height = Math.round(1024 / PLANE_RATIO);
-  const ctx = canvas.getContext('2d');
-  ctx.fillStyle = '#0d1416';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-  ctx.strokeStyle = '#0b6f74';
-  ctx.lineWidth = 3;
-  ctx.setLineDash([14, 12]);
-  ctx.strokeRect(20, 20, canvas.width - 40, canvas.height - 40);
-  ctx.textAlign = 'center';
-  ctx.fillStyle = '#eaf2f2';
-  ctx.font = '800 84px Anybody, sans-serif';
-  if ('fontStretch' in ctx) ctx.fontStretch = 'condensed';
-  ctx.fillText(title, canvas.width / 2, canvas.height / 2 + 4);
-  ctx.fillStyle = '#93a6a8';
-  ctx.font = '400 34px "Instrument Sans", sans-serif';
-  if ('fontStretch' in ctx) ctx.fontStretch = 'normal';
-  ctx.fillText('Caso en preparación', canvas.width / 2, canvas.height / 2 + 64);
-  const tex = new CanvasTexture(canvas);
-  tex.colorSpace = SRGBColorSpace;
   return tex;
 }
 
@@ -306,14 +280,11 @@ function fillBespoke(out, n) {
 // Los casos: marcos alrededor de cada plano y polvo entre ellos.
 function fillCases(out, n, planes) {
   for (let i = 0; i < n; i++) {
-    if (Math.random() < 0.74) {
+    {
       const pl = planes[i % planes.length];
-      const m = rand(0.03, 0.14);
+      const m = rand(0.02, 0.07);
       const [x, y] = rectPoint(-pl.w / 2 - m, -pl.h / 2 - m, pl.w / 2 + m, pl.h / 2 + m, Math.random());
       out.set([pl.x + x, pl.y + y, pl.z + rand(-0.05, 0.05)], i * 3);
-    } else {
-      const pl = planes[0];
-      out.set([pl.x + rand(-pl.w, pl.w), pl.y + rand(-pl.h * 1.6, pl.h * 1.6), rand(2, -GAP * (planes.length - 1) - 2)], i * 3);
     }
   }
 }
@@ -409,8 +380,7 @@ export async function startJourney(root) {
         pl.mat.color.set(0xffffff);
         pl.mat.needsUpdate = true;
       };
-      if (pl.data.img) loader.load(`/assets/${pl.data.img}-${mobile ? 480 : 960}.webp`, apply, undefined, () => {});
-      else apply(plateTexture(pl.data.title));
+      loader.load(`/assets/${pl.data.img}-960.webp`, apply, undefined, () => {});
     });
   }
 
@@ -432,7 +402,7 @@ export async function startJourney(root) {
     const vw = vh * camera.aspect;
     const cx = ((r.left - pin.left + r.width / 2) / W - 0.5) * vw;
     const cy = (0.5 - (r.top - pin.top + r.height / 2) / H) * vh;
-    const w = Math.min((r.width / W) * vw, (r.height / H) * vh * PLANE_RATIO) * 0.94;
+    const w = Math.min((r.width / W) * vw, (r.height / H) * vh * PLANE_RATIO) * 0.8;
     planes.forEach((pl, k) => {
       pl.x = cx;
       pl.y = cy;
@@ -440,7 +410,7 @@ export async function startJourney(root) {
       pl.h = w / PLANE_RATIO;
       pl.mesh.position.set(cx, cy, pl.z);
       pl.mesh.scale.set(pl.w, pl.h, 1);
-      pl.mesh.rotation.y = (k % 2 ? 1 : -1) * (mobile ? 0.06 : 0.16);
+      pl.mesh.rotation.y = (k % 2 ? 1 : -1) * 0.08;
     });
     fillCases(posD, N, planes);
     attrD.needsUpdate = true;
@@ -521,11 +491,15 @@ export async function startJourney(root) {
     const sE = eOk ? uniforms.uOffE.value.w : sD;
     const scale = [sA, sB, sC, sD, sE];
     const i = Math.min(3, Math.floor(T));
-    uniforms.uSize.value = 0.115 * (scale[i] + (scale[i + 1] - scale[i]) * ease(T - i));
+    uniforms.uSize.value = 0.1 * (scale[i] + (scale[i + 1] - scale[i]) * ease(T - i));
 
     // Camara: quieta hasta los casos; ahi avanza en profundidad.
     const inD = ease(T - 2) * (1 - ease(T - 3));
-    const travel = FOCUS - state.c * GAP * (planes.length - 1);
+    // La camara se detiene frente a cada caso y avanza entre uno y otro.
+    const seg = state.c * (planes.length - 1);
+    const k = Math.min(planes.length - 2, Math.floor(seg));
+    const stop = k + smooth(0.3, 0.7, seg - k);
+    const travel = FOCUS - stop * GAP;
     pointer.cx += (pointer.x - pointer.cx) * 0.06;
     pointer.cy += (pointer.y - pointer.cy) * 0.06;
     camera.position.set(pointer.cx, pointer.cy, CAM_Z + (travel - CAM_Z) * inD);
@@ -534,7 +508,7 @@ export async function startJourney(root) {
     const fadeD = smooth(2.35, 2.95, T) * (1 - smooth(3.0, 3.5, T));
     planes.forEach((pl) => {
       const dist = camera.position.z - pl.z;
-      const a = fadeD * smooth(1.0, 3.2, dist) * (1 - smooth(8, 15, dist) * 0.8);
+      const a = fadeD * smooth(1.0, 3.2, dist) * (1 - smooth(7.5, 10.5, dist));
       pl.mat.opacity = a;
       pl.mesh.visible = a > 0.01;
     });

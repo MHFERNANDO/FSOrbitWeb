@@ -4,7 +4,7 @@ import Shot from '@/components/Shot';
 import Closing from '@/components/Closing';
 import { usePageSeo } from '@/hooks/usePageSeo';
 import { projectListNode } from '@/seo/jsonld';
-import { projects, publishedProjects } from '@/data/content';
+import { projects } from '@/data/content';
 
 const CRUMBS = [
   { name: 'Inicio', path: '/' },
@@ -12,7 +12,7 @@ const CRUMBS = [
 ];
 
 export default function Proyectos() {
-  usePageSeo({ path: '/proyectos', crumbs: CRUMBS, type: 'CollectionPage', nodes: [projectListNode('/proyectos', publishedProjects)] });
+  usePageSeo({ path: '/proyectos', crumbs: CRUMBS, type: 'CollectionPage', nodes: [projectListNode('/proyectos', projects)] });
 
   return (
     <main id="main">
@@ -41,7 +41,7 @@ export default function Proyectos() {
                   <p>{p.description}</p>
                   <div className="actions">
                     <Link className="link" to={`/proyectos/${p.slug}`}>
-                      {p.pending ? `Ver el estado del caso de ${p.title}` : `Ver el caso de ${p.title}`}
+                      Ver el caso de {p.title}
                     </Link>
                     {p.url && (
                       <a className="link" href={p.url} target="_blank" rel="noopener noreferrer">

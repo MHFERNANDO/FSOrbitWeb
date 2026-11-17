@@ -37,6 +37,7 @@ export default function Precios() {
               </div>
               <div className="ledger-desc">
                 <p className="muted">{plan.description}</p>
+                <p className="ledger-ideal">{plan.idealFor}</p>
                 <WaButton variant="btn--ghost btn--small" text={plan.whatsappText} source={`precios_${plan.slug}`}>
                   {plan.cta}
                 </WaButton>

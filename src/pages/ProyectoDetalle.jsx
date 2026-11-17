@@ -114,7 +114,8 @@ export default function ProyectoDetalle() {
           </h2>
           <div className="rows">
             {others.map((p) => (
-              <Link className="row row--2" to={`/proyectos/${p.slug}`} key={p.slug}>
+              <Link className="row row--case" to={`/proyectos/${p.slug}`} key={p.slug}>
+                <img src={`/assets/${p.img}-480.webp`} width="160" height={Math.round((160 * p.h) / p.w)} alt="" loading="lazy" decoding="async" />
                 <h3 className="h3 row-title">{p.title}</h3>
                 <p>{p.tag}</p>
               </Link>

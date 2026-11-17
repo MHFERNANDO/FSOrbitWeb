@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom';
 import PageHead from '@/components/PageHead';
 import Closing from '@/components/Closing';
+import ServiceIcon from '@/components/ServiceIcon';
+import { serviceListNode } from '@/seo/jsonld';
 import { usePageSeo } from '@/hooks/usePageSeo';
 import { services } from '@/data/content';
 
@@ -10,7 +12,7 @@ const CRUMBS = [
 ];
 
 export default function Servicios() {
-  usePageSeo({ path: '/servicios', crumbs: CRUMBS, type: 'CollectionPage' });
+  usePageSeo({ path: '/servicios', crumbs: CRUMBS, type: 'CollectionPage', nodes: [serviceListNode('/servicios', services)] });
 
   return (
     <main id="main">
@@ -25,7 +27,8 @@ export default function Servicios() {
           {services.map((s) => (
             <Link className="row row--3" to={s.href} key={s.slug}>
               <div>
-                <h2 className="h3 row-title">{s.title}</h2>
+                <ServiceIcon slug={s.slug} />
+                <h2 className="h3 row-title" style={{ marginTop: 12 }}>{s.title}</h2>
                 <p className="row-meta">{s.from}</p>
               </div>
               <div className="stack-sm">

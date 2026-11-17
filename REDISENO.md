@@ -53,3 +53,11 @@ Las 20 URLs anteriores conservan su dirección; no hizo falta ningún 301 nuevo.
 6. **Política de privacidad**: se corrigieron dos párrafos (ya no hay preloader ni vista previa en iframe; se describe el armador de mensajes) y la fecha. Conviene que la leas.
 7. **Precios de servicios sin plan** (UI/UX, mantenimiento, rediseño): figuran como "se cotiza".
 8. `AUDITORIA.md` y `legacy-static/` describen el sitio anterior; no se tocaron.
+
+## Revisión del 17 de noviembre
+
+- H1 de la home: "Páginas web hechas desde cero para negocios de Cuenca". Sigue diciendo qué, para quién y dónde, y suma lo que diferencia (sin plantilla).
+- El texto del inicio ya no nombra a Pablo y Fernando; dice lo que recibe el cliente. Los nombres quedan en Sobre nosotros y en el schema (`founder`).
+- Guías visuales nuevas: miniaturas de los cuatro sitios publicados en el primer viewport, índice lateral del recorrido en pantallas anchas, sección "Qué hacemos" con pictogramas en la home y en Servicios, línea "Ideal si…" en cada plan y miniaturas en "Otros casos".
+- Textos de agencia reescritos en servicios ("robustos y escalables", "vender 24/7", "protegemos tu inversión", "se quedó en el pasado").
+- SEO/GEO: pregunta "¿Qué es FS Orbit?" en la FAQ de la home (FAQPage), `HowTo` en Proceso, `ItemList` en Servicios y `founder` en la organización.

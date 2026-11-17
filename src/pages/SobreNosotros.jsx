@@ -32,7 +32,7 @@ export default function SobreNosotros() {
       <PageHead
         crumbs={CRUMBS}
         lines={['Un estudio web', 'con base en Cuenca']}
-        lead="FS Orbit diseña y desarrolla sitios web a medida para negocios de Cuenca y de todo Ecuador. Somos dos desarrolladores: Pablo y Fernando."
+        lead="FS Orbit diseña y desarrolla sitios web a medida para negocios de Cuenca y de todo Ecuador. Lo formamos Pablo y Fernando, y cada proyecto lo diseñamos y programamos nosotros."
       />
 
       <section className="wrap section--tight">

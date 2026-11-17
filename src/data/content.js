@@ -69,7 +69,7 @@ export const services = [
     short: 'Tu sitio actual, más rápido y bien resuelto en celular.',
     description:
       'Tomamos un sitio lento o antiguo y mejoramos su velocidad, su código y su experiencia en celular sin perder tu identidad.',
-    features: ['Más velocidad', 'Rediseño adaptativo', 'Limpieza de código'],
+    features: ['Más velocidad', 'Mejor en celular', 'Código más limpio'],
     from: 'Se cotiza caso por caso',
   },
 ];
@@ -85,6 +85,7 @@ export const pricingPlans = [
     kind: 'Landing page',
     description: 'Una landing page para servicios profesionales que necesitan presencia y velocidad.',
     scope: 'Una sola vista',
+    idealFor: 'Ideal si ofreces un servicio y quieres que te escriban por WhatsApp desde una sola página.',
     includes: [
       'Una landing page principal',
       'Diseño de autor, sin plantillas',
@@ -105,6 +106,7 @@ export const pricingPlans = [
     kind: 'Tienda online',
     description: 'Una tienda online para vender por catálogo y recibir los pedidos por WhatsApp.',
     scope: 'Hasta 4 vistas',
+    idealFor: 'Ideal si vendes productos y quieres mostrar tu catálogo con precios.',
     includes: [
       'Hasta 4 vistas (tienda completa)',
       'Catálogo de productos dinámico',
@@ -125,6 +127,7 @@ export const pricingPlans = [
     kind: 'Software a medida',
     description: 'Software a medida: portales médicos, sistemas internos o aplicaciones web.',
     scope: 'Vistas sin límite',
+    idealFor: 'Ideal si necesitas usuarios con acceso, una base de datos o un sistema interno.',
     includes: [
       'Arquitectura de vistas ilimitada',
       'Desarrollo con React / Next.js',
@@ -214,7 +217,7 @@ export const processSteps = [
   {
     title: 'Nos escribes por WhatsApp',
     text: 'Cuéntanos qué necesita tu negocio, para qué sirve la página y si ya tienes dominio, logo o fotos. Si ya tienes un sitio, envíanos su dirección.',
-    youGet: 'Una respuesta de Pablo o Fernando, que son quienes diseñan y programan.',
+    youGet: 'Una respuesta de quien va a diseñar y programar tu sitio, sin intermediarios.',
   },
   {
     title: 'Te enviamos una propuesta',

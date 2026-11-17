@@ -85,8 +85,50 @@ html.gl-on .stage canvas {
 .scene-1 .lead {
   margin-top: 4px;
 }
-.hero-proof {
-  max-width: 52ch;
+/* Clientes publicados: prueba visible en el primer viewport. */
+.clients {
+  display: grid;
+  gap: 10px;
+  margin-top: 8px;
+}
+.clients ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+}
+.clients a {
+  display: grid;
+  gap: 6px;
+  width: 96px;
+  color: var(--color-mist);
+  font-size: 0.8125rem;
+  line-height: 1.25;
+  transition: color 160ms ease;
+}
+.clients img {
+  width: 96px;
+  height: auto;
+  border: 1px solid var(--color-line);
+  transition: border-color 160ms ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  .clients a:hover {
+    color: var(--color-bone);
+  }
+  .clients a:hover img {
+    border-color: var(--color-cyan);
+  }
+}
+@media (max-width: 559px) {
+  .clients ul {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+  }
+  .clients a,
+  .clients img {
+    width: 100%;
+  }
 }
 .orbit-figure {
   overflow: visible;

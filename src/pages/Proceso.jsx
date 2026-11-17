@@ -4,6 +4,7 @@ import PageHead from '@/components/PageHead';
 import Closing from '@/components/Closing';
 import { usePageSeo } from '@/hooks/usePageSeo';
 import { processSteps } from '@/data/content';
+import { howToNode } from '@/seo/jsonld';
 import { initScroll } from '@/lib/scroll';
 import { motionAllowed } from '@/lib/capability';
 
@@ -13,7 +14,7 @@ const CRUMBS = [
 ];
 
 export default function Proceso() {
-  usePageSeo({ path: '/proceso', crumbs: CRUMBS });
+  usePageSeo({ path: '/proceso', crumbs: CRUMBS, nodes: [howToNode('/proceso', 'Cómo hacemos tu página web', processSteps)] });
   const steps = useRef(null);
 
   // La unica animacion de la pagina: la linea se llena al avanzar por los

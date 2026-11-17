@@ -19,13 +19,13 @@ export const serviceContent = [
     highlights: [
       {
         icon: 'globe',
-        title: 'Desarrollo Web',
-        text: 'Sitios de alto rendimiento, seguros y optimizados para SEO. Construimos la base sólida que tu empresa necesita para escalar.',
+        title: 'Una página o varias',
+        text: 'Una landing page si quieres que la visita haga una sola acción; un sitio de varias páginas si tienes servicios distintos que explicar y posicionar en Google.',
       },
       {
         icon: 'layout',
-        title: 'Diseño UI/UX',
-        text: 'Interfaces modernas centradas en el usuario. No solo diseñamos cosas bonitas, creamos experiencias que convierten visitas en clientes.',
+        title: 'Lista para buscadores',
+        text: 'Títulos, descripciones, encabezados y datos estructurados en cada página, y tiempos de carga bajos en celular.',
       },
     ],
     sections: [
@@ -117,13 +117,13 @@ export const serviceContent = [
     highlights: [
       {
         icon: 'bag',
-        title: 'Tienda online',
-        text: 'Sistemas de venta online robustos y escalables. Gestiona inventario, pagos y envíos en una plataforma diseñada para vender 24/7.',
+        title: 'Un catálogo que administras tú',
+        text: 'Agregas, editas o retiras productos desde un panel de inventario, sin volver a pasar por el desarrollo.',
       },
       {
         icon: 'whatsapp',
         title: 'Pedidos directos',
-        text: 'Botón de pedido directo a WhatsApp o pasarela de pago, según lo que tu negocio necesite.',
+        text: 'Cada producto abre una conversación por WhatsApp con el detalle del pedido. Si necesitas cobrar dentro de la tienda, evaluamos una pasarela de pago.',
       },
     ],
     sections: [
@@ -163,9 +163,9 @@ export const serviceContent = [
   {
     slug: 'mantenimiento-web',
     kicker: 'Mantenimiento Web — Ecuador',
-    h1Segments: [{ text: 'Mantenimiento web en Ecuador' }, { break: true }, { text: 'para un sitio siempre activo.', highlight: true }],
+    h1Segments: [{ text: 'Mantenimiento web en Ecuador' }, { break: true }, { text: 'para que tu sitio siga en línea.', highlight: true }],
     intro:
-      'Protegemos tu inversión con soporte técnico continuo: corrección de errores, actualizaciones de seguridad y respaldos constantes para que tu sitio nunca deje de estar online.',
+      'Cuidamos tu sitio después de publicarlo: corregimos errores, aplicamos parches de seguridad y guardamos un respaldo diario para recuperarlo si algo falla.',
     highlights: [
       {
         icon: 'shield',
@@ -217,17 +217,17 @@ export const serviceContent = [
     kicker: 'Rediseño y optimización — Cuenca',
     h1Segments: [{ text: 'Rediseño y optimización' }, { break: true }, { text: 'de páginas web en Cuenca.', highlight: true }],
     intro:
-      '¿Tu página web se quedó en el pasado? Transformamos sitios lentos y antiguos en plataformas rápidas y modernas, mejorando el código y la experiencia móvil sin perder tu esencia de marca.',
+      'Tomamos tu página actual, lenta o difícil de usar en el celular, y la dejamos rápida y clara sin cambiar tu identidad de marca.',
     highlights: [
       {
         icon: 'bolt',
-        title: 'Optimización y rediseño',
-        text: 'Mejora de rendimiento, rediseño adaptativo y limpieza de código para que tu sitio cargue mejor y se vea bien en cualquier pantalla.',
+        title: 'Más rápido y mejor en celular',
+        text: 'Revisamos qué frena tu sitio, quitamos el código que sobra y ajustamos el diseño para pantallas pequeñas.',
       },
       {
         icon: 'shield',
-        title: 'Mantenimiento Web',
-        text: 'Protegemos tu inversión con soporte técnico continuo, actualizaciones de seguridad y respaldos constantes.',
+        title: 'Sin perder lo que ya posiciona',
+        text: 'Mantenemos tus direcciones o las redirigimos con un 301, y conservamos los títulos y textos que ya aparecen en Google.',
       },
     ],
     sections: [

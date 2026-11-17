@@ -19,7 +19,7 @@ function h1Lines(segments) {
     if (s.break) lines.push('');
     else lines[lines.length - 1] = `${lines[lines.length - 1]} ${s.text}`.trim();
   });
-  return lines;
+  return lines.map((l) => l.replace(/\.$/, ''));
 }
 
 // Contenido propio de la pagina local de Cuenca: solo hechos que constan

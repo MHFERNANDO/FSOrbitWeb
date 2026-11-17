@@ -78,6 +78,10 @@ function organizationNode() {
       })),
     },
     sameAs: [contact.instagram],
+    founder: [
+      { '@type': 'Person', name: 'Pablo' },
+      { '@type': 'Person', name: 'Fernando' },
+    ],
     knowsAbout: ['Desarrollo web', 'Diseño UI/UX', 'Tiendas online', 'SEO técnico', 'Optimización de rendimiento web', 'Mantenimiento web'],
   };
 }
@@ -241,5 +245,37 @@ export function articleNode({ path, headline, description, datePublished, dateMo
     author: { '@id': ID.org },
     publisher: { '@id': ID.org },
     mainEntityOfPage: { '@id': `${url}#webpage` },
+  };
+}
+
+// Pasos del proceso de trabajo (pagina /proceso).
+export function howToNode(path, name, steps) {
+  const url = urlOf(path);
+  return {
+    '@type': 'HowTo',
+    '@id': `${url}#howto`,
+    name,
+    inLanguage: 'es-EC',
+    step: steps.map((st, i) => ({
+      '@type': 'HowToStep',
+      position: i + 1,
+      name: st.title,
+      text: st.text,
+    })),
+  };
+}
+
+// Lista de servicios (pagina /servicios).
+export function serviceListNode(path, items) {
+  const url = urlOf(path);
+  return {
+    '@type': 'ItemList',
+    '@id': `${url}#list`,
+    itemListElement: items.map((sv, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      url: urlOf(sv.href),
+      name: sv.title,
+    })),
   };
 }

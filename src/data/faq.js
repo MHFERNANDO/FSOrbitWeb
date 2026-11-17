@@ -214,6 +214,11 @@ export const faqPrecios = [
 // que incluye, rediseno sin perder SEO y hosting.
 export const faqHome = [
   {
+    question: '¿Qué es FS Orbit?',
+    answer:
+      'FS Orbit es un estudio de desarrollo web con base en Cuenca, Azuay. Diseña y programa páginas web, tiendas online y software a medida para negocios de Cuenca y de todo Ecuador, con código propio y sin plantillas.',
+  },
+  {
     question: '¿Cuánto cuesta una página web en Cuenca?',
     answer:
       'Con FS Orbit, una landing page parte desde $200 y una tienda online desde $500. El software a medida se cotiza según el proyecto. El dominio y el hosting van aparte.',

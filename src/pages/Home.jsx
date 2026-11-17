@@ -6,10 +6,12 @@ import Faq from '@/components/Faq';
 import Shot from '@/components/Shot';
 import Closing from '@/components/Closing';
 import OrbitFigure from '@/components/OrbitFigure';
+import ServiceIcon from '@/components/ServiceIcon';
+import SceneRail from '@/components/SceneRail';
 import { usePageSeo } from '@/hooks/usePageSeo';
 import { faqNode } from '@/seo/jsonld';
 import { faqHome } from '@/data/faq';
-import { homeCases, pricingPlans } from '@/data/content';
+import { homeCases, pricingPlans, projects, services } from '@/data/content';
 import { detectTier } from '@/lib/capability';
 import '@/styles/home.css';
 
@@ -17,6 +19,15 @@ import '@/styles/home.css';
 // los dispositivos: con GPU capaz, un solo lienzo WebGL (el objeto en
 // orbita hecho de codigo) acompana el scroll; sin ella, cada escena
 // muestra su figura estatica con la misma informacion.
+const SCENES = [
+  { id: 'inicio', label: 'Inicio' },
+  { id: 'plantillas', label: 'Plantillas' },
+  { id: 'a-medida', label: 'A medida' },
+  { id: 'casos', label: 'Casos' },
+  { id: 'planes', label: 'Planes' },
+  { id: 'servicios', label: 'Servicios' },
+];
+
 export default function Home() {
   usePageSeo({ path: '/', name: 'Diseño de Páginas Web en Cuenca', nodes: [faqNode('/', faqHome)] });
   const journey = useRef(null);
@@ -49,23 +60,24 @@ export default function Home() {
 
   return (
     <main id="main" className="home">
+      <SceneRail items={SCENES} />
       <div className="journey" ref={journey}>
         <div className="stage" aria-hidden="true" />
 
         {/* ------------------------------------------------ 1. Arranque */}
-        <section className="scene scene-1" aria-labelledby="h-inicio">
+        <section className="scene scene-1" id="inicio" aria-labelledby="h-inicio">
           <div className="wrap scene-grid">
             <div className="scene-copy">
               <Display
                 id="h-inicio"
-                lines={['Diseño de páginas web', 'a medida para negocios', 'de Cuenca']}
+                lines={['Páginas web hechas', 'desde cero para', 'negocios de Cuenca']}
                 from={72}
                 to={54}
                 scrub={{ trigger: '.scene-1', start: 'top top', end: 'bottom top' }}
               />
               <p className="lead">
-                FS Orbit diseña y programa tu sitio con código propio, sin plantillas. Hablas directo con Pablo o Fernando, los dos
-                desarrolladores que lo construyen.
+                Diseñamos y programamos tu sitio sin plantillas: claro en el celular, rápido de cargar y con un botón para que tus
+                clientes te escriban por WhatsApp.
               </p>
               <div className="actions" data-dock-hide>
                 <WaButton source="home_hero" />
@@ -73,12 +85,26 @@ export default function Home() {
                   Ver planes desde $200
                 </Link>
               </div>
-              <p className="small muted hero-proof">
-                Sitios publicados para Accu-Lab, Gravity Estudio Creativo, JF Vapes y Laboratorio Diesel MG.{' '}
-                <Link className="link" to="/proyectos">
-                  Ver los casos
-                </Link>
-              </p>
+              <div className="clients">
+                <p className="small muted">Sitios que hemos publicado en Cuenca</p>
+                <ul>
+                  {projects.map((p) => (
+                    <li key={p.slug}>
+                      <Link to={`/proyectos/${p.slug}`}>
+                        <img
+                          src={`/assets/${p.img}-480.webp`}
+                          width="96"
+                          height={Math.round((96 * p.h) / p.w)}
+                          alt=""
+                          decoding="async"
+                          fetchPriority="low"
+                        />
+                        <span>{p.title}</span>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
             <div className="slot" data-slot="a">
               <OrbitFigure />
@@ -87,7 +113,7 @@ export default function Home() {
         </section>
 
         {/* ------------------------------------------------ 2. Problema */}
-        <section className="scene scene-2 scene--pin" aria-labelledby="h-plantilla">
+        <section className="scene scene-2 scene--pin" id="plantillas" aria-labelledby="h-plantilla">
           <div className="scene-pin">
             <div className="wrap scene-grid">
               <div className="scene-copy">
@@ -122,7 +148,7 @@ export default function Home() {
         </section>
 
         {/* ---------------------------------------------------- 3. Giro */}
-        <section className="scene scene-3 scene--pin" aria-labelledby="h-medida">
+        <section className="scene scene-3 scene--pin" id="a-medida" aria-labelledby="h-medida">
           <div className="scene-pin">
             <div className="wrap scene-grid">
               <div className="scene-copy">
@@ -146,8 +172,7 @@ export default function Home() {
                   <li>Adaptada a celular desde el primer día, no como un ajuste posterior.</li>
                 </ul>
                 <p className="small muted">
-                  Esta página está hecha así: el objeto que se transforma, la letra que cambia de ancho y cada línea de texto se
-                  escribieron para FS Orbit.{' '}
+                  Esta misma página está hecha así, sin plantilla.{' '}
                   <Link className="link" to="/proceso">
                     Ver cómo trabajamos
                   </Link>
@@ -172,7 +197,7 @@ export default function Home() {
         </section>
 
         {/* --------------------------------------------------- 4. Casos */}
-        <section className="scene scene-4" aria-labelledby="h-casos">
+        <section className="scene scene-4" id="casos" aria-labelledby="h-casos">
           <div className="wrap cases-head">
             <h2 className="h2" id="h-casos">
               Para quién hemos trabajado
@@ -199,11 +224,9 @@ export default function Home() {
                       <Link className="link" to={`/proyectos/${c.slug}`}>
                         Ver el caso de {c.title}
                       </Link>
-                      {(
-                        <a className="link" href={c.url} target="_blank" rel="noopener noreferrer">
-                          Abrir {new URL(c.url).hostname.replace(/^www\./, '')}
-                        </a>
-                      )}
+                      <a className="link" href={c.url} target="_blank" rel="noopener noreferrer">
+                        Abrir {new URL(c.url).hostname.replace(/^www\./, '')}
+                      </a>
                     </div>
                   </div>
                   <div className="figure case-figure">
@@ -216,7 +239,7 @@ export default function Home() {
         </section>
 
         {/* -------------------------------------------------- 5. Cierre */}
-        <section className="scene scene-5" aria-labelledby="h-planes">
+        <section className="scene scene-5" id="planes" aria-labelledby="h-planes">
           <div className="wrap">
             <div className="scene-grid plans-head">
               <div className="scene-copy">
@@ -241,7 +264,10 @@ export default function Home() {
                       {plan.kind}, {plan.scope.toLowerCase()}
                     </p>
                   </div>
-                  <p className="ledger-desc muted">{plan.description}</p>
+                  <div className="ledger-desc">
+                    <p className="muted">{plan.description}</p>
+                    <p className="ledger-ideal">{plan.idealFor}</p>
+                  </div>
                   <ul className="ticks">
                     {plan.includes.slice(0, 4).map((f) => (
                       <li key={f}>{f}</li>
@@ -260,6 +286,36 @@ export default function Home() {
           </div>
         </section>
       </div>
+
+      <section className="rule" id="servicios" aria-labelledby="h-servicios">
+        <div className="wrap section">
+          <div className="split">
+            <div className="stack-sm sticky">
+              <h2 className="h2" id="h-servicios">
+                Qué hacemos
+              </h2>
+              <p className="muted">Cinco servicios, todos con código propio. Elige por lo que necesita tu negocio hoy.</p>
+              <p>
+                <Link className="link" to="/servicios">
+                  Ver los servicios y cómo elegir
+                </Link>
+              </p>
+            </div>
+            <div className="rows">
+              {services.map((sv) => (
+                <Link className="row row--svc" to={sv.href} key={sv.slug}>
+                  <ServiceIcon slug={sv.slug} />
+                  <div>
+                    <h3 className="h3 row-title">{sv.title}</h3>
+                    <p>{sv.short}</p>
+                  </div>
+                  <span className="row-meta">{sv.from}</span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
 
       <section className="rule" aria-labelledby="h-faq">
         <div className="wrap section split">

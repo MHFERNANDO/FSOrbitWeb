@@ -153,6 +153,10 @@ html.seq-on .seq-canvas {
     transform: rotate(360deg);
   }
 }
+/* Con el modelo, el dibujo fijo no se pinta (y no compite por el LCP). */
+html.seq .orbit-figure {
+  display: none;
+}
 html.seq-on .orbit-figure {
   opacity: 0;
 }
@@ -344,13 +348,11 @@ html.seq-on .orbit-figure {
     align-items: start;
     padding-top: 8px;
   }
+  /* Mismo alto con y sin modelo: el hueco no cambia al cargar (CLS 0). */
   .scene-1 .slot {
-    height: 24vh;
-    height: 24svh;
-  }
-  .scene-1 .slot .figure {
-    inset: -14% 0;
-    height: 128%;
+    height: 36vh;
+    height: 36svh;
+    max-width: none;
   }
   .scene-1 .scene-grid {
     gap: 12px;
@@ -465,5 +467,27 @@ html.seq .slot--end {
 @media (prefers-reduced-motion: reduce) {
   html:not([data-motion='on']) .orbit-spin {
     animation: none;
+  }
+}
+
+/* Celular primero: el modelo tiene mas presencia en el inicio y hace de
+   monitor en cada caso, con la captura de ese caso en su pantalla. */
+.slot--case {
+  display: none;
+}
+@media (max-width: 899px) {
+  html.seq .case-figure {
+    display: none;
+  }
+  html.seq .slot--case {
+    display: block;
+    order: -1;
+    width: 100%;
+    max-width: none;
+    height: auto;
+    aspect-ratio: 1 / 0.56;
+  }
+  html.seq .slot--faq {
+    display: none;
   }
 }

@@ -1,22 +1,28 @@
 // El modelo de la home: 180 cuadros renderizados en Blender
 // (scripts/blender/orbita.py) que se dibujan en un lienzo con el scroll.
 //
-// Donde se dibuja: cada escena reserva un hueco ([data-slot]). En
-// escritorio el modelo viaja de un hueco al siguiente mientras bajas; en
-// celular aparece en el hueco de cada escena (se funde entre uno y otro),
-// asi nunca pasa por encima del texto.
+// Donde se dibuja: cada seccion reserva un hueco ([data-slot]). En
+// escritorio el modelo viaja de un hueco al siguiente mientras bajas; si
+// el siguiente esta en la otra columna, o en celular, se apaga en uno y se
+// enciende en el otro (con un leve cambio de escala), asi nunca pasa por
+// encima del texto.
 //
 // Que cuadro: lo decide la posicion del scroll. Al inicio y al final el
-// atomo gira solo (dos loops de 24 cuadros). En los casos, el codigo forma
-// un monitor y en su pantalla se dibuja la captura del caso que estas
-// leyendo.
+// logo gira solo (dos loops de 24 cuadros). En los casos el codigo forma
+// un monitor y en su pantalla se dibuja la captura del caso.
+//
+// Con "reducir movimiento" el modelo sigue cambiando solo cuando la
+// persona hace scroll: sin giros automaticos ni viajes, solo fundidos.
 import { initScroll } from '@/lib/scroll';
+import { motionAllowed } from '@/lib/capability';
 import { homeCases } from '@/data/content';
 import screen from './screen.json';
 
 const FRAMES = screen.frames;
-const LOOP_A = [0, 23];
-const LOOP_B = [156, 179];
+const HOLD = screen.hold ?? 131;
+const LOOP_A = 0;
+const LOOP_B = 156;
+const LOOP_LEN = 24;
 const LOOP_FPS = 12;
 
 const smooth = (x) => {
@@ -28,6 +34,7 @@ const lerp = (a, b, t) => a + (b - a) * t;
 export async function startSequence(root) {
   const { gsap } = await initScroll();
   const mobile = window.matchMedia('(max-width: 899px)').matches;
+  const calm = !motionAllowed();
   // 720 px en escritorio, 480 en celular (los huecos miden menos).
   const dir = `/seq/${mobile ? 480 : 720}`;
 
@@ -50,8 +57,8 @@ export async function startSequence(root) {
   resize();
 
   // ---------------------------------------------------------- cuadros
-  // Orden de carga: el loop del inicio, luego uno de cada seis (para tener
-  // algo que mostrar en cualquier punto) y despues el resto.
+  // Orden de carga: el loop del inicio, uno de cada seis (para tener algo
+  // en cualquier punto) y despues el resto.
   const images = new Array(FRAMES).fill(null);
   const order = [];
   const seen = new Set();
@@ -61,11 +68,13 @@ export async function startSequence(root) {
       order.push(i);
     }
   };
-  for (let i = LOOP_A[0]; i <= LOOP_A[1]; i++) push(i);
+  for (let i = 0; i < LOOP_LEN; i++) push(LOOP_A + i);
   for (let i = 0; i < FRAMES; i += 6) push(i);
+  push(HOLD);
   for (let i = 0; i < FRAMES; i++) push(i);
 
   let alive = true;
+  let dirty = true;
   let cursor = 0;
   function loadNext() {
     if (!alive || cursor >= order.length) return;
@@ -93,17 +102,18 @@ export async function startSequence(root) {
     return null;
   }
 
-  // Capturas de los casos para la pantalla del monitor (solo escritorio).
+  // Capturas de los casos para la pantalla del monitor.
   const shots = homeCases.map((c) => {
     const img = new Image();
     img.decoding = 'async';
-    img.src = `/assets/${c.img}-960.webp`;
+    img.src = `/assets/${c.img}-${mobile ? 480 : 960}.webp`;
+    img.onload = () => (dirty = true);
     return img;
   });
 
   // ---------------------------------------------------------- medidas
   const q = (sel) => root.querySelector(sel);
-  // Los huecos de servicios y del cierre estan fuera del recorrido.
+  // Los huecos de servicios, preguntas y cierre estan fuera del recorrido.
   const page = root.closest('main') || document;
   const slots = [...page.querySelectorAll('[data-slot]')];
   const steps = [...root.querySelectorAll('.case-step')];
@@ -121,17 +131,20 @@ export async function startSequence(root) {
     const s4 = q('.scene-4');
     const cases = q('.cases');
     const s5 = q('.scene-5');
-    marks = {
-      t1: span(s2, 0.55),
-      t2: span(s3, 0.55),
-      t3: [top(s4) - vh * 0.6, top(cases) - vh * 0.05],
-      t4: [top(s5) - vh * 0.75, top(s5) - vh * 0.15],
-    };
-    if (mobile) {
-      // Sin escenas fijas: la transformacion ocurre mientras la escena entra.
-      marks.t1 = [top(s2) - vh * 0.7, top(s2) + vh * 0.1];
-      marks.t2 = [top(s3) - vh * 0.7, top(s3) + vh * 0.1];
-    }
+    marks = mobile
+      ? {
+          // Sin escenas fijas: cada cambio ocurre mientras su seccion entra.
+          t1: [top(s2) - vh * 0.75, top(s2) + vh * 0.05],
+          t2: [top(s3) - vh * 0.75, top(s3) + vh * 0.05],
+          t3: [top(s4) - vh * 0.6, top(cases) - vh * 0.2],
+          t4: [top(s5) - vh * 0.8, top(s5) - vh * 0.1],
+        }
+      : {
+          t1: span(s2, 0.55),
+          t2: span(s3, 0.55),
+          t3: [top(s4) - vh * 0.6, top(cases) - vh * 0.05],
+          t4: [top(s5) - vh * 0.75, top(s5) - vh * 0.15],
+        };
   }
   measure();
 
@@ -139,66 +152,82 @@ export async function startSequence(root) {
   function frameAt(y, time) {
     const m = marks;
     const seg = ([a, b], f0, f1) => Math.round(lerp(f0, f1, Math.min(1, Math.max(0, (y - a) / (b - a)))));
-    if (y < m.t1[0]) return LOOP_A[0] + (Math.floor(time * LOOP_FPS) % 24);
+    const loop = (base) => (calm ? base : base + (Math.floor(time * LOOP_FPS) % LOOP_LEN));
+    if (y < m.t1[0]) return loop(LOOP_A);
     if (y <= m.t1[1]) return seg(m.t1, 24, 59);
     if (y < m.t2[0]) return 59;
     if (y <= m.t2[1]) return seg(m.t2, 60, 95);
     if (y < m.t3[0]) return 95;
-    if (y <= m.t3[1]) return seg(m.t3, 96, 131);
-    if (y < m.t4[0]) return 131;
-    if (y <= m.t4[1]) return seg(m.t4, 132, 155);
-    return LOOP_B[0] + (Math.floor(time * LOOP_FPS) % 24);
+    if (y <= m.t3[1]) return seg(m.t3, 96, HOLD);
+    if (y < m.t4[0]) return HOLD;
+    if (y <= m.t4[1]) return seg(m.t4, HOLD + 1, 155);
+    return loop(LOOP_B);
   }
 
-  // Huecos visibles en este momento, en orden de la pagina.
+  // Huecos con tamano, en orden de la pagina. Cada uno puede recortar
+  // arriba y abajo el cuadro (data-crop) para usar mejor un hueco ancho.
   function slotRects() {
-    return slots
-      .map((el) => ({ el, r: el.getBoundingClientRect() }))
-      .filter(({ r }) => r.width > 0 && r.height > 0)
-      .map(({ el, r }) => {
-        const s = Math.min(r.width, r.height);
-        return { el, x: r.left + (r.width - s) / 2, y: r.top + (r.height - s) / 2, s, cy: r.top + r.height / 2 };
-      });
+    const out = [];
+    for (const el of slots) {
+      const r = el.getBoundingClientRect();
+      if (!r.width || !r.height) continue;
+      const crop = parseFloat(el.dataset.crop || '0');
+      const aspect = 1 / (1 - 2 * crop);
+      const w = Math.min(r.width, r.height * aspect);
+      const h = w / aspect;
+      out.push({ el, crop, x: r.left + (r.width - w) / 2, y: r.top + (r.height - h) / 2, w, h, cy: r.top + r.height / 2 });
+    }
+    return out;
   }
 
-  // Donde dibujar: lista de { x, y, s, alpha }.
+  // Donde dibujar: lista de rectangulos con su opacidad.
   function placements() {
     const rects = slotRects();
     if (!rects.length) return [];
     const c = H * 0.5;
-    let i = rects.findIndex((r) => r.cy > c);
+    const i = rects.findIndex((r) => r.cy > c);
     if (i === -1) return [{ ...rects[rects.length - 1], alpha: 1 }];
     if (i === 0) return [{ ...rects[0], alpha: 1 }];
     const a = rects[i - 1];
     const b = rects[i];
     const t = (c - a.cy) / (b.cy - a.cy);
-    // En celular, o cuando el siguiente hueco esta en la otra columna, el
-    // modelo no cruza por encima del texto: se apaga en un hueco y se
-    // enciende en el otro.
-    if (mobile || Math.abs(b.x - a.x) > W * 0.25) {
-      const k = smooth((t - 0.35) / 0.3);
+    if (calm || mobile || Math.abs(b.x - a.x) > W * 0.25) {
+      const k = smooth((t - 0.32) / 0.36);
+      const grow = (r, s) => ({ ...r, x: r.x + (r.w * (1 - s)) / 2, y: r.y + (r.h * (1 - s)) / 2, w: r.w * s, h: r.h * s });
       return [
-        { ...a, alpha: 1 - k },
-        { ...b, alpha: k },
+        { ...grow(a, 1 - 0.1 * k), alpha: 1 - k },
+        { ...grow(b, 0.9 + 0.1 * k), alpha: k },
       ].filter((p) => p.alpha > 0.01);
     }
     const k = smooth((t - 0.2) / 0.6);
-    return [{ x: lerp(a.x, b.x, k), y: lerp(a.y, b.y, k), s: lerp(a.s, b.s, k), alpha: 1, el: k < 0.5 ? a.el : b.el }];
+    const near = k < 0.5 ? a : b;
+    return [
+      {
+        el: near.el,
+        crop: near.crop,
+        x: lerp(a.x, b.x, k),
+        y: lerp(a.y, b.y, k),
+        w: lerp(a.w, b.w, k),
+        h: lerp(a.h, b.h, k),
+        alpha: 1,
+      },
+    ];
   }
 
-  // Caso que se esta leyendo (para la pantalla del monitor).
+  // Caso que se esta leyendo (para el monitor fijo de escritorio).
   function caseMix() {
-    const c = H * 0.5;
-    // Se toma el texto del caso (mitad superior del paso), no su centro: la
+    // El caso cambia cuando su texto entra al ultimo cuarto de la pantalla.
+    const c = H * 0.75;
+    // Se toma el texto del caso (parte alta del paso), no su centro: la
     // pantalla cambia cuando empiezas a leer el siguiente.
-    const centers = steps.map((el) => {
+    const marksY = steps.map((el) => {
       const r = el.getBoundingClientRect();
       return r.top + r.height * 0.3;
     });
-    let i = centers.findIndex((y) => y > c);
-    if (i === -1) return [[centers.length - 1, 1]];
+    const i = marksY.findIndex((y) => y > c);
+    if (i === -1) return [[marksY.length - 1, 1]];
     if (i === 0) return [[0, 1]];
-    const t = smooth(((c - centers[i - 1]) / (centers[i] - centers[i - 1]) - 0.15) / 0.3);
+    const t = smooth(((c - marksY[i - 1]) / (marksY[i] - marksY[i - 1]) - 0.15) / 0.3);
     return [
       [i - 1, 1 - t],
       [i, t],
@@ -206,37 +235,51 @@ export async function startSequence(root) {
   }
 
   // ---------------------------------------------------------- dibujo
-  let dirty = true;
   let lastKey = '';
   let shown = false;
+  const half = (screen.screenTo - screen.screenFrom) / 2;
+  let lastY = -1;
+  let lastF = -1;
   function draw(time) {
     const y = window.scrollY;
     const f = frameAt(y, time);
+    // Sin scroll, sin cambio de cuadro y sin nada nuevo cargado: nada que hacer.
+    if (!dirty && y === lastY && f === lastF) return;
+    lastY = y;
+    lastF = f;
     const places = placements();
-    const key = `${f}|${places.map((p) => `${p.x | 0},${p.y | 0},${p.s | 0},${p.alpha.toFixed(2)}`).join(';')}`;
+    const key = `${f}|${places.map((p) => `${p.x | 0},${p.y | 0},${p.w | 0},${p.alpha.toFixed(2)}`).join(';')}`;
     if (!dirty && key === lastKey) return;
     const img = nearestLoaded(f);
-    if (!img) return;
+    if (!img) {
+      lastF = -1;
+      return;
+    }
     lastKey = key;
     dirty = false;
 
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, W, H);
-    const screenOn = !mobile && f >= screen.screenFrom && f <= screen.screenTo ? smooth(1 - Math.abs(f - 131) / 11) : 0;
+    const screenOn = smooth(1 - Math.abs(f - HOLD) / half);
+    const n = img.naturalWidth;
     for (const p of places) {
+      const band = 1 - 2 * p.crop;
       ctx.globalAlpha = p.alpha;
-      ctx.drawImage(img, p.x, p.y, p.s, p.s);
-      if (screenOn > 0 && p.el?.dataset.slot === 'd') {
-        const sx = p.x + screen.x * p.s;
-        const sy = p.y + screen.y * p.s;
-        const sw = screen.w * p.s;
-        const sh = screen.h * p.s;
-        for (const [k, w] of caseMix()) {
-          const shot = shots[k];
-          if (!shot?.complete || !shot.naturalWidth || w <= 0) continue;
-          ctx.globalAlpha = p.alpha * screenOn * w;
-          ctx.drawImage(shot, sx, sy, sw, sh);
-        }
+      ctx.drawImage(img, 0, p.crop * n, n, band * n, p.x, p.y, p.w, p.h);
+
+      // Pantalla del monitor: la captura del caso correspondiente.
+      const kind = p.el?.dataset.slot;
+      if (screenOn <= 0 || (kind !== 'd' && kind !== 'case')) continue;
+      const sx = p.x + screen.x * p.w;
+      const sy = p.y + ((screen.y - p.crop) / band) * p.h;
+      const sw = screen.w * p.w;
+      const sh = (screen.h / band) * p.h;
+      const mix = kind === 'case' ? [[Number(p.el.dataset.case), 1]] : caseMix();
+      for (const [k, w] of mix) {
+        const shot = shots[k];
+        if (!shot?.complete || !shot.naturalWidth || w <= 0) continue;
+        ctx.globalAlpha = p.alpha * screenOn * w;
+        ctx.drawImage(shot, sx, sy, sw, sh);
       }
     }
     ctx.globalAlpha = 1;
@@ -253,6 +296,7 @@ export async function startSequence(root) {
   const onResize = () => {
     resize();
     dirty = true;
+    lastY = -1;
     if (!mobile || window.innerWidth !== lastW) measure();
     lastW = window.innerWidth;
   };

@@ -69,8 +69,8 @@ export default function Home() {
               <Display
                 id="h-inicio"
                 lines={['Páginas web hechas', 'desde cero para', 'negocios de Cuenca']}
-                from={72}
-                to={54}
+                from={110}
+                to={94}
                 scrub={{ trigger: '.scene-1', start: 'top top', end: 'bottom top' }}
               />
               <p className="lead">
@@ -119,10 +119,10 @@ export default function Home() {
                   as="h2"
                   id="h-plantilla"
                   lines={['Una plantilla trata', 'igual a todos', 'los negocios']}
-                  from={84}
-                  to={50}
+                  from={122}
+                  to={78}
                   wrap={false}
-                  mobile={[66, 50]}
+                  mobile={[112, 80]}
                   scrub={{ trigger: '.scene-2', start: 'top 60%', end: 'bottom 80%' }}
                 />
                 <p>
@@ -154,10 +154,10 @@ export default function Home() {
                   as="h2"
                   id="h-medida"
                   lines={['El tuyo lo escribimos', 'línea por línea']}
-                  from={50}
-                  to={96}
+                  from={78}
+                  to={122}
                   wrap={false}
-                  mobile={[50, 70]}
+                  mobile={[80, 112]}
                   scrub={{ trigger: '.scene-3', start: 'top 70%', end: 'top -30%' }}
                 />
                 <p>
@@ -211,7 +211,7 @@ export default function Home() {
                 <div className="slot" data-slot="d" />
               </div>
             </div>
-            {homeCases.map((c) => (
+            {homeCases.map((c, i) => (
               <article className="case-step" key={c.slug}>
                 <div className="wrap scene-grid">
                   <div className="scene-copy">
@@ -230,6 +230,8 @@ export default function Home() {
                   <div className="figure case-figure">
                     <Shot project={c} sizes="(min-width: 900px) 52vw, 100vw" />
                   </div>
+                  {/* En celular, el monitor del modelo muestra esta captura. */}
+                  <div className="slot slot--case" data-slot="case" data-case={i} data-crop="0.22" aria-hidden="true" />
                 </div>
               </article>
             ))}
@@ -318,9 +320,12 @@ export default function Home() {
 
       <section className="rule" aria-labelledby="h-faq">
         <div className="wrap section split">
-          <h2 className="h2 sticky" id="h-faq">
-            Preguntas frecuentes
-          </h2>
+          <div className="stack-sm sticky">
+            <h2 className="h2" id="h-faq">
+              Preguntas frecuentes
+            </h2>
+            <div className="slot slot--side slot--faq" data-slot="faq" aria-hidden="true" />
+          </div>
           <Faq items={faqHome} />
         </div>
       </section>

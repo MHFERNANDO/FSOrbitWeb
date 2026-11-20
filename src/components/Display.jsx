@@ -3,7 +3,7 @@ import { fitOf } from '@/lib/fit';
 import { initScroll } from '@/lib/scroll';
 import { motionAllowed } from '@/lib/capability';
 
-// Titular en Anybody cuyo ancho (eje wdth) cambia con el scroll.
+// Titular en Mona Sans cuyo ancho (eje wdth, 75-125) cambia con el scroll.
 //  lines   -> cada elemento es una linea (sin corte en pantallas anchas)
 //  from/to -> ancho al empezar y al terminar el tramo de scroll
 //  scrub   -> false (quieto) | { trigger, start, end } (ScrollTrigger)
@@ -12,11 +12,11 @@ import { motionAllowed } from '@/lib/capability';
 export default function Display({
   as: Tag = 'h1',
   lines,
-  from = 84,
-  to = 60,
+  from = 112,
+  to = 100,
   scrub = { start: 0, end: 560 },
   wrap = true,
-  mobile = [64, 50],
+  mobile = [104, 96],
   cap,
   className = '',
   id,

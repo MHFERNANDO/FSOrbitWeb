@@ -1,6 +1,6 @@
 // Genera scripts/source/og-image.png (1200x630) con Puppeteer y, de paso,
 // public/assets/og-image.jpg, que es la que se publica. Usa lo mismo que
-// el sitio: negro, el cian del logo, Anybody e Instrument Sans (las
+// el sitio: negro, el cian del logo, Mona Sans e Instrument Sans (las
 // fuentes autoalojadas de public/fonts) y el atomo de codigo de la home.
 // Se corre a mano porque es un asset de marca, no depende de cada build:
 //   node scripts/generate-og-image.mjs
@@ -20,8 +20,8 @@ const CODE = [
 ];
 
 async function buildHtml() {
-  const [anybody, instrument, mono, emblem] = await Promise.all([
-    b64('public/fonts/anybody-variable-latin.woff2'),
+  const [display, instrument, mono, emblem] = await Promise.all([
+    b64('public/fonts/mona-sans-variable-latin.woff2'),
     b64('public/fonts/instrument-sans-variable-latin.woff2'),
     b64('public/fonts/jetbrains-mono-variable-latin.woff2'),
     b64('public/icon-192.png'),
@@ -37,15 +37,15 @@ async function buildHtml() {
 <head>
 <meta charset="utf-8">
 <style>
-  @font-face { font-family: Anybody; src: url(data:font/woff2;base64,${anybody}); font-weight: 100 900; font-stretch: 50% 150%; }
+  @font-face { font-family: Display; src: url(data:font/woff2;base64,${display}); font-weight: 200 900; font-stretch: 75% 125%; }
   @font-face { font-family: Instrument; src: url(data:font/woff2;base64,${instrument}); font-weight: 400 700; }
   @font-face { font-family: Mono; src: url(data:font/woff2;base64,${mono}); font-weight: 400 700; }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html, body { width: 1200px; height: 630px; overflow: hidden; }
   body { position: relative; background: #000; color: #eaf2f2; font-family: Instrument, sans-serif; padding: 64px 72px; display: flex; flex-direction: column; }
-  .brand { display: flex; align-items: center; gap: 16px; font-family: Anybody; font-weight: 800; font-stretch: 92%; font-size: 30px; }
+  .brand { display: flex; align-items: center; gap: 16px; font-family: Display; font-weight: 680; font-stretch: 112%; font-size: 30px; }
   .brand img { width: 56px; height: 56px; border-radius: 50%; }
-  h1 { margin-top: auto; max-width: 700px; font-family: Anybody; font-weight: 800; font-stretch: 66%; font-size: 80px; line-height: .98; letter-spacing: -.012em; }
+  h1 { margin-top: auto; max-width: 700px; font-family: Display; font-weight: 640; font-stretch: 104%; font-size: 70px; line-height: 1; letter-spacing: -.025em; }
   p { margin-top: 24px; max-width: 680px; font-size: 28px; line-height: 1.4; color: #93a6a8; }
   .url { margin-top: 28px; font-size: 24px; font-weight: 600; color: #00f3fb; }
   svg { position: absolute; right: -70px; top: 50%; width: 540px; height: 540px; transform: translateY(-50%); overflow: visible; }

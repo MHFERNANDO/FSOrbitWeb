@@ -1,13 +1,13 @@
 @import 'tailwindcss';
 
 /* ------------------------------------------------------------------ fuentes
-   Autoalojadas, subset latin, display swap. Anybody trae dos ejes: peso
-   (100-900) y ancho (50-150); el ancho es el que se mueve con el scroll. */
+   Autoalojadas, subset latin, display swap. Mona Sans trae dos ejes: peso
+   (200-900) y ancho (75-125); el ancho es el que se mueve con el scroll. */
 @font-face {
-  font-family: 'Anybody';
-  src: url('/fonts/anybody-variable-latin.woff2') format('woff2');
-  font-weight: 100 900;
-  font-stretch: 50% 150%;
+  font-family: 'Mona Sans';
+  src: url('/fonts/mona-sans-variable-latin.woff2') format('woff2');
+  font-weight: 560 700;
+  font-stretch: 78% 122%;
   font-display: swap;
 }
 @font-face {
@@ -47,7 +47,7 @@
   --color-line: #1d292b;
   --color-warn: #ffb38a;
 
-  --font-display: 'Anybody', 'Arial Narrow', system-ui, sans-serif;
+  --font-display: 'Mona Sans', 'Instrument Fallback', system-ui, sans-serif;
   --font-body: 'Instrument Sans', 'Instrument Fallback', system-ui, sans-serif;
   --font-code: 'JetBrains Mono', ui-monospace, 'Cascadia Mono', Menlo, monospace;
 }
@@ -183,19 +183,19 @@ html.lenis body {
 .h2 {
   font-family: var(--font-display);
   font-size: var(--fs-h2);
-  font-weight: 700;
-  font-stretch: 80%;
-  line-height: 1.02;
-  letter-spacing: -0.012em;
+  font-weight: 640;
+  font-stretch: 108%;
+  line-height: 1.04;
+  letter-spacing: -0.022em;
   text-wrap: balance;
 }
 .h3 {
   font-family: var(--font-display);
   font-size: var(--fs-h3);
-  font-weight: 650;
-  font-stretch: 88%;
-  line-height: 1.15;
-  letter-spacing: -0.005em;
+  font-weight: 600;
+  font-stretch: 104%;
+  line-height: 1.18;
+  letter-spacing: -0.012em;
 }
 .lead {
   font-size: var(--fs-lead);
@@ -254,11 +254,11 @@ html.lenis body {
 .display-in {
   display: block;
   font-family: var(--font-display);
-  font-weight: 700;
-  font-stretch: calc(var(--wd, 70) * 1%);
+  font-weight: 640;
+  font-stretch: calc(var(--wd, 108) * 1%);
   font-size: min(calc(100cqi / var(--fit, 12)), var(--cap, 4.5rem));
-  line-height: 1.02;
-  letter-spacing: -0.012em;
+  line-height: 1;
+  letter-spacing: -0.025em;
 }
 .display-in > span {
   display: block;
@@ -266,12 +266,12 @@ html.lenis body {
 }
 @media (max-width: 767px) {
   .display:not(.display--wrap) .display-in {
-    font-stretch: calc(var(--wm, 60) * 1%);
+    font-stretch: calc(var(--wm, 100) * 1%);
     font-size: min(calc(100cqi / var(--fit-m, 12)), var(--cap, 2.625rem));
   }
   .display--wrap .display-in {
-    font-size: clamp(1.875rem, 8.4vw, 2.5rem);
-    font-stretch: 66%;
+    font-size: clamp(1.875rem, 8.6vw, 2.5rem);
+    font-stretch: 100%;
     line-height: 1.04;
     text-wrap: balance;
   }
@@ -362,10 +362,10 @@ html.lenis body {
   align-items: center;
   gap: 10px;
   font-family: var(--font-display);
-  font-weight: 800;
-  font-stretch: 92%;
+  font-weight: 680;
+  font-stretch: 112%;
   font-size: 1.125rem;
-  letter-spacing: 0.01em;
+  letter-spacing: -0.01em;
 }
 .brand img {
   width: 34px;
@@ -466,9 +466,10 @@ html.lenis body {
   display: block;
   padding: 10px 0;
   font-family: var(--font-display);
-  font-weight: 700;
-  font-stretch: 70%;
-  font-size: clamp(1.75rem, 8vw, 2.5rem);
+  font-weight: 620;
+  font-stretch: 106%;
+  letter-spacing: -0.02em;
+  font-size: clamp(1.75rem, 8vw, 2.375rem);
   line-height: 1.05;
 }
 .sheet-links a[aria-current='page'] {
@@ -614,8 +615,8 @@ html.lenis body {
   cursor: pointer;
   list-style: none;
   font-family: var(--font-display);
-  font-weight: 600;
-  font-stretch: 90%;
+  font-weight: 560;
+  font-stretch: 102%;
   font-size: clamp(1.0625rem, 0.3vw + 1rem, 1.1875rem);
   line-height: 1.25;
 }
@@ -660,9 +661,10 @@ html.lenis body {
 }
 .ledger-price {
   font-family: var(--font-display);
-  font-weight: 700;
-  font-stretch: 70%;
-  font-size: clamp(2rem, 2.8vw, 2.875rem);
+  font-weight: 640;
+  font-stretch: 108%;
+  letter-spacing: -0.02em;
+  font-size: clamp(1.875rem, 2.6vw, 2.625rem);
   line-height: 1;
   color: var(--color-cyan);
   white-space: nowrap;
@@ -899,8 +901,8 @@ a.row {
   border-radius: 50%;
   background: var(--color-black);
   font-family: var(--font-display);
-  font-weight: 700;
-  font-stretch: 80%;
+  font-weight: 600;
+  font-stretch: 100%;
   color: var(--color-cyan);
 }
 .step:last-child {
@@ -1070,8 +1072,9 @@ a.row {
 .article h2 {
   margin: 2em 0 0.6em;
   font-family: var(--font-display);
-  font-weight: 650;
-  font-stretch: 84%;
+  font-weight: 600;
+  font-stretch: 104%;
+  letter-spacing: -0.015em;
   font-size: clamp(1.375rem, 1vw + 1rem, 1.75rem);
   line-height: 1.12;
 }

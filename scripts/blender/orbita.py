@@ -1,15 +1,16 @@
 # El objeto de la home, hecho de codigo, renderizado en Blender.
 #
-# 240 caracteres de codigo en 3D (JetBrains Mono, extruidos) mas cuatro
-# orbitas finas. Cada cuadro se calcula aqui mismo, sin keyframes: es un
-# recorrido de 180 cuadros que la web reproduce con el scroll.
+# Es el logo de FS Orbit construido con caracteres de codigo en 3D
+# (JetBrains Mono, extruidos): cuatro orbitas, el circulo central con "FS",
+# el anillo exterior y una nube de codigo tenue alrededor, con profundidad
+# de campo. Cada cuadro se calcula aqui mismo, sin keyframes.
 #
-#   0-23     atomo del logo girando 45 grados (loop perfecto: 4 orbitas)
-#   24-59    el atomo se aplana en 9 cajas grises identicas (la plantilla)
+#   0-23     el logo gira 45 grados (loop perfecto: todo es simetrico)
+#   24-59    se aplana en 9 cajas grises identicas (la plantilla)
 #   60-95    las cajas se desordenan y se arman como un layout a medida
 #   96-131   el codigo forma un monitor; la web dibuja el caso en la pantalla
-#   132-155  el monitor vuelve a ser atomo
-#   156-179  atomo girando (loop) hasta el final de la pagina
+#   132-155  el monitor vuelve a ser el logo
+#   156-179  el logo gira (loop) hasta el final de la pagina
 #
 # Uso (Blender 5.2):
 #   blender -b -P scripts/blender/orbita.py -- <carpeta_png> <screen.json> [lado_px] [desde] [hasta]
@@ -31,13 +32,15 @@ F_FROM = int(argv[3]) if len(argv) > 3 else 0
 F_TO = int(argv[4]) if len(argv) > 4 else 179
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-FONT = os.path.normpath(os.path.join(HERE, '..', '..', '..', 'FSOrbit Contenido', 'brand', 'fonts', 'JetBrainsMono-Bold.ttf'))
+FONTS = os.path.normpath(os.path.join(HERE, '..', '..', '..', 'FSOrbit Contenido', 'brand', 'fonts'))
 
 random.seed(7)
-N = 240
+N = 400  # caracteres que forman las figuras
+DUST_SEED = 18  # x8 = caracteres de la nube de fondo
 GLYPHS = '{}<>/;=()[]:.+*&|!?#$_%@~abcdefghijklmnopqrstuvwxyz0123456789'
 
 CYAN = (0.0, 0.92, 0.97)
+SOFT = (0.42, 0.97, 1.0)
 DEEP = (0.02, 0.36, 0.38)
 BONE = (0.86, 0.93, 0.93)
 LEAD = (0.22, 0.25, 0.26)
@@ -58,7 +61,7 @@ scene.render.image_settings.file_format = 'PNG'
 scene.render.image_settings.color_mode = 'RGB'
 scene.render.film_transparent = False
 try:
-    scene.eevee.taa_render_samples = 48
+    scene.eevee.taa_render_samples = 64
 except AttributeError:
     pass
 try:
@@ -71,21 +74,41 @@ world.use_nodes = True
 world.node_tree.nodes['Background'].inputs[0].default_value = (0, 0, 0, 1)
 scene.world = world
 
+CAM_D = 9.5
 cam_data = bpy.data.cameras.new('cam')
 cam_data.lens = 85
+cam_data.dof.use_dof = True
+cam_data.dof.focus_distance = CAM_D
+cam_data.dof.aperture_fstop = 1.2
 cam = bpy.data.objects.new('cam', cam_data)
-cam.location = (0, -9.5, 0)
-cam.rotation_euler = (math.pi / 2, 0, 0)
 scene.collection.objects.link(cam)
 scene.camera = cam
 
-light_data = bpy.data.lights.new('luz', type='AREA')
-light_data.energy = 260
-light_data.size = 4
-light = bpy.data.objects.new('luz', light_data)
-light.location = (-3, -5, 4)
-light.rotation_euler = (math.radians(55), 0, math.radians(-30))
-scene.collection.objects.link(light)
+
+def place_camera(yaw, pitch):
+    """Camara en orbita alrededor del origen, mirando al centro."""
+    x = CAM_D * math.sin(yaw) * math.cos(pitch)
+    y = -CAM_D * math.cos(yaw) * math.cos(pitch)
+    z = CAM_D * math.sin(pitch)
+    cam.location = (x, y, z)
+    direction = Vector((0, 0, 0)) - Vector((x, y, z))
+    cam.rotation_euler = direction.to_track_quat('-Z', 'Y').to_euler()
+
+
+place_camera(0, 0)
+
+for name, energy, loc, rot in (
+    ('clave', 300, (-3, -5, 4), (55, 0, -30)),
+    ('contra', 160, (4, 3, 2), (-60, 0, 140)),
+):
+    ld = bpy.data.lights.new(name, type='AREA')
+    ld.energy = energy
+    ld.size = 4
+    ld.color = (0.75, 1.0, 1.0)
+    lo = bpy.data.objects.new(name, ld)
+    lo.location = loc
+    lo.rotation_euler = tuple(math.radians(a) for a in rot)
+    scene.collection.objects.link(lo)
 
 
 def make_material(name, strength):
@@ -107,46 +130,73 @@ def make_material(name, strength):
     return mat
 
 
-glyph_mat = make_material('codigo', 2.2)
-ring_mat = make_material('orbita', 1.4)
+glyph_mat = make_material('codigo', 2.4)
+ring_mat = make_material('orbita', 1.6)
+dust_mat = make_material('nube', 1.2)
 
-font = bpy.data.fonts.load(FONT) if os.path.exists(FONT) else None
+mono = os.path.join(FONTS, 'JetBrainsMono-Bold.ttf')
+sans = os.path.join(FONTS, 'Archivo-Bold.ttf')
+font_mono = bpy.data.fonts.load(mono) if os.path.exists(mono) else None
+font_sans = bpy.data.fonts.load(sans) if os.path.exists(sans) else None
 
-# ------------------------------------------------------------ caracteres
-tiles = []
-for i in range(N):
-    cu = bpy.data.curves.new(f'g{i}', type='FONT')
-    cu.body = random.choice(GLYPHS)
-    cu.size = 0.13
-    cu.extrude = 0.012
+
+def glyph_object(name, body, size, extrude, mat, font):
+    cu = bpy.data.curves.new(name, type='FONT')
+    cu.body = body
+    cu.size = size
+    cu.extrude = extrude
+    cu.bevel_depth = extrude * 0.25
     cu.align_x = 'CENTER'
     cu.align_y = 'CENTER'
     if font:
         cu.font = font
-    cu.materials.append(glyph_mat)
-    ob = bpy.data.objects.new(f'g{i}', cu)
+    cu.materials.append(mat)
+    ob = bpy.data.objects.new(name, cu)
     scene.collection.objects.link(ob)
+    return ob
+
+
+# ------------------------------------------------------------ caracteres
+tiles = []
+for i in range(N):
+    ob = glyph_object(f'g{i}', random.choice(GLYPHS), 0.12, 0.014, glyph_mat, font_mono)
     tiles.append(
         {
             'ob': ob,
-            'glyph': cu.body,
+            'glyph': ob.data.body,
             'seed': random.random(),
+            'bright': random.uniform(0.7, 1.15),
             'noise': Vector((random.uniform(-1, 1), random.uniform(-1, 1), random.uniform(-1, 1))),
-            'tilt': (random.uniform(-0.25, 0.25), random.uniform(-0.25, 0.25)),
+            'tilt': (random.uniform(-0.3, 0.3), random.uniform(-0.3, 0.3)),
         }
     )
 
-# ---------------------------------------------------------------- orbitas
+# Nube de codigo tenue alrededor (simetrica en 8 giros, para el loop).
+drng = random.Random(21)
+dust_base = []
+for _ in range(DUST_SEED):
+    r = drng.uniform(1.55, 2.05)
+    th = drng.uniform(0, math.pi / 4)
+    z = drng.uniform(-1.05, 1.05)
+    dust_base.append((r, th, z, drng.choice(GLYPHS), drng.uniform(0.25, 0.6)))
+dust = []
+for k in range(8):
+    for r, th, z, ch, b in dust_base:
+        a = th + k * math.pi / 4
+        ob = glyph_object(f'd{len(dust)}', ch, 0.1, 0.008, dust_mat, font_mono)
+        dust.append({'ob': ob, 'p': Vector((r * math.cos(a), r * math.sin(a), z)), 'b': b})
+
+# ---------------------------------------------------------------- logo
 RING_R = 1.3
 RING_ALPHA = 0.42  # inclinacion: elipse como la del logo
-BETA = 0.22  # el atomo se inclina un poco hacia la camara
+BETA = 0.22  # el logo se inclina un poco hacia la camara
 
-atom_rig = bpy.data.objects.new('atomo', None)
+atom_rig = bpy.data.objects.new('logo', None)
 atom_rig.rotation_mode = 'YXZ'
 scene.collection.objects.link(atom_rig)
 rings = []
 for k in range(4):
-    bpy.ops.mesh.primitive_torus_add(major_radius=RING_R, minor_radius=0.0065, major_segments=160, minor_segments=8)
+    bpy.ops.mesh.primitive_torus_add(major_radius=RING_R, minor_radius=0.0065, major_segments=180, minor_segments=8)
     t = bpy.context.active_object
     t.rotation_mode = 'XYZ'
     t.rotation_euler = (RING_ALPHA, k * math.pi / 4, 0)
@@ -154,6 +204,20 @@ for k in range(4):
     t.color = (*DEEP, 1)
     t.parent = atom_rig
     rings.append(t)
+# Circulos del logo: el exterior y el central (de frente a la camara).
+for radius, minor in ((1.62, 0.009), (0.5, 0.008)):
+    bpy.ops.mesh.primitive_torus_add(major_radius=radius, minor_radius=minor, major_segments=200, minor_segments=8)
+    t = bpy.context.active_object
+    t.rotation_euler = (math.pi / 2, 0, 0)
+    t.data.materials.append(ring_mat)
+    t.color = (*CYAN, 1)
+    t.parent = atom_rig
+    rings.append(t)
+
+# "FS" en el centro, como en el logo; no gira con el loop.
+fs = glyph_object('fs', 'FS', 0.42, 0.05, glyph_mat, font_sans)
+fs.rotation_euler = (math.pi / 2, 0, 0)
+fs.color = (*SOFT, 1)
 
 
 def atom_rot(spin):
@@ -167,25 +231,19 @@ def ring_point(k, t):
     return Matrix.Rotation(k * math.pi / 4, 4, 'Y') @ p
 
 
-# Pose A (sin giro global): 4 orbitas x 48 caracteres + nucleo simetrico.
-pose_a = []
-color_a = []
-per_ring = 48
-for i in range(N):
-    if i < 4 * per_ring:
-        k, j = divmod(i, per_ring)
-        pose_a.append(ring_point(k, 2 * math.pi * j / per_ring))
-        color_a.append(CYAN if k % 2 == 0 else DEEP)
-core = []
-rng = random.Random(3)
-for _ in range(6):
-    r = 0.28 * rng.random() ** 0.6
-    th, ph = rng.uniform(0, 2 * math.pi), rng.uniform(-1, 1)
-    core.append(Vector((r * math.sqrt(1 - ph * ph) * math.cos(th), r * math.sqrt(1 - ph * ph) * math.sin(th), r * ph)))
-for c in range(8):
-    for p in core:
-        pose_a.append(Matrix.Rotation(c * math.pi / 4, 4, 'Y') @ p)
-        color_a.append(BONE)
+# Pose A (sin giro global): 4 orbitas + dos circulos alrededor de "FS".
+pose_a, color_a = [], []
+PER_RING = 74
+for k in range(4):
+    for j in range(PER_RING):
+        pose_a.append(ring_point(k, 2 * math.pi * j / PER_RING))
+        color_a.append(CYAN if k % 2 == 0 else SOFT)
+rest = N - len(pose_a)  # 104 = 8 * 13: simetrico en giros de 45 grados
+for j in range(rest):
+    radius = 0.62 if j % 2 == 0 else 0.72
+    a = 2 * math.pi * j / rest
+    pose_a.append(Vector((radius * math.cos(a), 0, radius * math.sin(a))))
+    color_a.append(DEEP if j % 2 else CYAN)
 assert len(pose_a) == N
 
 
@@ -206,16 +264,19 @@ def rect_point(x0, z0, x1, z1, u):
 # Pose B: la plantilla. 3x3 cajas iguales, grises, el mismo caracter.
 pose_b, color_b = [], []
 BW, BH, GAP = 0.92, 0.6, 0.14
+per_box = N // 9
 for i in range(N):
     box = i % 9
     nth = i // 9
     cx = ((box % 3) - 1) * (BW + GAP)
     cz = (1 - box // 3) * (BH + GAP)
     x0, z0 = cx - BW / 2, cz - BH / 2
-    if nth < 18:
-        x, z = rect_point(x0, z0, x0 + BW, z0 + BH, nth / 18)
+    if nth < 28:
+        x, z = rect_point(x0, z0, x0 + BW, z0 + BH, nth / 28)
+    elif nth < 38:
+        x, z = rect_point(x0 + 0.1, z0 + 0.28, x0 + 0.42, z0 + 0.5, (nth - 28) / 10)
     else:
-        x, z = rect_point(x0 + 0.1, z0 + 0.28, x0 + 0.42, z0 + 0.5, (nth - 18) / 9)
+        x, z = x0 + 0.1 + 0.7 * ((nth - 38) / max(1, per_box - 38)), z0 + 0.12
     pose_b.append(Vector((x, 0, z)))
     color_b.append(LEAD)
 
@@ -224,11 +285,15 @@ crng = random.Random(11)
 
 
 def line(x0, x1, z, y):
-    return lambda u: Vector((x0 + (x1 - x0) * u, y, z + crng.uniform(-0.02, 0.02)))
+    return lambda u: Vector((x0 + (x1 - x0) * u, y, z + crng.uniform(-0.015, 0.015)))
 
 
 def box_(x0, z0, x1, z1, y):
-    return lambda u: Vector((*rect_point(x0, z0, x1, z1, u)[:1], y, rect_point(x0, z0, x1, z1, u)[1]))
+    def f(u):
+        x, z = rect_point(x0, z0, x1, z1, u)
+        return Vector((x, y, z))
+
+    return f
 
 
 def circle(cx, cz, r, y):
@@ -237,17 +302,17 @@ def circle(cx, cz, r, y):
 
 PARTS = [
     (26, line(-1.45, 0.25, 0.95, -0.35), BONE),
-    (19, line(-1.45, -0.25, 0.72, -0.35), BONE),
+    (19, line(-1.45, -0.25, 0.75, -0.35), BONE),
     (34, box_(0.55, -0.25, 1.45, 1.05, 0.25), DEEP),
+    (14, box_(0.68, 0.45, 1.32, 0.92, 0.1), SOFT),
     (22, circle(0.55, -0.35, 0.32, -0.5), CYAN),
-    (14, line(-1.45, 0.05, 0.42, 0), CYAN),
-    (13, line(-1.45, -0.1, 0.28, 0), CYAN),
-    (11, line(-1.45, -0.35, 0.14, 0), CYAN),
-    (16, box_(-1.45, -0.3, -0.75, -0.1, -0.45), CYAN),
+    (14, line(-1.45, 0.05, 0.45, 0), CYAN),
+    (13, line(-1.45, -0.1, 0.31, 0), CYAN),
+    (11, line(-1.45, -0.35, 0.17, 0), CYAN),
+    (16, box_(-1.45, -0.3, -0.75, -0.08, -0.45), CYAN),
     (18, box_(-1.45, -1.0, -0.6, -0.65, 0.1), DEEP),
     (32, box_(-0.45, -1.0, 1.45, -0.65, 0.1), DEEP),
 ]
-# Se reparten los 240 caracteres entre las piezas, sin relleno suelto.
 total = sum(p[0] for p in PARTS)
 counts = [round(p[0] * N / total) for p in PARTS]
 counts[0] += N - sum(counts)
@@ -256,7 +321,8 @@ for count, (_, fn, col) in zip(counts, PARTS):
     for j in range(count):
         pose_c.append(fn((j + 0.5) / count))
         color_c.append(col)
-crng.shuffle(idx := list(range(N)))
+idx = list(range(N))
+crng.shuffle(idx)
 pose_c = [pose_c[k] for k in idx]
 color_c = [color_c[k] for k in idx]
 ROT_C = Matrix.Rotation(-0.42, 4, 'Z') @ Matrix.Rotation(-0.08, 4, 'X')
@@ -270,30 +336,37 @@ M = 0.1
 ox0, ox1 = -SCREEN_W / 2 - M, SCREEN_W / 2 + M
 oz0, oz1 = SCREEN_Z - SCREEN_H / 2 - M, SCREEN_Z + SCREEN_H / 2 + M
 pose_d, color_d = [], []
+N_FRAME, N_STAND = 312, 40
 for i in range(N):
-    if i < 196:
-        x, z = rect_point(ox0, oz0, ox1, oz1, i / 196)
-        pose_d.append(Vector((x, 0, z)))
-        color_d.append(CYAN)
-    elif i < 216:
-        u = (i - 196) / 20
-        pose_d.append(Vector((-0.06 + 0.12 * (u > 0.5), 0, oz0 - 0.05 - 0.38 * ((u * 2) % 1))))
+    if i < N_FRAME:
+        x, z = rect_point(ox0, oz0, ox1, oz1, i / N_FRAME)
+        y = -0.03 if i % 2 else 0.03  # marco con algo de grosor
+        pose_d.append(Vector((x, y, z)))
+        color_d.append(CYAN if i % 3 else SOFT)
+    elif i < N_FRAME + N_STAND:
+        u = (i - N_FRAME) / N_STAND
+        pose_d.append(Vector((-0.07 + 0.14 * (u > 0.5), 0, oz0 - 0.05 - 0.4 * ((u * 2) % 1))))
         color_d.append(DEEP)
     else:
-        u = (i - 216) / 24
-        pose_d.append(Vector((-0.6 + 1.2 * u, 0, oz0 - 0.47)))
+        u = (i - N_FRAME - N_STAND) / (N - N_FRAME - N_STAND)
+        pose_d.append(Vector((-0.7 + 1.4 * u, 0, oz0 - 0.5)))
         color_d.append(DEEP)
 
 screen_data = bpy.data.meshes.new('pantalla')
 screen_data.from_pydata(
-    [(-SCREEN_W / 2, 0.03, SCREEN_Z - SCREEN_H / 2), (SCREEN_W / 2, 0.03, SCREEN_Z - SCREEN_H / 2), (SCREEN_W / 2, 0.03, SCREEN_Z + SCREEN_H / 2), (-SCREEN_W / 2, 0.03, SCREEN_Z + SCREEN_H / 2)],
+    [
+        (-SCREEN_W / 2, 0.04, SCREEN_Z - SCREEN_H / 2),
+        (SCREEN_W / 2, 0.04, SCREEN_Z - SCREEN_H / 2),
+        (SCREEN_W / 2, 0.04, SCREEN_Z + SCREEN_H / 2),
+        (-SCREEN_W / 2, 0.04, SCREEN_Z + SCREEN_H / 2),
+    ],
     [],
     [(0, 1, 2, 3)],
 )
 screen = bpy.data.objects.new('pantalla', screen_data)
-screen_mat = make_material('pantalla', 0.6)
+screen_mat = make_material('pantalla', 0.25)
 screen_data.materials.append(screen_mat)
-screen.color = (0.012, 0.024, 0.026, 1)
+screen.color = (0.006, 0.012, 0.013, 1)
 scene.collection.objects.link(screen)
 
 
@@ -316,23 +389,23 @@ def atom_pose(spin):
     return [R @ p for p in pose_a]
 
 
-A0 = atom_pose(0.0)
-POSES = {'A': (A0, color_a), 'B': (pose_b, color_b), 'C': (pose_c, color_c), 'D': (pose_d, color_d)}
-SEGMENTS = [  # (desde, hasta, pose inicial, pose final, desorden)
-    (24, 59, 'A', 'B', 0.25),
-    (60, 95, 'B', 'C', 0.65),
-    (96, 131, 'C', 'D', 0.35),
-    (132, 155, 'D', 'A', 0.3),
+POSES = {'A': (atom_pose(0.0), color_a), 'B': (pose_b, color_b), 'C': (pose_c, color_c), 'D': (pose_d, color_d)}
+SEGMENTS = [  # (desde, hasta, pose inicial, pose final, desorden, giro de camara)
+    (24, 59, 'A', 'B', 0.3, 0.35),
+    (60, 95, 'B', 'C', 0.75, -0.45),
+    (96, 131, 'C', 'D', 0.4, 0.3),
+    (132, 155, 'D', 'A', 0.35, -0.3),
 ]
 
 
 def state(frame):
-    """Posicion, color, glifo 'x' y visibilidades para un cuadro."""
+    """Posicion, color, glifo 'x', giro, logo visible, pantalla, camara."""
     if frame < 24 or frame >= 156:
         base = 0 if frame < 24 else 156
         spin = (frame - base) / 24 * (math.pi / 4)
-        return atom_pose(spin), color_a, [False] * N, spin, 1.0, 0.0
-    for f0, f1, pa, pb, amp in SEGMENTS:
+        cols = [tuple(c * t['bright'] for c in color_a[i]) for i, t in enumerate(tiles)]
+        return atom_pose(spin), cols, [False] * N, spin, 1.0, 0.0, 0.0
+    for f0, f1, pa, pb, amp, yaw in SEGMENTS:
         if f0 <= frame <= f1:
             t = (frame - f0) / (f1 - f0)
             (Pa, Ca), (Pb, Cb) = POSES[pa], POSES[pb]
@@ -341,18 +414,18 @@ def state(frame):
                 lt = smooth((t - tile['seed'] * 0.3) / 0.7)
                 p = lerp_v(Pa[i], Pb[i], lt) + tile['noise'] * (math.sin(lt * math.pi) * amp)
                 pos.append(p)
-                col.append(lerp_c(Ca[i], Cb[i], lt))
-                gray_from = pa == 'B'
-                gray_to = pb == 'B'
-                same.append((gray_from and lt < 0.5) or (gray_to and lt >= 0.5))
-            rings_on = 1 - smooth(t / 0.4) if pa == 'A' else (smooth((t - 0.6) / 0.4) if pb == 'A' else 0.0)
+                col.append(tuple(c * tile['bright'] for c in lerp_c(Ca[i], Cb[i], lt)))
+                same.append((pa == 'B' and lt < 0.5) or (pb == 'B' and lt >= 0.5))
+            logo_on = 1 - smooth(t / 0.4) if pa == 'A' else (smooth((t - 0.6) / 0.4) if pb == 'A' else 0.0)
             screen_on = smooth((t - 0.65) / 0.3) if pb == 'D' else (1 - smooth(t / 0.3) if pa == 'D' else 0.0)
-            return pos, col, same, 0.0, rings_on, screen_on
+            # La camara gira un poco durante el cambio y vuelve de frente.
+            cam_yaw = yaw * math.sin(math.pi * t) ** 2
+            return pos, col, same, 0.0, logo_on, screen_on, cam_yaw
     raise ValueError(frame)
 
 
 def apply(frame):
-    pos, col, same, spin, rings_on, screen_on = state(frame)
+    pos, col, same, spin, logo_on, screen_on, cam_yaw = state(frame)
     for i, tile in enumerate(tiles):
         ob = tile['ob']
         ob.location = pos[i]
@@ -361,15 +434,23 @@ def apply(frame):
         body = 'x' if same[i] else tile['glyph']
         if ob.data.body != body:
             ob.data.body = body
+    R = Matrix.Rotation(spin, 4, 'Z')
+    for d in dust:
+        d['ob'].location = R @ d['p']
+        d['ob'].rotation_euler = (math.pi / 2, 0, 0)
+        d['ob'].color = (*(c * d['b'] for c in DEEP), 1)
     atom_rig.rotation_euler = (BETA, spin, 0)
-    s = max(rings_on, 0.0001)
+    s = max(logo_on, 0.0001)
     atom_rig.scale = (s, s, s)
     for r in rings:
-        r.hide_render = rings_on < 0.01
+        r.hide_render = logo_on < 0.01
+    fs.scale = (s, s, s)
+    fs.hide_render = logo_on < 0.01
     ss = max(screen_on, 0.0001)
     screen.scale = (ss, 1, ss)
     screen.location = (0, 0, SCREEN_Z * (1 - ss))
     screen.hide_render = screen_on < 0.01
+    place_camera(cam_yaw, 0.0)
 
 
 # --------------------------------------------- pantalla del monitor -> JSON
@@ -383,8 +464,9 @@ rect = {
     'y': round(1 - proj[1].y, 4),
     'w': round(proj[1].x - proj[0].x, 4),
     'h': round(proj[1].y - proj[0].y, 4),
-    'screenFrom': 120,
-    'screenTo': 140,
+    'screenFrom': 126,
+    'screenTo': 136,
+    'hold': 131,
     'frames': 180,
 }
 with open(SCREEN_JSON, 'w', encoding='utf-8') as fh:

@@ -1,14 +1,14 @@
-// Cuantos "em" mide la linea mas larga de un titular en Anybody 800 para
+// Cuantos "em" mide la linea mas larga de un titular en Mona Sans 640 para
 // un ancho dado (eje wdth). Usa la tabla medida por
 // scripts/measure-display.mjs, asi el tamano del titular se resuelve en
 // CSS sin medir en el navegador.
-import metrics from './anybodyMetrics.json';
+import metrics from './displayMetrics.json';
 
-const STOPS = [50, 75, 100, 125, 150];
-const TRACKING = -0.012;
+const STOPS = Object.keys(metrics).map(Number).sort((a, b) => a - b);
+const TRACKING = -0.025;
 
 function advance(char, wdth) {
-  const w = Math.min(150, Math.max(50, wdth));
+  const w = Math.min(STOPS.at(-1), Math.max(STOPS[0], wdth));
   let i = STOPS.findIndex((s) => s >= w);
   if (i <= 0) i = 1;
   const a = STOPS[i - 1];

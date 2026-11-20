@@ -69,3 +69,11 @@ Las 20 URLs anteriores conservan su dirección; no hizo falta ningún 301 nuevo.
 - Cada sección reserva su hueco (`data-slot`). En escritorio el modelo viaja de un hueco a otro; si el siguiente está en la otra columna, o en celular, se apaga en uno y se enciende en el otro, para no pasar por encima del texto.
 - Peso: 4.2 MB (720 px, escritorio) o 2.8 MB (480 px, celular), en WebP, pedidos después del primer pintado. Con "reducir movimiento" se ve la versión estática.
 - Para volver a renderizar: `blender -b -P scripts/blender/orbita.py -- <carpeta_png> src/seq/screen.json 1000`, y luego convertir a WebP con ffmpeg (brillo con `gblur` + `blend=screen`, ver el historial de este archivo).
+
+## Segunda versión del modelo y tipografía (20 de noviembre)
+
+- Tipografía de titulares: Mona Sans (variable, peso 560–700 y ancho 78–122), recortada a latín con fonttools (73 KB). El cuerpo sigue en Instrument Sans.
+- Modelo: el logo completo hecho de código (cuatro órbitas, círculo exterior, círculo central con "FS"), una nube de código tenue alrededor y profundidad de campo. La cámara gira un poco en cada cambio.
+- Celular: el modelo es más grande en el inicio y hace de monitor en cada caso, con la captura de ese caso en su pantalla.
+- "Reducir movimiento": el modelo se muestra igual, pero solo cambia al hacer scroll (sin giros automáticos ni viajes, solo fundidos).
+- Revisión: `node scripts/sweep-home.mjs http://localhost:4180 <carpeta>` recorre la home en escritorio, celular y con movimiento reducido.

@@ -9,7 +9,10 @@ const base = process.argv[2] || 'http://localhost:4180';
 const out = process.argv[3] || 'sweep';
 await mkdir(out, { recursive: true });
 
+// Tambien una pasada con "reducir movimiento" activo (como en el equipo
+// de Pablo): el modelo debe verse igual.
 const VIEWPORTS = [
+  { name: 'reducido', width: 1366, height: 768, reduce: true },
   { name: 'escritorio', width: 1366, height: 768 },
   { name: 'celular', width: 375, height: 812, isMobile: true, hasTouch: true, deviceScaleFactor: 2 },
 ];
@@ -18,7 +21,7 @@ const browser = await puppeteer.launch({ headless: true });
 for (const vp of VIEWPORTS) {
   const page = await browser.newPage();
   await page.setViewport(vp);
-  await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'no-preference' }]);
+  await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: vp.reduce ? 'reduce' : 'no-preference' }]);
   const errors = [];
   page.on('pageerror', (e) => errors.push(String(e)));
   await page.goto(`${base}/`, { waitUntil: 'networkidle0' });

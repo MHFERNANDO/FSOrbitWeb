@@ -88,7 +88,6 @@ export default function Footer() {
         </div>
         <div className="foot-legal">
           <span>© {new Date().getFullYear()} FS Orbit. Cuenca, Ecuador.</span>
-          <span>Este sitio está escrito a mano, sin plantillas.</span>
         </div>
       </div>
     </footer>

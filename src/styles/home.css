@@ -1,37 +1,26 @@
 /* Home: recorrido de cinco escenas.
-   Sin la clase html.gl cada escena es una seccion normal con su figura
-   estatica. Con html.gl las escenas 2 y 3 se fijan mientras el objeto 3D
-   se transforma, y las figuras estaticas ceden su lugar al lienzo. */
+   Sin la clase html.seq cada escena es una seccion normal con su figura
+   estatica. Con html.seq un solo modelo (cuadros renderizados en Blender,
+   ver src/seq/sequence.js) recorre la pagina de hueco en hueco; en
+   escritorio las escenas 2 y 3 se fijan mientras se transforma. */
 
 .journey {
   position: relative;
 }
 
-/* Lienzo unico: pegado arriba durante todo el recorrido; al terminar la
-   ultima escena se va con ella (y deja de dibujarse). */
-.stage {
-  display: none;
-  position: sticky;
-  top: 0;
-  z-index: 0;
+/* Lienzo del modelo: detras de todo el contenido. El fondo negro de los
+   cuadros se funde con el de la pagina. */
+.seq-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  width: 100vw;
   height: 100vh;
-  height: 100svh;
-  margin-bottom: -100vh;
-  margin-bottom: -100svh;
-  overflow: hidden;
   pointer-events: none;
-}
-html.gl .stage {
-  display: block;
-}
-.stage canvas {
-  display: block;
-  width: 100%;
-  height: 100%;
   opacity: 0;
-  transition: opacity 700ms ease;
+  transition: opacity 600ms ease;
 }
-html.gl-on .stage canvas {
+html.seq-on .seq-canvas {
   opacity: 1;
 }
 
@@ -164,7 +153,7 @@ html.gl-on .stage canvas {
     transform: rotate(360deg);
   }
 }
-html.gl-on .orbit-figure {
+html.seq-on .orbit-figure {
   opacity: 0;
 }
 
@@ -371,52 +360,108 @@ html.gl-on .orbit-figure {
   }
 }
 
-/* ----------------------------------------------------------- modo 3D (html.gl) */
-html.gl .scene--pin {
-  height: 210vh;
-  height: 210svh;
-  padding-block: 0;
-}
-html.gl .scene--pin .scene-pin {
-  position: sticky;
-  top: 0;
-  display: grid;
-  align-items: center;
-  height: 100vh;
-  height: 100svh;
-}
-/* Las figuras estaticas quedan como hueco: el lienzo dibuja en su lugar. */
-html.gl .slot .figure:not(.orbit-figure) {
-  visibility: hidden;
-}
-html.gl .case-figure {
+/* Huecos que solo existen para el modelo (planes, servicios, cierre). */
+.slot--small,
+.slot--side,
+.slot--end {
   display: none;
 }
-html.gl .cases-pin {
-  display: grid;
-  align-items: center;
-  position: sticky;
-  top: 0;
-  height: 100vh;
-  height: 100svh;
-  margin-bottom: -100vh;
-  margin-bottom: -100svh;
-  pointer-events: none;
+
+/* ------------------------------------------------- modo secuencia (html.seq) */
+/* Las figuras estaticas quedan como hueco: el modelo se dibuja en su lugar. */
+html.seq .slot .figure:not(.orbit-figure) {
+  visibility: hidden;
 }
-html.gl .case-step {
-  display: grid;
-  align-items: center;
-  min-height: 100vh;
-  min-height: 100svh;
-  padding-block: 0;
+html.seq .slot--small,
+html.seq .slot--side,
+html.seq .slot--end {
+  display: block;
 }
-@media (min-width: 900px) {
-  html.gl .slot--small {
-    display: block;
-    aspect-ratio: 2.4;
-    max-height: 220px;
+html.seq .slot--side {
+  width: 100%;
+  max-width: 260px;
+  aspect-ratio: 1;
+  height: auto;
+  justify-self: start;
+  margin-top: 8px;
+}
+html.seq .slot--end {
+  width: 100%;
+  max-width: 360px;
+  aspect-ratio: 1;
+  height: auto;
+}
+@media (max-width: 899px) {
+  html.seq .slot--small {
+    height: 26vh;
+    height: 26svh;
+  }
+  html.seq .slot--side,
+  html.seq .slot--end {
+    max-width: none;
+    height: 26vh;
+    height: 26svh;
+    aspect-ratio: auto;
   }
 }
+@media (min-width: 900px) {
+  html.seq .scene--pin {
+    height: 210vh;
+    height: 210svh;
+    padding-block: 0;
+  }
+  html.seq .scene--pin .scene-pin {
+    position: sticky;
+    top: 0;
+    display: grid;
+    align-items: center;
+    height: 100vh;
+    height: 100svh;
+  }
+  html.seq .case-figure {
+    display: none;
+  }
+  html.seq .cases-pin {
+    display: grid;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    height: 100svh;
+    margin-bottom: -100vh;
+    margin-bottom: -100svh;
+    pointer-events: none;
+  }
+  html.seq .case-step {
+    display: grid;
+    align-items: center;
+    min-height: 100vh;
+    min-height: 100svh;
+    padding-block: 0;
+  }
+  html.seq .slot--small {
+    aspect-ratio: 2.2;
+    max-height: 240px;
+  }
+}
+
+/* Cierre de la home con el modelo al lado. */
+.end-grid {
+  display: grid;
+  gap: 32px clamp(32px, 5vw, 80px);
+  align-items: center;
+}
+@media (min-width: 900px) {
+  .end-grid {
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  }
+}
+@media (max-width: 899px) {
+  .end-grid > .slot {
+    order: -1;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html:not([data-motion='on']) .orbit-spin {
     animation: none;

@@ -12,8 +12,8 @@ applyMotionOverride();
 // (html.gl) o estatica. Se decide antes de hidratar para que el layout no
 // cambie despues. Solo se prueba la GPU si se entra por la home; al llegar
 // por navegacion interna lo hace Home.jsx al montar.
-if (window.location.pathname === '/' && detectTier() === 'gl') {
-  document.documentElement.classList.add('gl');
+if (window.location.pathname === '/' && detectTier() === 'seq') {
+  document.documentElement.classList.add('seq');
 }
 
 const app = (

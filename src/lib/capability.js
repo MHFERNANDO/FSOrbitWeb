@@ -1,12 +1,7 @@
-// Decide una sola vez si este dispositivo ve la escena 3D ('gl') o la
-// version estatica con la misma informacion ('static').
-//
-// Va a 'static' cuando: el sistema pide menos movimiento, el navegador
-// pide ahorro de datos, no hay WebGL2 con aceleracion real, la GPU es de
-// gama baja conocida, o es un celular con poca memoria / pocos nucleos.
+// Decide una sola vez si la home muestra el modelo animado ('seq') o la
+// version estatica con la misma informacion ('static'). Va a estatica con
+// "reducir movimiento", ahorro de datos o un equipo con menos de 2 GB.
 // El prerender siempre captura 'static' (es el HTML base de todos).
-const LOW_GPU = /swiftshader|llvmpipe|software|basic render|mali-4|mali-t[67]|adreno \(tm\) [2-4]\d\d|powervr sgx|videocore/i;
-
 let cached = null;
 
 export function motionAllowed() {
@@ -39,27 +34,7 @@ function compute() {
   if (typeof window === 'undefined' || window.__PRERENDER__) return 'static';
   if (!motionAllowed()) return 'static';
   if (navigator.connection?.saveData) return 'static';
-
-  // En pantallas angostas el objeto no tiene un lugar propio: competiria
-  // con el texto. Ahi va la figura estatica, con la misma informacion.
-  if (window.matchMedia('(max-width: 899px)').matches) return 'static';
-
-  const coarse = window.matchMedia('(pointer: coarse)').matches;
-  if (coarse) {
-    if (navigator.deviceMemory && navigator.deviceMemory <= 3) return 'static';
-    if (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4) return 'static';
-  }
-
-  try {
-    const canvas = document.createElement('canvas');
-    const gl = canvas.getContext('webgl2', { failIfMajorPerformanceCaveat: true, powerPreference: 'high-performance' });
-    if (!gl) return 'static';
-    const info = gl.getExtension('WEBGL_debug_renderer_info');
-    const renderer = info ? String(gl.getParameter(info.UNMASKED_RENDERER_WEBGL)) : '';
-    gl.getExtension('WEBGL_lose_context')?.loseContext();
-    if (LOW_GPU.test(renderer)) return 'static';
-  } catch {
-    return 'static';
-  }
-  return 'gl';
+  // Celulares con muy poca memoria: los cuadros decodificados no caben.
+  if (navigator.deviceMemory && navigator.deviceMemory < 2) return 'static';
+  return 'seq';
 }

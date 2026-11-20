@@ -61,3 +61,11 @@ Las 20 URLs anteriores conservan su dirección; no hizo falta ningún 301 nuevo.
 - Guías visuales nuevas: miniaturas de los cuatro sitios publicados en el primer viewport, índice lateral del recorrido en pantallas anchas, sección "Qué hacemos" con pictogramas en la home y en Servicios, línea "Ideal si…" en cada plan y miniaturas en "Otros casos".
 - Textos de agencia reescritos en servicios ("robustos y escalables", "vender 24/7", "protegemos tu inversión", "se quedó en el pasado").
 - SEO/GEO: pregunta "¿Qué es FS Orbit?" en la FAQ de la home (FAQPage), `HowTo` en Proceso, `ItemList` en Servicios y `founder` en la organización.
+
+## Modelo renderizado en Blender (20 de noviembre)
+
+- El objeto de la home ya no se dibuja con WebGL en el navegador. Es una secuencia de 180 cuadros renderizada en Blender 5.2 (`scripts/blender/orbita.py`) que se reproduce con el scroll en un `<canvas>` (`src/seq/sequence.js`). Funciona igual en celular y en equipos sin GPU; `three` salió del proyecto.
+- Recorrido: átomo girando → nueve cajas grises iguales (la plantilla) → layout a medida → un monitor hecho de código que muestra la captura del caso que estás leyendo → átomo otra vez, que acompaña planes, servicios y el cierre.
+- Cada sección reserva su hueco (`data-slot`). En escritorio el modelo viaja de un hueco a otro; si el siguiente está en la otra columna, o en celular, se apaga en uno y se enciende en el otro, para no pasar por encima del texto.
+- Peso: 4.2 MB (720 px, escritorio) o 2.8 MB (480 px, celular), en WebP, pedidos después del primer pintado. Con "reducir movimiento" se ve la versión estática.
+- Para volver a renderizar: `blender -b -P scripts/blender/orbita.py -- <carpeta_png> src/seq/screen.json 1000`, y luego convertir a WebP con ffmpeg (brillo con `gblur` + `blend=screen`, ver el historial de este archivo).

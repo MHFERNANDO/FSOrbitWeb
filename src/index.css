@@ -78,7 +78,7 @@ html {
 }
 body {
   margin: 0;
-  background: var(--color-black);
+  background: transparent;
   color: var(--color-bone);
   font-family: var(--font-body);
   font-size: var(--fs-body);

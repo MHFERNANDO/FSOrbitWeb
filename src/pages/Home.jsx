@@ -4,7 +4,6 @@ import Display from '@/components/Display';
 import WaButton from '@/components/WaButton';
 import Faq from '@/components/Faq';
 import Shot from '@/components/Shot';
-import Closing from '@/components/Closing';
 import OrbitFigure from '@/components/OrbitFigure';
 import ServiceIcon from '@/components/ServiceIcon';
 import SceneRail from '@/components/SceneRail';
@@ -16,9 +15,9 @@ import { detectTier } from '@/lib/capability';
 import '@/styles/home.css';
 
 // La home es un recorrido de cinco escenas. El HTML es el mismo en todos
-// los dispositivos: con GPU capaz, un solo lienzo WebGL (el objeto en
-// orbita hecho de codigo) acompana el scroll; sin ella, cada escena
-// muestra su figura estatica con la misma informacion.
+// los dispositivos: un modelo hecho de codigo (cuadros renderizados en
+// Blender) recorre la pagina con el scroll, de hueco en hueco; con
+// "reducir movimiento" cada escena muestra su figura estatica.
 const SCENES = [
   { id: 'inicio', label: 'Inicio' },
   { id: 'plantillas', label: 'Plantillas' },
@@ -36,25 +35,25 @@ export default function Home() {
     const root = document.documentElement;
     let dispose;
     let alive = true;
-    if (detectTier() === 'gl') {
-      root.classList.add('gl');
-      // El 3D se pide cuando el navegador queda libre: no compite con el
-      // texto ni con las fuentes del primer pintado.
+    if (detectTier() === 'seq') {
+      root.classList.add('seq');
+      // Los cuadros se piden cuando el navegador queda libre: no compiten
+      // con el texto ni con las fuentes del primer pintado.
       const start = () =>
-        import('@/gl/journey.js')
-          .then((mod) => mod.startJourney(journey.current))
+        import('@/seq/sequence.js')
+          .then((mod) => mod.startSequence(journey.current))
           .then((stop) => {
             if (alive) dispose = stop;
             else stop?.();
           })
-          .catch(() => root.classList.remove('gl', 'gl-on'));
+          .catch(() => root.classList.remove('seq', 'seq-on'));
       if ('requestIdleCallback' in window) requestIdleCallback(start, { timeout: 1500 });
       else setTimeout(start, 400);
     }
     return () => {
       alive = false;
       dispose?.();
-      root.classList.remove('gl', 'gl-on');
+      root.classList.remove('seq', 'seq-on');
     };
   }, []);
 
@@ -62,7 +61,6 @@ export default function Home() {
     <main id="main" className="home">
       <SceneRail items={SCENES} />
       <div className="journey" ref={journey}>
-        <div className="stage" aria-hidden="true" />
 
         {/* ------------------------------------------------ 1. Arranque */}
         <section className="scene scene-1" id="inicio" aria-labelledby="h-inicio">
@@ -300,6 +298,7 @@ export default function Home() {
                   Ver los servicios y cómo elegir
                 </Link>
               </p>
+              <div className="slot slot--side" data-slot="f" aria-hidden="true" />
             </div>
             <div className="rows">
               {services.map((sv) => (
@@ -326,7 +325,20 @@ export default function Home() {
         </div>
       </section>
 
-      <Closing source="home_cierre" />
+      <section className="rule">
+        <div className="wrap section end-grid">
+          <div className="closing">
+            <h2 className="h2">Cuéntanos qué necesita tu negocio</h2>
+            <p>
+              Escríbenos por WhatsApp. Te respondemos con una propuesta: precio, plazo estimado y forma de pago, antes de empezar.
+            </p>
+            <div className="actions" data-dock-hide>
+              <WaButton source="home_cierre" />
+            </div>
+          </div>
+          <div className="slot slot--end" data-slot="g" aria-hidden="true" />
+        </div>
+      </section>
     </main>
   );
 }

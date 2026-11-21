@@ -2,7 +2,7 @@ import { Link, useParams } from 'react-router-dom';
 import PageHead from '@/components/PageHead';
 import WaButton from '@/components/WaButton';
 import Faq from '@/components/Faq';
-import Shot from '@/components/Shot';
+import CaseCard from '@/components/CaseCard';
 import Closing from '@/components/Closing';
 import NotFound from './NotFound';
 import { usePageSeo } from '@/hooks/usePageSeo';
@@ -151,25 +151,11 @@ export default function Servicio() {
         <section className="rule">
           <div className="wrap section">
             <h2 className="h2">Casos relacionados</h2>
-            <div className="case-list" style={{ marginTop: 'clamp(32px, 5vw, 64px)' }}>
+            <ul className="cases-rail cases-rail--inline" aria-label="Casos relacionados">
               {related.map((p) => (
-                <article className="case-item" key={p.slug}>
-                  <div className="case-media">
-                    <Shot project={p} sizes="(min-width: 900px) 58vw, 100vw" />
-                  </div>
-                  <div>
-                    <p className="small muted">{p.tag}</p>
-                    <h3 className="h2">{p.title}</h3>
-                    <p>{p.description}</p>
-                    <div className="actions">
-                      <Link className="link" to={`/proyectos/${p.slug}`}>
-                        Ver el caso de {p.title}
-                      </Link>
-                    </div>
-                  </div>
-                </article>
+                <CaseCard project={p} key={p.slug} />
               ))}
-            </div>
+            </ul>
           </div>
         </section>
       )}

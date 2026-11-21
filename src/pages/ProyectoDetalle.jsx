@@ -1,6 +1,7 @@
 import { Link, useParams } from 'react-router-dom';
 import PageHead from '@/components/PageHead';
 import Shot from '@/components/Shot';
+import CaseCard from '@/components/CaseCard';
 import Closing from '@/components/Closing';
 import NotFound from './NotFound';
 import { usePageSeo } from '@/hooks/usePageSeo';
@@ -112,15 +113,11 @@ export default function ProyectoDetalle() {
           <h2 className="h3" style={{ marginBottom: 24 }}>
             Otros casos
           </h2>
-          <div className="rows">
+          <ul className="cases-rail cases-rail--inline" aria-label="Otros casos">
             {others.map((p) => (
-              <Link className="row row--case" to={`/proyectos/${p.slug}`} key={p.slug}>
-                <img src={`/assets/${p.img}-480.webp`} width="160" height={Math.round((160 * p.h) / p.w)} alt="" loading="lazy" decoding="async" />
-                <h3 className="h3 row-title">{p.title}</h3>
-                <p>{p.tag}</p>
-              </Link>
+              <CaseCard project={p} key={p.slug} />
             ))}
-          </div>
+          </ul>
         </div>
       </section>
 

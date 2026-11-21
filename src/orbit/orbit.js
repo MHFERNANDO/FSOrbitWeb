@@ -37,7 +37,7 @@ import {
   WebGLRenderer,
 } from 'three';
 import { initScroll } from '@/lib/scroll';
-import { homeCases } from '@/data/content';
+import { projects } from '@/data/content';
 
 const FOV = 30;
 const TAN = Math.tan((FOV * Math.PI) / 360);
@@ -398,7 +398,7 @@ export async function startOrbit(root) {
   function resize() {
     W = window.innerWidth;
     H = window.innerHeight;
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, mobile ? 1.75 : 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, mobile ? 1.5 : 2));
     renderer.setSize(W, H, false);
   }
   resize();
@@ -501,7 +501,7 @@ export async function startOrbit(root) {
 
   // Pantalla del monitor: dos capas para fundir de un caso al otro.
   const loader = new TextureLoader();
-  const shots = homeCases.map((c) => {
+  const shots = projects.map((c) => {
     const t = loader.load(`/assets/${c.img}-${mobile ? 480 : 960}.webp`);
     t.colorSpace = SRGBColorSpace;
     return t;
@@ -527,7 +527,6 @@ export async function startOrbit(root) {
   const q = (sel) => root.querySelector(sel);
   const page = root.closest('main') || document;
   const slots = [...page.querySelectorAll('[data-slot]')];
-  const steps = [...root.querySelectorAll('.case-step')];
   let marks = null;
   function measure() {
     const vh = window.innerHeight;
@@ -539,19 +538,18 @@ export async function startOrbit(root) {
     const s2 = q('.scene-2');
     const s3 = q('.scene-3');
     const s4 = q('.scene-4');
-    const cases = q('.cases');
     const s5 = q('.scene-5');
     marks = mobile
       ? {
           t1: [top(s2) - vh * 0.75, top(s2) + vh * 0.05],
           t2: [top(s3) - vh * 0.75, top(s3) + vh * 0.05],
-          t3: [top(s4) - vh * 0.6, top(cases) - vh * 0.2],
+          t3: [top(s4) - vh * 0.8, top(s4) - vh * 0.1],
           t4: [top(s5) - vh * 0.8, top(s5) - vh * 0.1],
         }
       : {
           t1: span(s2, 0.55),
           t2: span(s3, 0.55),
-          t3: [top(s4) - vh * 0.6, top(cases) - vh * 0.05],
+          t3: [top(s4) - vh * 0.7, top(s4) + vh * 0.05],
           t4: [top(s5) - vh * 0.75, top(s5) - vh * 0.15],
         };
   }
@@ -610,21 +608,13 @@ export async function startOrbit(root) {
     return [{ el: near.el, wide: false, x: lerp(a.x, b.x, k), y: lerp(a.y, b.y, k), w: lerp(a.w, b.w, k), h: lerp(a.h, b.h, k), alpha: 1 }];
   }
 
-  // Caso activo en escritorio: el paso cuyo centro esta mas cerca del
-  // centro de la pantalla.
-  function activeCase() {
-    let best = 0;
-    let dist = Infinity;
-    steps.forEach((el, i) => {
-      const r = el.getBoundingClientRect();
-      const d = Math.abs(r.top + r.height / 2 - H / 2);
-      if (d < dist) {
-        dist = d;
-        best = i;
-      }
-    });
-    return best;
-  }
+  // El monitor va mostrando los sitios publicados, uno cada 3.5 s.
+  const CASE_EVERY = 3.5;
+  const activeCase = (time) => Math.floor(time / CASE_EVERY) % shots.length;
+
+  // Forma que corresponde a cada hueco (celular).
+  const SLOT_SHAPE = { a: 0, b: 1, c: 2, d: 3 };
+  const shapeOf = (el) => SLOT_SHAPE[el?.dataset.slot] ?? 4;
 
   // ---------------------------------------------------------- estado vivo
   const pointer = { x: 0, y: 0, cx: 0, cy: 0 };
@@ -641,7 +631,7 @@ export async function startOrbit(root) {
   let shownCase = 0;
   let fadeCase = 1;
   let shown = false;
-  const AMPS = [0.3, 0.7, 0.4, 0.35];
+  const AMPS = mobile ? [0.18, 0.4, 0.25, 0.2] : [0.3, 0.7, 0.4, 0.35];
 
   function setShape(p, time) {
     const i = Math.min(3, Math.floor(p));
@@ -671,9 +661,22 @@ export async function startOrbit(root) {
     uniforms.uIntro.value = intro;
     dustUniforms.uIntro.value = intro;
 
-    // La forma sigue al scroll con inercia: nunca salta.
-    const target = targetP(window.scrollY);
-    P += (target - P) * (1 - Math.exp(-dt * 5));
+    // Escritorio: la forma sigue al scroll con inercia. Celular: la forma es
+    // la del hueco que esta a la vista, y el cambio se reproduce solo (~1 s)
+    // al llegar, para que nunca quede detenido a mitad de camino.
+    const places = placements();
+    let target;
+    if (mobile) {
+      const main = places.reduce((m, p) => (p.alpha > (m?.alpha ?? -1) ? p : m), null);
+      target = shapeOf(main?.el);
+      // De la forma 4 (logo final) a una anterior se vuelve por el logo.
+      if (P > 3.5 && target < 3) P = 0;
+      const step = dt * 1.1;
+      P = Math.abs(target - P) <= step ? target : P + Math.sign(target - P) * step;
+    } else {
+      target = targetP(window.scrollY);
+      P += (target - P) * (1 - Math.exp(-dt * 5));
+    }
 
     // Movimientos propios de cada forma.
     logoGroup.rotation.set(0.22 + 0.06 * Math.sin(time * 0.37), 0.12 * Math.sin(time * 0.23), time * 0.1);
@@ -687,9 +690,9 @@ export async function startOrbit(root) {
     pointer.cx += (pointer.x - pointer.cx) * 0.05;
     pointer.cy += (pointer.y - pointer.cy) * 0.05;
 
-    // Caso en pantalla (escritorio): fundido de 0.4 s al cambiar.
-    if (!mobile) {
-      const want = activeCase();
+    // Caso en pantalla: fundido de 0.6 s al cambiar.
+    {
+      const want = activeCase(time);
       if (want !== shownCase && fadeCase >= 1) {
         screenB.map = shots[shownCase];
         screenB.needsUpdate = true;
@@ -698,28 +701,17 @@ export async function startOrbit(root) {
         screenA.needsUpdate = true;
         fadeCase = 0;
       }
-      fadeCase = Math.min(1, fadeCase + dt / 0.4);
+      fadeCase = Math.min(1, fadeCase + dt / 0.6);
     }
 
-    const places = placements();
     renderer.setScissorTest(false);
     renderer.clear();
     renderer.setScissorTest(true);
     for (const p of places) {
       uniforms.uFade.value = p.alpha;
-      const isCase = p.el?.dataset.slot === 'case';
-      const shape = isCase ? 3 : P;
-      const wD = setShape(shape, time);
-      if (isCase) {
-        screenA.map = shots[Number(p.el.dataset.case)];
-        screenA.needsUpdate = true;
-        screenA.opacity = p.alpha;
-        screenB.opacity = 0;
-      } else {
-        if (mobile && screenA.map !== shots[shownCase]) screenA.map = shots[shownCase];
-        screenA.opacity = wD * p.alpha * (mobile ? 1 : fadeCase);
-        screenB.opacity = mobile ? 0 : wD * p.alpha * (1 - fadeCase);
-      }
+      const wD = setShape(P, time);
+      screenA.opacity = wD * p.alpha * fadeCase;
+      screenB.opacity = wD * p.alpha * (1 - fadeCase);
 
       const aspect = p.w / p.h;
       const halfH = p.wide ? 1.75 / aspect : aspect >= 1 ? HALF : HALF / aspect;
@@ -744,7 +736,18 @@ export async function startOrbit(root) {
     }
   }
 
-  const tick = (time, deltaMs) => frame(time, deltaMs);
+  // En celular se dibuja a 30 cuadros por segundo: el movimiento se ve
+  // igual de fluido y el hilo principal queda libre para el scroll.
+  let acc = 0;
+  const tick = (time, deltaMs) => {
+    if (mobile) {
+      acc += deltaMs;
+      if (acc < 30) return;
+      deltaMs = acc;
+      acc = 0;
+    }
+    frame(time, deltaMs);
+  };
   gsap.ticker.add(tick);
 
   let lastW = window.innerWidth;

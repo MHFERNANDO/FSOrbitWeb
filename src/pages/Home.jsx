@@ -10,7 +10,7 @@ import SceneRail from '@/components/SceneRail';
 import { usePageSeo } from '@/hooks/usePageSeo';
 import { faqNode } from '@/seo/jsonld';
 import { faqHome } from '@/data/faq';
-import { homeCases, pricingPlans, projects, services } from '@/data/content';
+import { pricingPlans, projects, services } from '@/data/content';
 import { detectTier } from '@/lib/capability';
 import '@/styles/home.css';
 
@@ -200,46 +200,62 @@ export default function Home() {
 
         {/* --------------------------------------------------- 4. Casos */}
         <section className="scene scene-4" id="casos" aria-labelledby="h-casos">
-          <div className="wrap cases-head">
-            <h2 className="h2" id="h-casos">
-              Para quién hemos trabajado
-            </h2>
-            <p className="muted">
-              Tres negocios de Cuenca, tres sitios publicados que puedes visitar. No mostramos cifras de tráfico ni de ventas que no tengamos.
-            </p>
-          </div>
-          <div className="cases">
-            <div className="cases-pin" aria-hidden="true">
-              <div className="wrap scene-grid">
-                <span />
-                <div className="slot" data-slot="d" />
+          <div className="wrap scene-grid cases-head">
+            <div className="scene-copy">
+              <h2 className="h2" id="h-casos">
+                Para quién hemos trabajado
+              </h2>
+              <p>
+                Negocios de Cuenca con sitios publicados que puedes visitar hoy. No mostramos cifras de tráfico ni de ventas que no
+                tengamos.
+              </p>
+              <Link className="link" to="/proyectos">
+                Ver todos los casos
+              </Link>
+            </div>
+            <div className="slot" data-slot="d" aria-hidden="true">
+              <div className="figure case-poster">
+                <Shot project={projects[0]} sizes="(min-width: 900px) 40vw, 90vw" />
               </div>
             </div>
-            {homeCases.map((c, i) => (
-              <article className="case-step" key={c.slug}>
-                <div className="wrap scene-grid">
-                  <div className="scene-copy">
-                    <p className="small muted">{c.tag}</p>
-                    <h3 className="h2">{c.title}</h3>
-                    <p>{c.description}</p>
+          </div>
+
+          <div className="wrap">
+            <p className="cases-hint small muted" aria-hidden="true">
+              Desliza para ver los {projects.length} sitios
+            </p>
+          </div>
+          <ul className="cases-rail" aria-label="Sitios publicados">
+            {projects.map((p) => {
+              const host = new URL(p.url).hostname.replace(/^www\./, '');
+              return (
+                <li className="case-card" key={p.slug}>
+                  <Link className="case-card-media" to={`/proyectos/${p.slug}`} aria-label={`Ver el caso de ${p.title}`}>
+                    <span className="browser-bar" aria-hidden="true">
+                      <i />
+                      <i />
+                      <i />
+                      <span>{host}</span>
+                    </span>
+                    <Shot project={p} sizes="(min-width: 900px) 44vw, 82vw" />
+                  </Link>
+                  <div className="case-card-body">
+                    <p className="small muted">{p.tag}</p>
+                    <h3 className="h3">{p.title}</h3>
+                    <p>{p.description}</p>
                     <div className="actions">
-                      <Link className="link" to={`/proyectos/${c.slug}`}>
-                        Ver el caso de {c.title}
+                      <Link className="link" to={`/proyectos/${p.slug}`}>
+                        Ver el caso
                       </Link>
-                      <a className="link" href={c.url} target="_blank" rel="noopener noreferrer">
-                        Abrir {new URL(c.url).hostname.replace(/^www\./, '')}
+                      <a className="link" href={p.url} target="_blank" rel="noopener noreferrer">
+                        Abrir {host}
                       </a>
                     </div>
                   </div>
-                  <div className="figure case-figure">
-                    <Shot project={c} sizes="(min-width: 900px) 52vw, 100vw" />
-                  </div>
-                  {/* En celular, el monitor del modelo muestra esta captura. */}
-                  <div className="slot slot--case" data-slot="case" data-case={i} data-crop="0.22" aria-hidden="true" />
-                </div>
-              </article>
-            ))}
-          </div>
+                </li>
+              );
+            })}
+          </ul>
         </section>
 
         {/* -------------------------------------------------- 5. Cierre */}

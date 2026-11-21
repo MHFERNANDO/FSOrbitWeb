@@ -1,6 +1,7 @@
 // Decide una sola vez si la home muestra el modelo ('seq') o la version
 // estatica con la misma informacion ('static'). Va a estatica con ahorro de
-// datos, un equipo con menos de 2 GB o sin WebGL. El modelo se mueve
+// datos, un equipo con menos de 2 GB o sin WebGL (esto ultimo se sabe al
+// crear el modelo). El modelo se mueve
 // siempre, tambien con "reducir movimiento" (pedido del cliente).
 // El prerender siempre captura 'static' (es el HTML base de todos).
 let cached = null;
@@ -35,13 +36,8 @@ function compute() {
   if (typeof window === 'undefined' || window.__PRERENDER__) return 'static';
   if (navigator.connection?.saveData) return 'static';
   if (navigator.deviceMemory && navigator.deviceMemory < 2) return 'static';
-  // El modelo es 3D en tiempo real: hace falta WebGL.
-  try {
-    const gl = document.createElement('canvas').getContext('webgl2') || document.createElement('canvas').getContext('webgl');
-    if (!gl) return 'static';
-    gl.getExtension('WEBGL_lose_context')?.loseContext();
-  } catch {
-    return 'static';
-  }
+  // WebGL se comprueba al crear el modelo (src/orbit/orbit.js), despues de
+  // la carga: crear un contexto aqui bloqueaba el primer pintado. Si falla,
+  // Home.jsx vuelve a la version estatica.
   return 'seq';
 }

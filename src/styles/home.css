@@ -120,37 +120,15 @@ html.seq-on .seq-canvas {
   }
 }
 .orbit-figure {
-  overflow: visible;
+  object-fit: contain;
   transition: opacity 700ms ease;
   /* Entra con un fundido: asi el elemento mas grande del primer pintado
-     (LCP) es el titular y no el dibujo decorativo. */
+     (LCP) es el titular y no la imagen decorativa. */
   animation: aparecer 700ms 60ms ease both;
 }
 @keyframes aparecer {
   from {
     opacity: 0;
-  }
-}
-.orbit-figure text {
-  fill: var(--color-cyan);
-  font-family: ui-monospace, 'Cascadia Mono', Menlo, Consolas, monospace;
-  font-size: 12px;
-}
-.orbit-figure g g:nth-child(even) text {
-  fill: var(--color-cyan-deep);
-}
-.orbit-core {
-  font-size: 22px !important;
-  font-weight: 700;
-}
-.orbit-spin {
-  transform-origin: center;
-  transform-box: view-box;
-  animation: orbita 90s linear infinite;
-}
-@keyframes orbita {
-  to {
-    transform: rotate(360deg);
   }
 }
 /* Con el modelo, el dibujo fijo no se pinta (y no compite por el LCP). */
@@ -275,30 +253,129 @@ html.seq-on .orbit-figure {
 
 /* ----------------------------------------------------------------- 4. Casos */
 .scene-4 {
-  padding-top: var(--section-y);
+  padding-block: var(--section-y) 0;
 }
 .cases-head {
+  padding-bottom: clamp(28px, 4vw, 56px);
+}
+.case-poster {
   display: grid;
-  gap: 16px;
-  padding-bottom: clamp(40px, 6vw, 80px);
+  place-items: center;
 }
-.cases-head p {
-  max-width: 56ch;
-}
-.cases {
-  position: relative;
-}
-.cases-pin {
-  display: none;
-}
-.case-step {
-  padding-block: clamp(36px, 6vw, 88px);
-}
-.case-step .h2 {
-  font-size: clamp(1.625rem, 2.4vw, 2.5rem);
-}
-.case-figure {
+.case-poster .shot {
   width: 100%;
+  border-radius: 10px;
+}
+.cases-hint {
+  display: none;
+  margin-bottom: 12px;
+}
+.cases-rail {
+  display: grid;
+  gap: clamp(20px, 3vw, 36px);
+  width: 100%;
+  max-width: var(--maxw);
+  margin-inline: auto;
+  padding: 0 var(--gutter) var(--section-y);
+}
+.case-card {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  overflow: hidden;
+  border: 1px solid var(--color-line);
+  border-radius: 16px;
+  background: var(--color-carbon);
+  transition: border-color 200ms ease, transform 200ms var(--ease-out);
+}
+.case-card-media {
+  display: block;
+  position: relative;
+  overflow: hidden;
+  background: #0a1113;
+}
+.browser-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 12px;
+  border-bottom: 1px solid var(--color-line);
+  background: #0a1113;
+}
+.browser-bar i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-lead);
+}
+.browser-bar span {
+  flex: 1;
+  margin-left: 8px;
+  overflow: hidden;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--color-black);
+  color: var(--color-mist);
+  font-size: 0.75rem;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.case-card .shot {
+  border: 0;
+  background: transparent;
+}
+.case-card .shot img {
+  transition: transform 500ms var(--ease-out);
+}
+.case-card-body {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  padding: 20px 22px 24px;
+}
+.case-card-body > p:not(.small) {
+  color: var(--color-mist);
+}
+.case-card-body .actions {
+  margin-top: 6px;
+  gap: 8px 22px;
+}
+@media (hover: hover) and (pointer: fine) {
+  .case-card:hover {
+    border-color: var(--color-cyan-deep);
+    transform: translateY(-3px);
+  }
+  .case-card:hover .shot img {
+    transform: scale(1.03);
+  }
+}
+@media (min-width: 900px) {
+  .cases-rail {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+/* Celular: carrusel horizontal con la siguiente tarjeta asomando. */
+@media (max-width: 899px) {
+  .cases-hint {
+    display: block;
+  }
+  .cases-rail {
+    display: flex;
+    gap: 14px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--gutter);
+    padding-bottom: calc(var(--section-y) * 0.8);
+    scrollbar-width: none;
+  }
+  .cases-rail::-webkit-scrollbar {
+    display: none;
+  }
+  .case-card {
+    flex: 0 0 84%;
+    scroll-snap-align: start;
+  }
 }
 
 /* ---------------------------------------------------------------- 5. Cierre */
@@ -420,27 +497,6 @@ html.seq .slot--end {
     height: 100vh;
     height: 100svh;
   }
-  html.seq .case-figure {
-    display: none;
-  }
-  html.seq .cases-pin {
-    display: grid;
-    align-items: center;
-    position: sticky;
-    top: 0;
-    height: 100vh;
-    height: 100svh;
-    margin-bottom: -100vh;
-    margin-bottom: -100svh;
-    pointer-events: none;
-  }
-  html.seq .case-step {
-    display: grid;
-    align-items: center;
-    min-height: 100vh;
-    min-height: 100svh;
-    padding-block: 0;
-  }
   html.seq .slot--small {
     aspect-ratio: 2.2;
     max-height: 240px;
@@ -464,30 +520,65 @@ html.seq .slot--end {
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  html:not([data-motion='on']) .orbit-spin {
-    animation: none;
+
+
+/* Celular: el modelo aparece en el inicio, en las dos escenas, en los casos
+   y en el cierre; en planes, servicios y preguntas no se repite. */
+@media (max-width: 899px) {
+  html.seq .slot--small,
+  html.seq .slot--side {
+    display: none;
   }
 }
 
-/* Celular primero: el modelo tiene mas presencia en el inicio y hace de
-   monitor en cada caso, con la captura de ese caso en su pantalla. */
-.slot--case {
-  display: none;
-}
+/* ------------------------------------------------ celular: mas presencia
+   Bandas de color para cortar el negro continuo, planes como tarjetas y
+   servicios con su pictograma en una pieza propia. */
 @media (max-width: 899px) {
-  html.seq .case-figure {
-    display: none;
+  .scene-5,
+  #servicios {
+    background: var(--color-carbon);
   }
-  html.seq .slot--case {
-    display: block;
-    order: -1;
-    width: 100%;
-    max-width: none;
-    height: auto;
-    aspect-ratio: 1 / 0.56;
+  .scene-5 {
+    padding-block: 56px;
   }
-  html.seq .slot--faq {
-    display: none;
+  .cases-rail {
+    padding-bottom: 56px;
+  }
+  .scene-5 .ledger {
+    display: grid;
+    gap: 14px;
+    border-top: 0;
+  }
+  .scene-5 .ledger-row {
+    padding: 22px 20px;
+    border: 1px solid var(--color-line);
+    border-radius: 16px;
+    background: var(--color-black);
+  }
+  .scene-5 .ledger-price {
+    font-size: 2.25rem;
+  }
+  #servicios .section {
+    padding-block: 56px;
+  }
+  .row--svc {
+    grid-template-columns: 44px minmax(0, 1fr);
+    gap: 4px 16px;
+  }
+  .row--svc .svc-icon {
+    box-sizing: content-box;
+    width: 24px;
+    height: 24px;
+    padding: 9px;
+    border: 1px solid var(--color-cyan-deep);
+    border-radius: 12px;
+    background: rgb(0 243 251 / 0.06);
+  }
+  .clients ul {
+    gap: 10px;
+  }
+  .clients img {
+    border-radius: 6px;
   }
 }

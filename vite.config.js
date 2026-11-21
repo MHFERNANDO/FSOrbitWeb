@@ -23,6 +23,7 @@ export default defineConfig({
           groups: [
             { name: 'react', test: /node_modules[\\/](react|react-dom|scheduler|react-router|react-router-dom)[\\/]/ },
             { name: 'scroll', test: /node_modules[\/](gsap|lenis)[\/]/ },
+            { name: 'three', test: /node_modules[\/]three[\/]/ },
           ],
         },
       },

@@ -84,3 +84,11 @@ Las 20 URLs anteriores conservan su dirección; no hizo falta ningún 301 nuevo.
 - El intro y el giro se reproducen solos siempre, también con "reducir movimiento" (pedido del cliente). Entre dos cuadros se dibuja una mezcla, para que el scroll se sienta continuo. En escritorio el modelo sigue apenas al mouse.
 - Los cuadros se piden después del evento `load`. Lighthouse móvil: LCP 2.4 s con throttling real (devtools); la estimación simulada varía entre 2.7 y 3.8 s porque cuenta las descargas de los cuadros.
 - `node scripts/hero-timelapse.mjs http://localhost:4180 <carpeta>` captura el inicio a lo largo del tiempo para comprobar el intro y el giro.
+
+## Modelo en tiempo real (21 de noviembre)
+
+- La secuencia de cuadros de Blender se reemplazó por un modelo 3D en tiempo real (`src/orbit/orbit.js`, three.js). Ya no hay cuadros que descargar (se quitaron `public/seq`, `src/seq` y `scripts/blender`; quedan en el historial de git).
+- El modelo nunca está quieto: cada forma tiene su propio movimiento (las órbitas giran y el código corre por ellas; una onda de luz recorre la plantilla; los bloques a medida flotan; el código recorre el marco del monitor) y el scroll solo decide hacia qué forma va, con inercia.
+- Casos: en escritorio la pantalla muestra el caso cuyo bloque está más cerca del centro de la pantalla (antes podía quedar un caso adelantado según el alto de la pantalla). En celular cada caso tiene su propio monitor.
+- Funciona donde hay WebGL (celulares incluidos); sin WebGL se ve la versión estática.
+- Lighthouse móvil (simulado): 96, LCP 1.8 s, CLS 0. Con CPU limitada real, el arranque del 3D suma tiempo de bloqueo (TBT 620 ms).

@@ -40,8 +40,8 @@ export default function Home() {
       // Los cuadros se piden cuando el navegador queda libre: no compiten
       // con el texto ni con las fuentes del primer pintado.
       const start = () =>
-        import('@/seq/sequence.js')
-          .then((mod) => mod.startSequence(journey.current))
+        import('@/orbit/orbit.js')
+          .then((mod) => mod.startOrbit(journey.current))
           .then((stop) => {
             if (alive) dispose = stop;
             else stop?.();

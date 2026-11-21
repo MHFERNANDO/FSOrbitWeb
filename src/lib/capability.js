@@ -1,7 +1,7 @@
 // Decide una sola vez si la home muestra el modelo ('seq') o la version
 // estatica con la misma informacion ('static'). Va a estatica con ahorro de
-// datos o un equipo con menos de 2 GB. Con "reducir movimiento" el modelo
-// se muestra igual, pero sin giros automaticos (ver src/seq/sequence.js).
+// datos, un equipo con menos de 2 GB o sin WebGL. El modelo se mueve
+// siempre, tambien con "reducir movimiento" (pedido del cliente).
 // El prerender siempre captura 'static' (es el HTML base de todos).
 let cached = null;
 
@@ -34,9 +34,14 @@ export function detectTier() {
 function compute() {
   if (typeof window === 'undefined' || window.__PRERENDER__) return 'static';
   if (navigator.connection?.saveData) return 'static';
-  // Celulares con muy poca memoria: los cuadros decodificados no caben.
   if (navigator.deviceMemory && navigator.deviceMemory < 2) return 'static';
-  // Con 'reducir movimiento' tambien se usa la secuencia, pero en modo
-  // tranquilo (src/seq/sequence.js): solo cambia al hacer scroll.
+  // El modelo es 3D en tiempo real: hace falta WebGL.
+  try {
+    const gl = document.createElement('canvas').getContext('webgl2') || document.createElement('canvas').getContext('webgl');
+    if (!gl) return 'static';
+    gl.getExtension('WEBGL_lose_context')?.loseContext();
+  } catch {
+    return 'static';
+  }
   return 'seq';
 }

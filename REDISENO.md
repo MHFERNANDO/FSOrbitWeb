@@ -92,3 +92,11 @@ Las 20 URLs anteriores conservan su dirección; no hizo falta ningún 301 nuevo.
 - Casos: en escritorio la pantalla muestra el caso cuyo bloque está más cerca del centro de la pantalla (antes podía quedar un caso adelantado según el alto de la pantalla). En celular cada caso tiene su propio monitor.
 - Funciona donde hay WebGL (celulares incluidos); sin WebGL se ve la versión estática.
 - Lighthouse móvil (simulado): 96, LCP 1.8 s, CLS 0. Con CPU limitada real, el arranque del 3D suma tiempo de bloqueo (TBT 620 ms).
+
+## Modelo de bloques sólidos (21 de noviembre)
+
+- El modelo ya no está hecho de letras. Son 36 bloques (cajas redondeadas oscuras con borde de luz cian, shader propio sin luces ni postproceso), cuatro órbitas de luz, los círculos del logo y "FS".
+- Formas: logo (8 bloques corren por las órbitas), plantilla (9 tarjetas grises iguales con miniatura y líneas, una onda de luz las recorre), layout a medida (titular, imagen, avatar, botón, tarjetas, pie) y monitor (marco, base y la pantalla con los casos).
+- Se conservan el intro (los bloques llegan en espiral), el giro continuo, la inercia del scroll, el viaje entre huecos y el parallax.
+- Celular: sin antialias, 30 fps, 70 partículas; el bloqueo del hilo principal bajó de ~1.5 s a ~0.4 s (Lighthouse con throttling real).
+- La versión con letras quedó en la rama `respaldo-modelo-letras`.

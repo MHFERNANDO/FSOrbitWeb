@@ -1,14 +1,15 @@
 // El modelo de la home, en 3D y en tiempo real (three.js).
 //
-// Es el logo de FS Orbit hecho de caracteres de codigo. Nunca esta quieto:
-// cada forma tiene su propio movimiento y el scroll solo decide hacia que
-// forma va:
+// Es el logo de FS Orbit hecho de piezas solidas: orbitas de luz, el
+// circulo con "FS" y 36 bloques (cajas redondeadas con borde de luz cian)
+// que se reordenan en cada forma. Nunca esta quieto: cada forma tiene su
+// propio movimiento y el scroll solo decide hacia que forma va.
 //
-//   0  logo     las orbitas giran y el codigo corre por ellas; "FS" late
-//   1  plantilla 9 cajas grises iguales; una onda de luz las recorre
-//   2  a medida  bloques desiguales que flotan a distinta profundidad
-//   3  monitor   el codigo corre por el marco; la pantalla muestra el caso
-//   4  logo     otra vez, hasta el final de la pagina
+//   0  logo       las orbitas giran, 8 bloques corren por ellas, "FS" late
+//   1  plantilla  9 tarjetas grises iguales; una onda de luz las recorre
+//   2  a medida   un layout de piezas desiguales que flotan
+//   3  monitor    marco, base y pantalla con el caso
+//   4  logo       otra vez, hasta el final de la pagina
 //
 // Donde se dibuja: cada seccion reserva un hueco ([data-slot]) y el modelo
 // se renderiza dentro de ese rectangulo (viewport + scissor) en un unico
@@ -19,36 +20,48 @@ import {
   AdditiveBlending,
   BufferGeometry,
   CanvasTexture,
+  Color,
+  Euler,
   Float32BufferAttribute,
   Group,
   InstancedBufferAttribute,
-  InstancedBufferGeometry,
-  LinearFilter,
-  LineBasicMaterial,
-  LineLoop,
+  InstancedMesh,
+  Matrix4,
   Mesh,
   MeshBasicMaterial,
   PerspectiveCamera,
   PlaneGeometry,
+  Points,
+  PointsMaterial,
+  Quaternion,
   Scene,
   ShaderMaterial,
   SRGBColorSpace,
   TextureLoader,
+  TorusGeometry,
+  Vector3,
   WebGLRenderer,
 } from 'three';
+import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
 import { initScroll } from '@/lib/scroll';
 import { projects } from '@/data/content';
 
 const FOV = 30;
 const TAN = Math.tan((FOV * Math.PI) / 360);
 const HALF = 2.05; // medio alto visible en un hueco cuadrado
-const GLYPHS = '{}<>/;=()[]:.+*&|!?#$_%@~abcdefghijklmnopqrstuvwxyz0123456';
-const X = GLYPHS.indexOf('x');
+const K = 36; // bloques
 
 const CYAN = [0.0, 0.92, 0.97];
 const SOFT = [0.45, 0.97, 1.0];
-const DEEP = [0.03, 0.42, 0.45];
+const DEEP = [0.05, 0.5, 0.53];
 const BONE = [0.86, 0.94, 0.94];
+const LEAD = [0.34, 0.39, 0.4];
+
+const RING_R = 1.3;
+const RING_AL = 0.42;
+const SCREEN_W = 2.9;
+const SCREEN_H = SCREEN_W / 2.06;
+const SCREEN_Y = 0.22;
 
 const smooth = (x) => {
   const t = Math.min(1, Math.max(0, x));
@@ -56,186 +69,52 @@ const smooth = (x) => {
 };
 const lerp = (a, b, t) => a + (b - a) * t;
 
-// ------------------------------------------------------------- shaders
-const VERT = /* glsl */ `
-  attribute vec4 aA;    // logo: orbita (0-3) o circulo (4), angulo, radio
-  attribute vec3 aB;    // plantilla
-  attribute vec4 aC;    // a medida (xyz) + fase
-  attribute vec4 aD;    // monitor: tipo, u, profundidad
-  attribute vec4 aRnd;  // semilla, glifo, tamano, brillo
-  attribute vec3 aColA;
-  attribute vec3 aColC;
-  uniform float uTime, uFrom, uTo, uT, uAmp, uSize, uFade, uIntro;
-  uniform mat4 uLogo, uRotC, uMon;
-  varying vec2 vUv;
-  varying float vGlyph;
+// --------------------------------------------------------------- material
+// Bloque oscuro con borde de luz: el brillo sale del angulo de vision
+// (fresnel) y de un filo calculado en el espacio local de la caja, asi se
+// lee como una pieza solida sin luces ni postproceso.
+const BLOCK_VERT = /* glsl */ `
+  attribute float aGlow;
+  varying vec3 vN;
+  varying vec3 vV;
   varying vec3 vCol;
-  varying float vAlpha;
-
-  const float R = 1.3;
-  const float AL = 0.42;
-  const float SW = 2.9;
-  const float SH = 1.4078;
-  const float SY = 0.22;
-  const float M = 0.11;
-
-  vec2 rectPoint(vec2 lo, vec2 hi, float u) {
-    vec2 s = hi - lo;
-    float d = u * 2.0 * (s.x + s.y);
-    if (d < s.x) return vec2(lo.x + d, hi.y);
-    d -= s.x;
-    if (d < s.y) return vec2(hi.x, hi.y - d);
-    d -= s.y;
-    if (d < s.x) return vec2(hi.x - d, lo.y);
-    return vec2(lo.x, lo.y + (d - s.x));
-  }
-
-  vec3 poseA() {
-    vec3 p;
-    if (aA.x < 3.5) {
-      float dir = mod(aA.x, 2.0) < 0.5 ? 1.0 : -1.0;
-      float ang = aA.y + uTime * 0.28 * dir;
-      p = vec3(R * cos(ang), -R * sin(ang) * sin(AL), R * sin(ang) * cos(AL));
-      float k = aA.x * 0.7853982;
-      p = vec3(p.x * cos(k) - p.y * sin(k), p.x * sin(k) + p.y * cos(k), p.z);
-    } else {
-      float ang = aA.y - uTime * 0.16;
-      p = vec3(aA.z * cos(ang), aA.z * sin(ang), 0.0);
-    }
-    return (uLogo * vec4(p, 1.0)).xyz;
-  }
-  vec3 poseB() {
-    return aB + vec3(0.0, 0.0, 0.06 * sin(uTime * 1.3 + aB.x * 2.2 + aB.y * 1.7));
-  }
-  vec3 poseC() {
-    vec3 p = aC.xyz;
-    p.y += 0.035 * sin(uTime * 0.9 + aC.w * 6.283);
-    p.z += 0.09 * sin(uTime * 0.7 + aC.w * 6.283);
-    return (uRotC * vec4(p, 1.0)).xyz;
-  }
-  vec3 poseD() {
-    vec2 lo = vec2(-SW * 0.5 - M, SY - SH * 0.5 - M);
-    vec2 hi = vec2(SW * 0.5 + M, SY + SH * 0.5 + M);
-    vec3 p;
-    if (aD.x < 0.5) {
-      p = vec3(rectPoint(lo, hi, fract(aD.y + uTime * 0.02)), aD.z);
-    } else if (aD.x < 1.5) {
-      p = vec3(aD.y < 0.5 ? -0.07 : 0.07, lo.y - 0.05 - 0.4 * fract(aD.y * 2.0), 0.0);
-    } else {
-      p = vec3(-0.7 + 1.4 * aD.y, lo.y - 0.5, 0.0);
-    }
-    return (uMon * vec4(p, 1.0)).xyz;
-  }
-  vec3 pose(float i) {
-    if (i < 0.5) return poseA();
-    if (i < 1.5) return poseB();
-    if (i < 2.5) return poseC();
-    return poseD();
-  }
-  vec3 colorOf(float i) {
-    if (i < 0.5) return aColA;
-    if (i < 1.5) return vec3(0.3, 0.34, 0.35);
-    if (i < 2.5) return aColC;
-    return aRnd.x > 0.7 ? vec3(0.45, 0.97, 1.0) : vec3(0.0, 0.92, 0.97);
-  }
-
+  varying vec3 vLocal;
+  varying vec3 vScale;
+  varying float vGlow;
   void main() {
-    float seed = aRnd.x;
-    float lt = smoothstep(0.0, 1.0, clamp((uT - seed * 0.3) / 0.7, 0.0, 1.0));
-    vec3 n = vec3(sin(seed * 91.7 + uTime * 0.7), cos(seed * 57.3 + uTime * 0.6), sin(seed * 33.1 + uTime * 0.5));
-    vec3 p = mix(pose(uFrom), pose(uTo), lt) + n * (sin(lt * 3.14159) * uAmp + 0.01);
-
-    // Intro: el codigo llega desde afuera, en espiral.
-    float il = smoothstep(0.0, 1.0, clamp((uIntro - seed * 0.45) / 0.55, 0.0, 1.0));
-    vec3 far = normalize(n + vec3(0.001)) * (3.2 + seed * 2.0);
-    float sw = (1.0 - il) * 2.2;
-    far.xz = mat2(cos(sw), -sin(sw), sin(sw), cos(sw)) * far.xz;
-    p = mix(far, p, il);
-
-    vec3 col = mix(colorOf(uFrom), colorOf(uTo), lt) * aRnd.w;
-    float wB = (abs(uFrom - 1.0) < 0.5 ? 1.0 - lt : 0.0) + (abs(uTo - 1.0) < 0.5 ? lt : 0.0);
-    float wave = pow(0.5 + 0.5 * sin(uTime * 2.2 - p.x * 2.6 + p.y * 1.4), 4.0);
-    col *= mix(1.0, 0.55 + 1.3 * wave, wB);
-    vCol = col;
-
-    bool same = (abs(uFrom - 1.0) < 0.5 && lt < 0.5) || (abs(uTo - 1.0) < 0.5 && lt >= 0.5);
-    vGlyph = same ? ${X}.0 : aRnd.y;
-
-    vec4 mv = modelViewMatrix * vec4(p, 1.0);
-    mv.xy += position.xy * uSize * aRnd.z;
+    vec4 mv = modelViewMatrix * instanceMatrix * vec4(position, 1.0);
+    mat3 nm = mat3(modelViewMatrix) * mat3(instanceMatrix);
+    vN = normalize(nm * normal);
+    vV = normalize(-mv.xyz);
+    vCol = instanceColor;
+    vLocal = position;
+    vScale = vec3(length(instanceMatrix[0].xyz), length(instanceMatrix[1].xyz), length(instanceMatrix[2].xyz));
+    vGlow = aGlow;
     gl_Position = projectionMatrix * mv;
-    float twinkle = 0.75 + 0.25 * sin(uTime * (0.8 + seed) + seed * 40.0);
-    vAlpha = twinkle * uFade * (0.35 + 0.65 * il);
-    vUv = uv;
   }
 `;
-
-const FRAG = /* glsl */ `
+const BLOCK_FRAG = /* glsl */ `
   precision mediump float;
-  uniform sampler2D uAtlas;
-  varying vec2 vUv;
-  varying float vGlyph;
+  uniform float uFade;
+  varying vec3 vN;
+  varying vec3 vV;
   varying vec3 vCol;
-  varying float vAlpha;
+  varying vec3 vLocal;
+  varying vec3 vScale;
+  varying float vGlow;
   void main() {
-    float col = mod(vGlyph, 8.0);
-    float row = floor(vGlyph / 8.0);
-    vec2 uv = (vec2(col, 7.0 - row) + vUv) / 8.0;
-    float a = texture2D(uAtlas, uv).a * vAlpha;
-    if (a < 0.004) discard;
-    gl_FragColor = vec4(vCol * a * 1.45, a);
+    vec3 n = normalize(vN);
+    float facing = abs(dot(n, normalize(vV)));
+    float rim = pow(1.0 - facing, 2.0);
+    // Filo de luz en el contorno de la cara frontal (en unidades reales).
+    vec2 d = (0.5 - abs(vLocal.xy)) * vScale.xy;
+    float edge = 1.0 - smoothstep(0.0, 0.022, min(d.x, d.y));
+    float top = clamp(n.y * 0.5 + 0.5, 0.0, 1.0);
+    vec3 body = vCol * (0.12 + 0.16 * top) * (0.6 + 0.4 * vGlow);
+    vec3 light = vCol * (rim * 1.4 + edge * 1.1) * (0.55 + 0.6 * vGlow);
+    gl_FragColor = vec4(body + light, uFade);
   }
 `;
-
-const DUST_VERT = /* glsl */ `
-  attribute vec4 aP;   // posicion + semilla
-  attribute float aG;
-  uniform float uTime, uSize, uFade, uIntro;
-  varying vec2 vUv;
-  varying float vGlyph;
-  varying vec3 vCol;
-  varying float vAlpha;
-  void main() {
-    float a = uTime * 0.05;
-    vec3 p = aP.xyz;
-    p.xz = mat2(cos(a), -sin(a), sin(a), cos(a)) * p.xz;
-    p.y += 0.08 * sin(uTime * 0.4 + aP.w * 6.283);
-    vec4 mv = modelViewMatrix * vec4(p, 1.0);
-    mv.xy += position.xy * uSize;
-    gl_Position = projectionMatrix * mv;
-    vGlyph = aG;
-    vCol = vec3(0.03, 0.42, 0.45) * (0.5 + 0.5 * aP.w);
-    float depth = smoothstep(-2.6, 1.2, p.z);
-    vAlpha = uFade * uIntro * (0.25 + 0.55 * depth);
-    vUv = uv;
-  }
-`;
-
-// Atlas de glifos con su propio brillo (asi no hace falta bloom).
-function makeAtlas() {
-  const canvas = document.createElement('canvas');
-  canvas.width = canvas.height = 1024;
-  const ctx = canvas.getContext('2d');
-  ctx.font = '800 72px "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillStyle = '#fff';
-  [...GLYPHS].forEach((ch, i) => {
-    const x = (i % 8) * 128 + 64;
-    const y = Math.floor(i / 8) * 128 + 66;
-    ctx.shadowColor = 'rgba(255,255,255,0.9)';
-    ctx.shadowBlur = 26;
-    ctx.globalAlpha = 0.55;
-    ctx.fillText(ch, x, y);
-    ctx.shadowBlur = 0;
-    ctx.globalAlpha = 1;
-    ctx.fillText(ch, x, y);
-  });
-  const tex = new CanvasTexture(canvas);
-  tex.minFilter = LinearFilter;
-  tex.generateMipmaps = false;
-  return tex;
-}
 
 function makeFsTexture() {
   const canvas = document.createElement('canvas');
@@ -257,120 +136,95 @@ function makeFsTexture() {
   return tex;
 }
 
-// ---------------------------------------------------------- poses (CPU)
-function rectPoint(x0, y0, x1, y1, u) {
-  const w = x1 - x0;
-  const h = y1 - y0;
-  let d = u * 2 * (w + h);
-  if (d < w) return [x0 + d, y1];
-  d -= w;
-  if (d < h) return [x1, y1 - d];
-  d -= h;
-  if (d < w) return [x1 - d, y0];
-  return [x0, y0 + (d - w)];
+// Halo suave para las particulas de fondo.
+function makeDotTexture() {
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = 64;
+  const ctx = canvas.getContext('2d');
+  const g = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+  g.addColorStop(0, 'rgba(255,255,255,1)');
+  g.addColorStop(0.35, 'rgba(255,255,255,0.45)');
+  g.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, 64, 64);
+  return new CanvasTexture(canvas);
 }
 
-function buildGlyphs(N, rand) {
-  const aA = new Float32Array(N * 4);
-  const aB = new Float32Array(N * 3);
-  const aC = new Float32Array(N * 4);
-  const aD = new Float32Array(N * 4);
-  const aRnd = new Float32Array(N * 4);
-  const aColA = new Float32Array(N * 3);
-  const aColC = new Float32Array(N * 3);
+// ------------------------------------------------------------ poses (CPU)
+// Cada pose da, para cada bloque: posicion, tamano, color y brillo. Un
+// bloque con tamano casi 0 esta "guardado" en esa forma: aparece o
+// desaparece en la transicion, y eso hace que la forma se vea construirse.
+const HIDDEN = [0.001, 0.001, 0.001];
 
-  // A: 4 orbitas + 2 circulos alrededor de "FS"
-  const perRing = Math.floor((N * 0.72) / 4);
-  for (let i = 0; i < N; i++) {
-    if (i < perRing * 4) {
-      const k = Math.floor(i / perRing);
-      const j = i % perRing;
-      aA.set([k, (2 * Math.PI * j) / perRing, 0, 0], i * 4);
-      aColA.set(k % 2 ? SOFT : CYAN, i * 3);
-    } else {
-      const j = i - perRing * 4;
-      const rest = N - perRing * 4;
-      aA.set([4, (2 * Math.PI * j) / rest, j % 2 ? 0.74 : 0.62, 0], i * 4);
-      aColA.set(j % 2 ? DEEP : CYAN, i * 3);
+function poseTemplate() {
+  const out = [];
+  const BW = 0.9;
+  const BH = 0.62;
+  const GX = 1.04;
+  const GY = 0.76;
+  for (let b = 0; b < 9; b++) {
+    const cx = ((b % 3) - 1) * GX;
+    const cy = (1 - Math.floor(b / 3)) * GY;
+    out.push({ p: [cx, cy, 0], s: [BW, BH, 0.06], c: LEAD, g: 0.3, card: b });
+    out.push({ p: [cx - 0.22, cy + 0.08, 0.05], s: [0.34, 0.26, 0.04], c: LEAD, g: 0.5, card: b });
+    out.push({ p: [cx + 0.2, cy + 0.14, 0.05], s: [0.36, 0.05, 0.03], c: LEAD, g: 0.6, card: b });
+    out.push({ p: [cx + 0.14, cy + 0.02, 0.05], s: [0.24, 0.05, 0.03], c: LEAD, g: 0.6, card: b });
+  }
+  return out;
+}
+
+// Un layout a medida: titular, bajada, imagen grande, avatar, boton,
+// lineas de texto, tarjetas de servicios y pie. Piezas desiguales y a
+// distinta profundidad.
+function poseCustom() {
+  return [
+    { p: [-0.5, 0.92, 0.25], s: [1.7, 0.18, 0.08], c: BONE, g: 1 },
+    { p: [-0.75, 0.66, 0.25], s: [1.2, 0.11, 0.06], c: BONE, g: 0.8 },
+    { p: [1.0, 0.35, -0.3], s: [0.9, 1.35, 0.1], c: DEEP, g: 0.7 },
+    { p: [1.0, 0.68, -0.18], s: [0.6, 0.42, 0.05], c: SOFT, g: 0.9 },
+    { p: [0.42, -0.36, 0.45], s: [0.5, 0.5, 0.18], c: CYAN, g: 1 },
+    { p: [-0.98, 0.34, 0.1], s: [0.95, 0.06, 0.03], c: CYAN, g: 0.7 },
+    { p: [-1.05, 0.2, 0.1], s: [0.8, 0.06, 0.03], c: CYAN, g: 0.7 },
+    { p: [-1.12, 0.06, 0.1], s: [0.66, 0.06, 0.03], c: CYAN, g: 0.7 },
+    { p: [-1.1, -0.22, 0.4], s: [0.66, 0.2, 0.08], c: CYAN, g: 1.2 },
+    { p: [-1.02, -0.82, 0.0], s: [0.82, 0.38, 0.06], c: DEEP, g: 0.6 },
+    { p: [-0.1, -0.82, 0.0], s: [0.82, 0.38, 0.06], c: DEEP, g: 0.6 },
+    { p: [0.82, -0.82, 0.0], s: [0.82, 0.38, 0.06], c: DEEP, g: 0.6 },
+    { p: [-1.02, -0.74, 0.06], s: [0.5, 0.05, 0.02], c: CYAN, g: 0.8 },
+    { p: [-0.1, -0.74, 0.06], s: [0.5, 0.05, 0.02], c: CYAN, g: 0.8 },
+    { p: [0.82, -0.74, 0.06], s: [0.5, 0.05, 0.02], c: CYAN, g: 0.8 },
+    { p: [-0.25, -1.22, -0.05], s: [2.7, 0.08, 0.04], c: DEEP, g: 0.5 },
+    { p: [0.0, 1.22, -0.1], s: [3.0, 0.08, 0.04], c: DEEP, g: 0.5 },
+    { p: [1.3, 1.22, -0.06], s: [0.3, 0.1, 0.04], c: CYAN, g: 1 },
+  ];
+}
+
+function poseMonitor() {
+  const top = SCREEN_Y + SCREEN_H / 2;
+  const bottom = SCREEN_Y - SCREEN_H / 2;
+  const fw = SCREEN_W + 0.2;
+  return [
+    { p: [0, top + 0.05, 0], s: [fw, 0.1, 0.12], c: CYAN, g: 1 },
+    { p: [0, bottom - 0.05, 0], s: [fw, 0.1, 0.12], c: CYAN, g: 1 },
+    { p: [-fw / 2 + 0.05, SCREEN_Y, 0], s: [0.1, SCREEN_H + 0.2, 0.12], c: CYAN, g: 1 },
+    { p: [fw / 2 - 0.05, SCREEN_Y, 0], s: [0.1, SCREEN_H + 0.2, 0.12], c: CYAN, g: 1 },
+    { p: [0, bottom - 0.32, -0.04], s: [0.16, 0.46, 0.1], c: DEEP, g: 0.8 },
+    { p: [0, bottom - 0.58, 0], s: [1.2, 0.08, 0.36], c: DEEP, g: 0.9 },
+  ];
+}
+
+// Reparte una lista de piezas en K bloques; los que sobran quedan guardados
+// en la pieza que les toca (o en `anchor`), y desde ahi aparecen.
+function fill(pieces, anchor) {
+  const out = [];
+  for (let i = 0; i < K; i++) {
+    if (i < pieces.length) out.push(pieces[i]);
+    else {
+      const host = pieces[i % pieces.length];
+      out.push({ p: anchor ? [...anchor] : [...host.p], s: HIDDEN, c: host.c, g: 0 });
     }
   }
-
-  // B: la plantilla, 3x3 cajas iguales
-  const BW = 0.92;
-  const BH = 0.6;
-  const GAP = 0.14;
-  const per = Math.ceil(N / 9);
-  for (let i = 0; i < N; i++) {
-    const box = i % 9;
-    const q = Math.floor(i / 9) / per;
-    const cx = ((box % 3) - 1) * (BW + GAP);
-    const cy = (1 - Math.floor(box / 3)) * (BH + GAP);
-    const x0 = cx - BW / 2;
-    const y0 = cy - BH / 2;
-    let p;
-    if (q < 0.62) p = rectPoint(x0, y0, x0 + BW, y0 + BH, q / 0.62);
-    else if (q < 0.86) p = rectPoint(x0 + 0.1, y0 + 0.28, x0 + 0.42, y0 + 0.5, (q - 0.62) / 0.24);
-    else p = [x0 + 0.1 + 0.72 * ((q - 0.86) / 0.14), y0 + 0.12];
-    aB.set([p[0], p[1], 0], i * 3);
-  }
-
-  // C: el layout a medida, piezas desiguales a distinta profundidad
-  const line = (x0, x1, y, z) => (u) => [x0 + (x1 - x0) * u, y, z];
-  const box = (x0, y0, x1, y1, z) => (u) => [...rectPoint(x0, y0, x1, y1, u), z];
-  const circle = (cx, cy, r, z) => (u) => [cx + r * Math.cos(2 * Math.PI * u), cy + r * Math.sin(2 * Math.PI * u), z];
-  const parts = [
-    [26, line(-1.45, 0.25, 0.95, 0.35), BONE],
-    [19, line(-1.45, -0.25, 0.75, 0.35), BONE],
-    [34, box(0.55, -0.25, 1.45, 1.05, -0.25), DEEP],
-    [14, box(0.68, 0.45, 1.32, 0.92, -0.1), SOFT],
-    [22, circle(0.55, -0.35, 0.32, 0.5), CYAN],
-    [14, line(-1.45, 0.05, 0.45, 0), CYAN],
-    [13, line(-1.45, -0.1, 0.31, 0), CYAN],
-    [11, line(-1.45, -0.35, 0.17, 0), CYAN],
-    [16, box(-1.45, -0.3, -0.75, -0.08, 0.45), CYAN],
-    [18, box(-1.45, -1.0, -0.6, -0.65, -0.1), DEEP],
-    [32, box(-0.45, -1.0, 1.45, -0.65, -0.1), DEEP],
-  ];
-  const total = parts.reduce((s, p) => s + p[0], 0);
-  const counts = parts.map((p) => Math.round((p[0] * N) / total));
-  counts[0] += N - counts.reduce((s, c) => s + c, 0);
-  const cList = [];
-  parts.forEach(([, fn, col], pi) => {
-    for (let j = 0; j < counts[pi]; j++) cList.push([fn((j + 0.5) / counts[pi]), col, pi / parts.length]);
-  });
-  for (let i = cList.length - 1; i > 0; i--) {
-    const j = Math.floor(rand() * (i + 1));
-    [cList[i], cList[j]] = [cList[j], cList[i]];
-  }
-  cList.forEach(([p, col, phase], i) => {
-    aC.set([p[0], p[1], p[2], phase], i * 4);
-    aColC.set(col, i * 3);
-  });
-
-  // D: el monitor
-  const nFrame = Math.floor(N * 0.78);
-  const nStand = Math.floor(N * 0.1);
-  for (let i = 0; i < N; i++) {
-    if (i < nFrame) aD.set([0, i / nFrame, i % 2 ? 0.03 : -0.03, 0], i * 4);
-    else if (i < nFrame + nStand) aD.set([1, (i - nFrame) / nStand, 0, 0], i * 4);
-    else aD.set([2, (i - nFrame - nStand) / (N - nFrame - nStand), 0, 0], i * 4);
-  }
-
-  for (let i = 0; i < N; i++) {
-    aRnd.set([rand(), Math.floor(rand() * GLYPHS.length), 0.8 + rand() * 0.45, 0.75 + rand() * 0.45], i * 4);
-  }
-  return { aA, aB, aC, aD, aRnd, aColA, aColC };
-}
-
-function ellipse(radius, segments = 220) {
-  const pts = [];
-  for (let i = 0; i < segments; i++) {
-    const a = (2 * Math.PI * i) / segments;
-    pts.push(radius * Math.cos(a), 0, radius * Math.sin(a));
-  }
-  const g = new BufferGeometry();
-  g.setAttribute('position', new Float32BufferAttribute(pts, 3));
-  return g;
+  return out;
 }
 
 // ---------------------------------------------------------------------------
@@ -378,8 +232,6 @@ function ellipse(radius, segments = 220) {
 export async function startOrbit(root) {
   const { gsap } = await initScroll();
   const mobile = window.matchMedia('(max-width: 899px)').matches;
-  const N = mobile ? 900 : 1500;
-  const DUST = mobile ? 160 : 280;
   let seedState = 7;
   const rand = () => {
     seedState = (seedState * 16807) % 2147483647;
@@ -387,7 +239,9 @@ export async function startOrbit(root) {
   };
 
   // ---------------------------------------------------------- lienzo
-  const renderer = new WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
+  // Sin antialias en celular: con piezas solidas y pixel ratio 1.5 no se
+  // nota, y es buena parte del costo de cada cuadro.
+  const renderer = new WebGLRenderer({ antialias: !mobile, alpha: true, powerPreference: 'high-performance' });
   renderer.setClearColor(0x000000, 0);
   const canvas = renderer.domElement;
   canvas.className = 'seq-canvas';
@@ -406,98 +260,96 @@ export async function startOrbit(root) {
   const scene = new Scene();
   const camera = new PerspectiveCamera(FOV, 1, 0.1, 60);
 
-  // ---------------------------------------------------------- codigo
-  const atlas = makeAtlas();
-  const data = buildGlyphs(N, rand);
-  const quad = new PlaneGeometry(1, 1);
-  const geo = new InstancedBufferGeometry();
-  geo.index = quad.index;
-  geo.setAttribute('position', quad.getAttribute('position'));
-  geo.setAttribute('uv', quad.getAttribute('uv'));
-  geo.instanceCount = N;
-  geo.setAttribute('aA', new InstancedBufferAttribute(data.aA, 4));
-  geo.setAttribute('aB', new InstancedBufferAttribute(data.aB, 3));
-  geo.setAttribute('aC', new InstancedBufferAttribute(data.aC, 4));
-  geo.setAttribute('aD', new InstancedBufferAttribute(data.aD, 4));
-  geo.setAttribute('aRnd', new InstancedBufferAttribute(data.aRnd, 4));
-  geo.setAttribute('aColA', new InstancedBufferAttribute(data.aColA, 3));
-  geo.setAttribute('aColC', new InstancedBufferAttribute(data.aColC, 3));
-
   const logoGroup = new Group();
   const monGroup = new Group();
   const rotC = new Group();
   scene.add(logoGroup, monGroup, rotC);
 
-  const uniforms = {
-    uTime: { value: 0 },
-    uFrom: { value: 0 },
-    uTo: { value: 1 },
-    uT: { value: 0 },
-    uAmp: { value: 0.3 },
-    uSize: { value: mobile ? 0.21 : 0.19 },
-    uFade: { value: 1 },
-    uIntro: { value: 0 },
-    uAtlas: { value: atlas },
-    uLogo: { value: logoGroup.matrix },
-    uRotC: { value: rotC.matrix },
-    uMon: { value: monGroup.matrix },
-  };
-  const glyphMat = new ShaderMaterial({
-    vertexShader: VERT,
-    fragmentShader: FRAG,
-    uniforms,
-    transparent: true,
-    depthTest: false,
-    depthWrite: false,
-    blending: AdditiveBlending,
-  });
-  const glyphs = new Mesh(geo, glyphMat);
-  glyphs.frustumCulled = false;
-  scene.add(glyphs);
+  // ---------------------------------------------------------- bloques
+  const blockGeo = new RoundedBoxGeometry(1, 1, 1, 3, 0.08);
+  const glowAttr = new InstancedBufferAttribute(new Float32Array(K), 1);
+  blockGeo.setAttribute('aGlow', glowAttr);
+  const blockUniforms = { uFade: { value: 1 } };
+  const blockMat = new ShaderMaterial({ vertexShader: BLOCK_VERT, fragmentShader: BLOCK_FRAG, uniforms: blockUniforms, transparent: true });
+  const blocks = new InstancedMesh(blockGeo, blockMat, K);
+  blocks.frustumCulled = false;
+  blocks.instanceColor = new InstancedBufferAttribute(new Float32Array(K * 3), 3);
+  scene.add(blocks);
 
-  // Nube de codigo tenue alrededor, siempre a la deriva.
-  const dustGeo = new InstancedBufferGeometry();
-  dustGeo.index = quad.index;
-  dustGeo.setAttribute('position', quad.getAttribute('position'));
-  dustGeo.setAttribute('uv', quad.getAttribute('uv'));
-  dustGeo.instanceCount = DUST;
-  const dP = new Float32Array(DUST * 4);
-  const dG = new Float32Array(DUST);
-  for (let i = 0; i < DUST; i++) {
-    const th = rand() * Math.PI * 2;
-    const r = 1.75 + rand() * 0.7;
-    dP.set([r * Math.cos(th), (rand() - 0.5) * 2.6, r * Math.sin(th) - 0.3, rand()], i * 4);
-    dG[i] = Math.floor(rand() * GLYPHS.length);
+  const seeds = Array.from({ length: K }, () => rand());
+  const spin = Array.from({ length: K }, () => [rand() - 0.5, rand() - 0.5, rand() - 0.5]);
+  const POSE_B = fill(poseTemplate());
+  const POSE_C = fill(poseCustom());
+  const POSE_D = fill(poseMonitor(), [0, SCREEN_Y, -0.1]);
+  const AXIS_Z = new Vector3(0, 0, 1);
+
+  // Logo: 8 bloques corren por las orbitas (2 por orbita); el resto queda
+  // dentro del nucleo, detras de "FS".
+  function poseLogo(time) {
+    const out = [];
+    for (let i = 0; i < K; i++) {
+      if (i < 8) {
+        const k = i % 4;
+        const dir = k % 2 ? -1 : 1;
+        const a = (i < 4 ? 0 : Math.PI) + time * 0.55 * dir + k * 0.7;
+        const v = new Vector3(RING_R * Math.cos(a), -RING_R * Math.sin(a) * Math.sin(RING_AL), RING_R * Math.sin(a) * Math.cos(RING_AL));
+        v.applyAxisAngle(AXIS_Z, (k * Math.PI) / 4);
+        out.push({ p: v.toArray(), s: [0.13, 0.13, 0.13], c: i % 2 ? SOFT : CYAN, g: 1.3, group: logoGroup });
+      } else {
+        out.push({ p: [0, 0, -0.05], s: HIDDEN, c: CYAN, g: 0, group: logoGroup });
+      }
+    }
+    return out;
   }
-  dustGeo.setAttribute('aP', new InstancedBufferAttribute(dP, 4));
-  dustGeo.setAttribute('aG', new InstancedBufferAttribute(dG, 1));
-  const dustUniforms = { uTime: uniforms.uTime, uSize: { value: 0.13 }, uFade: uniforms.uFade, uIntro: { value: 0 }, uAtlas: uniforms.uAtlas };
-  const dust = new Mesh(
-    dustGeo,
-    new ShaderMaterial({ vertexShader: DUST_VERT, fragmentShader: FRAG, uniforms: dustUniforms, transparent: true, depthTest: false, depthWrite: false, blending: AdditiveBlending }),
-  );
-  dust.frustumCulled = false;
-  scene.add(dust);
 
-  // Lineas del logo: 4 orbitas, circulo exterior y central.
-  const lineMats = [];
-  const addLine = (radius, rotation, order, opacity, color) => {
-    const m = new LineBasicMaterial({ color, transparent: true, opacity, blending: AdditiveBlending, depthTest: false });
+  // ---------------------------------------------------------- orbitas
+  const ringMats = [];
+  const ringGroup = new Group();
+  logoGroup.add(ringGroup);
+  const addRing = (radius, tube, rot, color, opacity) => {
+    const m = new MeshBasicMaterial({ color, transparent: true, opacity, blending: AdditiveBlending, depthWrite: false });
     m.userData.base = opacity;
-    lineMats.push(m);
-    const l = new LineLoop(ellipse(radius), m);
-    l.rotation.order = order;
-    l.rotation.set(...rotation);
-    logoGroup.add(l);
+    ringMats.push(m);
+    const mesh = new Mesh(new TorusGeometry(radius, tube, 6, mobile ? 120 : 180), m);
+    mesh.rotation.order = 'ZYX';
+    mesh.rotation.set(...rot);
+    ringGroup.add(mesh);
   };
-  for (let k = 0; k < 4; k++) addLine(1.3, [0.42, 0, (k * Math.PI) / 4], 'ZYX', 0.35, 0x0b8f96);
-  addLine(1.62, [Math.PI / 2, 0, 0], 'XYZ', 0.6, 0x00f3fb);
-  addLine(0.5, [Math.PI / 2, 0, 0], 'XYZ', 0.5, 0x00f3fb);
+  for (let k = 0; k < 4; k++) {
+    const rot = [Math.PI / 2 + RING_AL, 0, (k * Math.PI) / 4];
+    addRing(RING_R, 0.008, rot, 0x00f3fb, 0.85);
+    addRing(RING_R, 0.035, rot, 0x0b8f96, 0.16); // halo
+  }
+  addRing(1.62, 0.01, [0, 0, 0], 0x00f3fb, 0.7);
+  addRing(1.62, 0.04, [0, 0, 0], 0x0b8f96, 0.14);
+  addRing(0.5, 0.012, [0, 0, 0], 0x00f3fb, 0.8);
 
   // "FS" en el centro.
   const fsMat = new MeshBasicMaterial({ map: makeFsTexture(), transparent: true, blending: AdditiveBlending, depthTest: false });
   const fs = new Mesh(new PlaneGeometry(0.78, 0.39), fsMat);
   scene.add(fs);
+
+  // Particulas de luz alrededor, a la deriva (dan profundidad).
+  const DUST = mobile ? 70 : 140;
+  const dustPos = new Float32Array(DUST * 3);
+  for (let i = 0; i < DUST; i++) {
+    const th = rand() * Math.PI * 2;
+    const r = 1.8 + rand() * 0.8;
+    dustPos.set([r * Math.cos(th), (rand() - 0.5) * 2.8, r * Math.sin(th) - 0.4], i * 3);
+  }
+  const dustGeo = new BufferGeometry();
+  dustGeo.setAttribute('position', new Float32BufferAttribute(dustPos, 3));
+  const dustMat = new PointsMaterial({
+    map: makeDotTexture(),
+    color: 0x0fb8bf,
+    size: mobile ? 0.07 : 0.06,
+    transparent: true,
+    opacity: 0.6,
+    blending: AdditiveBlending,
+    depthWrite: false,
+  });
+  const dust = new Points(dustGeo, dustMat);
+  scene.add(dust);
 
   // Pantalla del monitor: dos capas para fundir de un caso al otro.
   const loader = new TextureLoader();
@@ -506,17 +358,17 @@ export async function startOrbit(root) {
     t.colorSpace = SRGBColorSpace;
     return t;
   });
-  const screenGeo = new PlaneGeometry(2.9, 2.9 / 2.06);
+  const screenGeo = new PlaneGeometry(SCREEN_W, SCREEN_H);
   const makeScreen = () => {
     const m = new MeshBasicMaterial({ transparent: true, opacity: 0, depthTest: false });
     const mesh = new Mesh(screenGeo, m);
-    mesh.position.set(0, 0.22, -0.02);
+    mesh.position.set(0, SCREEN_Y, 0.02);
     monGroup.add(mesh);
     return m;
   };
   const backing = new MeshBasicMaterial({ color: 0x030809, transparent: true, opacity: 0, depthTest: false });
   const back = new Mesh(screenGeo, backing);
-  back.position.set(0, 0.22, -0.03);
+  back.position.set(0, SCREEN_Y, 0.01);
   monGroup.add(back);
   const screenA = makeScreen();
   const screenB = makeScreen();
@@ -576,11 +428,8 @@ export async function startOrbit(root) {
     for (const el of slots) {
       const r = el.getBoundingClientRect();
       if (!r.width || !r.height || r.bottom < -H || r.top > 2 * H) continue;
-      const wide = parseFloat(el.dataset.crop || '0') > 0;
-      let w = r.width;
-      let h = r.height;
-      if (!wide) w = h = Math.min(r.width, r.height);
-      out.push({ el, wide, x: r.left + (r.width - w) / 2, y: r.top + (r.height - h) / 2, w, h, cy: r.top + r.height / 2 });
+      const w = Math.min(r.width, r.height);
+      out.push({ el, x: r.left + (r.width - w) / 2, y: r.top + (r.height - w) / 2, w, h: w, cy: r.top + r.height / 2 });
     }
     return out;
   }
@@ -595,7 +444,7 @@ export async function startOrbit(root) {
     const a = rects[i - 1];
     const b = rects[i];
     const t = (c - a.cy) / (b.cy - a.cy);
-    if (mobile || Math.abs(b.x - a.x) > W * 0.25 || a.wide || b.wide) {
+    if (mobile || Math.abs(b.x - a.x) > W * 0.25) {
       const k = smooth((t - 0.32) / 0.36);
       const grow = (r, s) => ({ ...r, x: r.x + (r.w * (1 - s)) / 2, y: r.y + (r.h * (1 - s)) / 2, w: r.w * s, h: r.h * s });
       return [
@@ -605,7 +454,7 @@ export async function startOrbit(root) {
     }
     const k = smooth((t - 0.2) / 0.6);
     const near = k < 0.5 ? a : b;
-    return [{ el: near.el, wide: false, x: lerp(a.x, b.x, k), y: lerp(a.y, b.y, k), w: lerp(a.w, b.w, k), h: lerp(a.h, b.h, k), alpha: 1 }];
+    return [{ el: near.el, x: lerp(a.x, b.x, k), y: lerp(a.y, b.y, k), w: lerp(a.w, b.w, k), h: lerp(a.h, b.h, k), alpha: 1 }];
   }
 
   // El monitor va mostrando los sitios publicados, uno cada 3.5 s.
@@ -626,102 +475,181 @@ export async function startOrbit(root) {
   if (fine) window.addEventListener('pointermove', onMove, { passive: true });
 
   let P = 0;
-  let last = 0;
   let introStart = null;
   let shownCase = 0;
   let fadeCase = 1;
   let shown = false;
-  const AMPS = mobile ? [0.18, 0.4, 0.25, 0.2] : [0.3, 0.7, 0.4, 0.35];
+  const AMPS = mobile ? [0.25, 0.45, 0.3, 0.25] : [0.35, 0.6, 0.4, 0.3];
 
-  function setShape(p, time) {
-    const i = Math.min(3, Math.floor(p));
-    const t = p - i;
-    uniforms.uFrom.value = i;
-    uniforms.uTo.value = i + 1 > 3 ? 0 : i + 1;
-    uniforms.uT.value = t;
-    uniforms.uAmp.value = AMPS[i];
-    const wA = Math.max(0, 1 - p * 1.6) + Math.max(0, 1 - (4 - p) * 1.6);
-    const wD = Math.max(0, 1 - Math.abs(p - 3) * 2.2);
-    for (const m of lineMats) m.opacity = m.userData.base * wA * uniforms.uFade.value * (0.85 + 0.15 * Math.sin(time * 2));
-    const pulse = 1 + 0.12 * Math.sin(time * 2.4);
-    fs.scale.setScalar(Math.max(0.0001, wA) * pulse);
-    fsMat.opacity = wA * uniforms.uFade.value * uniforms.uIntro.value;
-    backing.opacity = wD * 0.9 * uniforms.uFade.value;
-    return wD;
+  // Reutilizables (sin basura por cuadro).
+  const m4 = new Matrix4();
+  const ident = new Matrix4();
+  const qA = new Quaternion();
+  const qB = new Quaternion();
+  const qT = new Quaternion();
+  const eul = new Euler();
+  const vA = new Vector3();
+  const vB = new Vector3();
+  const vS = new Vector3();
+  const vF = new Vector3();
+  const col = new Color();
+
+  // Pose de cada forma con su movimiento propio.
+  function shapePose(shape, time) {
+    if (shape === 0 || shape === 4) return poseLogo(time);
+    if (shape === 1) {
+      // Una onda de luz recorre las tarjetas de la plantilla.
+      return POSE_B.map((b) => {
+        const card = b.card ?? 0;
+        const wave = Math.pow(0.5 + 0.5 * Math.sin(time * 2.2 - (card % 3) * 1.1 + Math.floor(card / 3) * 0.8), 4);
+        return { ...b, g: b.g + wave * 1.2, p: [b.p[0], b.p[1], b.p[2] + 0.05 * wave] };
+      });
+    }
+    if (shape === 2) {
+      return POSE_C.map((b, i) => ({
+        ...b,
+        p: [b.p[0], b.p[1] + 0.03 * Math.sin(time * 0.9 + i), b.p[2] + 0.06 * Math.sin(time * 0.7 + i * 1.7)],
+        group: rotC,
+      }));
+    }
+    return POSE_D.map((b) => ({ ...b, group: monGroup }));
+  }
+
+  function toWorld(b, out) {
+    out.set(b.p[0], b.p[1], b.p[2]);
+    if (b.group) out.applyMatrix4(b.group.matrix);
+    return out;
+  }
+
+  function placeBlocks(p, time, intro) {
+    const i0 = Math.min(3, Math.floor(p));
+    const t = p - i0;
+    const from = shapePose(i0, time);
+    const to = shapePose(i0 + 1, time);
+    const amp = AMPS[i0];
+    for (let i = 0; i < K; i++) {
+      const a = from[i];
+      const b = to[i];
+      const lt = smooth((t - seeds[i] * 0.3) / 0.7);
+      toWorld(a, vA);
+      toWorld(b, vB);
+      vA.lerp(vB, lt);
+      // Arco: a mitad de camino cada bloque se separa un poco.
+      const arc = Math.sin(lt * Math.PI) * amp;
+      vA.x += spin[i][0] * arc * 2;
+      vA.y += spin[i][1] * arc * 2;
+      vA.z += spin[i][2] * arc * 2 + arc * 0.4;
+
+      vS.set(lerp(a.s[0], b.s[0], lt), lerp(a.s[1], b.s[1], lt), lerp(a.s[2], b.s[2], lt));
+
+      // Intro: los bloques llegan en espiral desde afuera.
+      const il = smooth((intro - seeds[i] * 0.45) / 0.55);
+      if (il < 1) {
+        const ang = seeds[i] * Math.PI * 2 + (1 - il) * 2.4;
+        const r = 3.4 + seeds[i] * 1.6;
+        vF.set(Math.cos(ang) * r, (seeds[i] - 0.5) * 3, Math.sin(ang) * r - 1);
+        vA.lerp(vF, 1 - il);
+        vS.lerp(vF.set(0.14, 0.14, 0.14), 1 - il);
+      }
+
+      // Rotacion: la del grupo de cada forma, con un giro extra en el camino.
+      qA.setFromRotationMatrix(m4.extractRotation(a.group ? a.group.matrix : ident));
+      qB.setFromRotationMatrix(m4.extractRotation(b.group ? b.group.matrix : ident));
+      qT.slerpQuaternions(qA, qB, lt);
+      eul.set(spin[i][0] * arc * 4 + (1 - il) * 3, spin[i][1] * arc * 4 + (1 - il) * 2, spin[i][2] * arc * 2);
+      qA.setFromEuler(eul);
+      qT.multiply(qA);
+      m4.compose(vA, qT, vS);
+      blocks.setMatrixAt(i, m4);
+
+      col.setRGB(lerp(a.c[0], b.c[0], lt), lerp(a.c[1], b.c[1], lt), lerp(a.c[2], b.c[2], lt));
+      blocks.setColorAt(i, col);
+      glowAttr.array[i] = lerp(a.g, b.g, lt) * (0.6 + 0.4 * il);
+    }
+    blocks.instanceMatrix.needsUpdate = true;
+    blocks.instanceColor.needsUpdate = true;
+    glowAttr.needsUpdate = true;
   }
 
   function frame(time, deltaMs) {
     const dt = Math.min(0.1, deltaMs / 1000 || 0.016);
-    last = time;
-    uniforms.uTime.value = time;
 
-    // Intro: el codigo se arma como el logo al aparecer.
+    // Intro: los bloques llegan y el logo se enciende al aparecer.
     if (introStart === null) introStart = time;
-    const intro = smooth((time - introStart) / 1.8);
-    uniforms.uIntro.value = intro;
-    dustUniforms.uIntro.value = intro;
+    const intro = smooth((time - introStart) / 2.0);
 
     // Escritorio: la forma sigue al scroll con inercia. Celular: la forma es
     // la del hueco que esta a la vista, y el cambio se reproduce solo (~1 s)
     // al llegar, para que nunca quede detenido a mitad de camino.
     const places = placements();
-    let target;
     if (mobile) {
-      const main = places.reduce((m, p) => (p.alpha > (m?.alpha ?? -1) ? p : m), null);
-      target = shapeOf(main?.el);
-      // De la forma 4 (logo final) a una anterior se vuelve por el logo.
+      const main = places.reduce((m, pl) => (pl.alpha > (m?.alpha ?? -1) ? pl : m), null);
+      const target = shapeOf(main?.el);
       if (P > 3.5 && target < 3) P = 0;
       const step = dt * 1.1;
       P = Math.abs(target - P) <= step ? target : P + Math.sign(target - P) * step;
     } else {
-      target = targetP(window.scrollY);
+      const target = targetP(window.scrollY);
       P += (target - P) * (1 - Math.exp(-dt * 5));
     }
 
     // Movimientos propios de cada forma.
     logoGroup.rotation.set(0.22 + 0.06 * Math.sin(time * 0.37), 0.12 * Math.sin(time * 0.23), time * 0.1);
     logoGroup.updateMatrix();
+    logoGroup.updateMatrixWorld();
     rotC.rotation.set(0.08 + 0.05 * Math.sin(time * 0.31), -0.42 + 0.12 * Math.sin(time * 0.27), 0);
     rotC.updateMatrix();
     monGroup.rotation.set(0.04 * Math.sin(time * 0.33), 0.16 * Math.sin(time * 0.29), 0);
     monGroup.updateMatrix();
     monGroup.updateMatrixWorld();
+    dust.rotation.y = time * 0.05;
+
+    placeBlocks(P, time, intro);
+
+    // Pesos de cada forma: logo (orbitas, FS) y monitor (pantalla).
+    const wA = Math.max(0, 1 - P * 1.6) + Math.max(0, 1 - (4 - P) * 1.6);
+    const wD = Math.max(0, 1 - Math.abs(P - 3) * 2.2);
+    const ringIn = smooth((intro - 0.35) / 0.65);
+    ringGroup.scale.setScalar(Math.max(0.0001, wA * (0.6 + 0.4 * ringIn)));
+    const pulse = 1 + 0.12 * Math.sin(time * 2.4);
+    fs.scale.setScalar(Math.max(0.0001, wA * ringIn) * pulse);
 
     pointer.cx += (pointer.x - pointer.cx) * 0.05;
     pointer.cy += (pointer.y - pointer.cy) * 0.05;
 
     // Caso en pantalla: fundido de 0.6 s al cambiar.
-    {
-      const want = activeCase(time);
-      if (want !== shownCase && fadeCase >= 1) {
-        screenB.map = shots[shownCase];
-        screenB.needsUpdate = true;
-        shownCase = want;
-        screenA.map = shots[shownCase];
-        screenA.needsUpdate = true;
-        fadeCase = 0;
-      }
-      fadeCase = Math.min(1, fadeCase + dt / 0.6);
+    const want = activeCase(time);
+    if (want !== shownCase && fadeCase >= 1) {
+      screenB.map = shots[shownCase];
+      screenB.needsUpdate = true;
+      shownCase = want;
+      screenA.map = shots[shownCase];
+      screenA.needsUpdate = true;
+      fadeCase = 0;
     }
+    fadeCase = Math.min(1, fadeCase + dt / 0.6);
 
     renderer.setScissorTest(false);
     renderer.clear();
     renderer.setScissorTest(true);
     for (const p of places) {
-      uniforms.uFade.value = p.alpha;
-      const wD = setShape(P, time);
+      blockUniforms.uFade.value = p.alpha;
+      for (const m of ringMats) m.opacity = m.userData.base * p.alpha * ringIn * (0.85 + 0.15 * Math.sin(time * 2));
+      fsMat.opacity = wA * p.alpha * ringIn;
+      dustMat.opacity = 0.55 * p.alpha * intro;
+      backing.opacity = wD * 0.95 * p.alpha;
       screenA.opacity = wD * p.alpha * fadeCase;
       screenB.opacity = wD * p.alpha * (1 - fadeCase);
 
       const aspect = p.w / p.h;
-      const halfH = p.wide ? 1.75 / aspect : aspect >= 1 ? HALF : HALF / aspect;
+      const halfH = aspect >= 1 ? HALF : HALF / aspect;
       const dist = halfH / TAN;
       const calmD = 1 - 0.75 * wD;
       const yaw = (0.2 * Math.sin(time * 0.21) + pointer.cx * 0.18) * calmD;
       const pitch = (0.07 * Math.sin(time * 0.17) - pointer.cy * 0.1) * calmD;
       camera.aspect = aspect;
-      camera.position.set(dist * Math.sin(yaw) * Math.cos(pitch), dist * Math.sin(pitch) + (p.wide ? 0.05 : 0), dist * Math.cos(yaw) * Math.cos(pitch));
-      camera.lookAt(0, p.wide ? 0.05 : 0, 0);
+      camera.position.set(dist * Math.sin(yaw) * Math.cos(pitch), dist * Math.sin(pitch), dist * Math.cos(yaw) * Math.cos(pitch));
+      camera.lookAt(0, 0, 0);
       camera.updateProjectionMatrix();
       fs.quaternion.copy(camera.quaternion);
 
@@ -772,7 +700,6 @@ export async function startOrbit(root) {
       o.material?.map?.dispose?.();
       o.material?.dispose?.();
     });
-    atlas.dispose();
     shots.forEach((t) => t.dispose());
     renderer.dispose();
     canvas.remove();
@@ -786,6 +713,5 @@ export async function startOrbit(root) {
     document.documentElement.classList.remove('seq');
   });
 
-  void last;
   return dispose;
 }

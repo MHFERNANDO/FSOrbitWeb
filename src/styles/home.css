@@ -120,7 +120,7 @@ html.seq-on .seq-canvas {
   }
 }
 .orbit-figure {
-  object-fit: contain;
+  background: url('/assets/orbit-poster.webp') center / contain no-repeat;
   transition: opacity 700ms ease;
   /* Entra con un fundido: asi el elemento mas grande del primer pintado
      (LCP) es el titular y no la imagen decorativa. */

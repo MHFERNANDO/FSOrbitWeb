@@ -47,8 +47,12 @@ export default function Home() {
             else stop?.();
           })
           .catch(() => root.classList.remove('seq', 'seq-on'));
-      if ('requestIdleCallback' in window) requestIdleCallback(start, { timeout: 1500 });
-      else setTimeout(start, 400);
+      // Espera a que la pagina termine de cargar (texto, fuentes, capturas):
+      // los cuadros no compiten con el primer pintado.
+      const idle = () =>
+        'requestIdleCallback' in window ? requestIdleCallback(start, { timeout: 1200 }) : setTimeout(start, 300);
+      if (document.readyState === 'complete') idle();
+      else window.addEventListener('load', idle, { once: true });
     }
     return () => {
       alive = false;

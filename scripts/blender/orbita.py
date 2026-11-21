@@ -5,12 +5,12 @@
 # el anillo exterior y una nube de codigo tenue alrededor, con profundidad
 # de campo. Cada cuadro se calcula aqui mismo, sin keyframes.
 #
-#   0-23     el logo gira 45 grados (loop perfecto: todo es simetrico)
-#   24-59    se aplana en 9 cajas grises identicas (la plantilla)
-#   60-95    las cajas se desordenan y se arman como un layout a medida
-#   96-131   el codigo forma un monitor; la web dibuja el caso en la pantalla
-#   132-155  el monitor vuelve a ser el logo
-#   156-179  el logo gira (loop) hasta el final de la pagina
+#   0-29     intro: el codigo disperso se arma como el logo (se ve una vez)
+#   30-77    loop: el logo gira y el codigo corre por las orbitas
+#   78-113   se aplana en 9 cajas grises identicas (la plantilla)
+#   114-149  las cajas se desordenan y se arman como un layout a medida
+#   150-185  el codigo forma un monitor; la web dibuja el caso en la pantalla
+#   186-209  el monitor vuelve a ser el logo (y sigue el loop)
 #
 # Uso (Blender 5.2):
 #   blender -b -P scripts/blender/orbita.py -- <carpeta_png> <screen.json> [lado_px] [desde] [hasta]
@@ -29,7 +29,7 @@ OUT = argv[0] if len(argv) > 0 else os.path.abspath('frames')
 SCREEN_JSON = argv[1] if len(argv) > 1 else os.path.abspath('screen.json')
 SIDE = int(argv[2]) if len(argv) > 2 else 1000
 F_FROM = int(argv[3]) if len(argv) > 3 else 0
-F_TO = int(argv[4]) if len(argv) > 4 else 179
+F_TO = int(argv[4]) if len(argv) > 4 else 209
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 FONTS = os.path.normpath(os.path.join(HERE, '..', '..', '..', 'FSOrbit Contenido', 'brand', 'fonts'))
@@ -384,27 +384,67 @@ def lerp_c(a, b, t):
     return tuple(a[i] + (b[i] - a[i]) * t for i in range(3))
 
 
-def atom_pose(spin):
+def atom_pose(spin, phase=0.0):
+    """Logo con giro `spin` y el codigo avanzando `phase` lugares por la orbita."""
     R = atom_rot(spin)
-    return [R @ p for p in pose_a]
+    out = []
+    for k in range(4):
+        for j in range(PER_RING):
+            out.append(R @ ring_point(k, 2 * math.pi * (j + phase * (1 if k % 2 == 0 else -1)) / PER_RING))
+    rest = N - len(out)
+    for j in range(rest):
+        radius = 0.62 if j % 2 == 0 else 0.72
+        a = 2 * math.pi * (j - phase) / rest
+        out.append(R @ Vector((radius * math.cos(a), 0, radius * math.sin(a))))
+    return out
 
 
-POSES = {'A': (atom_pose(0.0), color_a), 'B': (pose_b, color_b), 'C': (pose_c, color_c), 'D': (pose_d, color_d)}
+# Linea de tiempo (cuadros). La web la lee de screen.json.
+INTRO = (0, 29)  # el logo se arma desde el codigo disperso (se ve una vez)
+LOOP = (30, 77)  # el logo gira y el codigo corre por las orbitas (sin fin)
 SEGMENTS = [  # (desde, hasta, pose inicial, pose final, desorden, giro de camara)
-    (24, 59, 'A', 'B', 0.3, 0.35),
-    (60, 95, 'B', 'C', 0.75, -0.45),
-    (96, 131, 'C', 'D', 0.4, 0.3),
-    (132, 155, 'D', 'A', 0.35, -0.3),
+    (78, 113, 'A', 'B', 0.3, 0.35),
+    (114, 149, 'B', 'C', 0.75, -0.45),
+    (150, 185, 'C', 'D', 0.4, 0.3),
+    (186, 209, 'D', 'A', 0.35, -0.3),
 ]
+TOTAL = 210
+HOLD = 185  # el monitor quieto, con la pantalla lista para la captura
+
+A0 = atom_pose(0.0)
+POSES = {'A': (A0, color_a), 'B': (pose_b, color_b), 'C': (pose_c, color_c), 'D': (pose_d, color_d)}
+
+# Puntos de partida del intro: fuera del cuadro, en espiral.
+irng = random.Random(5)
+intro_from = []
+for i in range(N):
+    th, ph = irng.uniform(0, 2 * math.pi), irng.uniform(-0.8, 0.8)
+    r = irng.uniform(3.0, 4.6)
+    intro_from.append(Vector((r * math.cos(th) * math.cos(ph), r * math.sin(ph), r * math.sin(th) * math.cos(ph))))
+
+
+def bright(cols):
+    return [tuple(c * t['bright'] for c in cols[i]) for i, t in enumerate(tiles)]
 
 
 def state(frame):
-    """Posicion, color, glifo 'x', giro, logo visible, pantalla, camara."""
-    if frame < 24 or frame >= 156:
-        base = 0 if frame < 24 else 156
-        spin = (frame - base) / 24 * (math.pi / 4)
-        cols = [tuple(c * t['bright'] for c in color_a[i]) for i, t in enumerate(tiles)]
-        return atom_pose(spin), cols, [False] * N, spin, 1.0, 0.0, 0.0
+    """Todo lo que cambia en un cuadro."""
+    s = {'same': [False] * N, 'spin': 0.0, 'logo': 1.0, 'screen': 0.0, 'yaw': 0.0, 'pulse': 1.0, 'dust': 1.0}
+    if frame <= INTRO[1]:
+        t = (frame - INTRO[0]) / (INTRO[1] - INTRO[0])
+        pos, col = [], []
+        for i, tile in enumerate(tiles):
+            lt = smooth((t - tile['seed'] * 0.35) / 0.65)
+            start = Matrix.Rotation((1 - lt) * 1.6, 4, 'Y') @ intro_from[i]
+            pos.append(lerp_v(start, A0[i], lt))
+            col.append(tuple(c * tile['bright'] for c in lerp_c(DEEP, color_a[i], lt)))
+        s.update(pos=pos, col=col, logo=smooth((t - 0.55) / 0.45), yaw=0.3 * (1 - smooth(t)), dust=smooth(t / 0.6))
+        return s
+    if frame <= LOOP[1]:
+        u = (frame - LOOP[0]) / (LOOP[1] - LOOP[0] + 1)
+        spin = u * (math.pi / 4)
+        s.update(pos=atom_pose(spin, u), col=bright(color_a), spin=spin, pulse=1 + 0.35 * math.sin(2 * math.pi * u))
+        return s
     for f0, f1, pa, pb, amp, yaw in SEGMENTS:
         if f0 <= frame <= f1:
             t = (frame - f0) / (f1 - f0)
@@ -416,46 +456,48 @@ def state(frame):
                 pos.append(p)
                 col.append(tuple(c * tile['bright'] for c in lerp_c(Ca[i], Cb[i], lt)))
                 same.append((pa == 'B' and lt < 0.5) or (pb == 'B' and lt >= 0.5))
-            logo_on = 1 - smooth(t / 0.4) if pa == 'A' else (smooth((t - 0.6) / 0.4) if pb == 'A' else 0.0)
-            screen_on = smooth((t - 0.65) / 0.3) if pb == 'D' else (1 - smooth(t / 0.3) if pa == 'D' else 0.0)
-            # La camara gira un poco durante el cambio y vuelve de frente.
-            cam_yaw = yaw * math.sin(math.pi * t) ** 2
-            return pos, col, same, 0.0, logo_on, screen_on, cam_yaw
+            logo = 1 - smooth(t / 0.4) if pa == 'A' else (smooth((t - 0.6) / 0.4) if pb == 'A' else 0.0)
+            scr = smooth((t - 0.65) / 0.3) if pb == 'D' else (1 - smooth(t / 0.3) if pa == 'D' else 0.0)
+            s.update(pos=pos, col=col, same=same, logo=logo, screen=scr, yaw=yaw * math.sin(math.pi * t) ** 2)
+            return s
     raise ValueError(frame)
 
 
 def apply(frame):
-    pos, col, same, spin, logo_on, screen_on, cam_yaw = state(frame)
+    s = state(frame)
     for i, tile in enumerate(tiles):
         ob = tile['ob']
-        ob.location = pos[i]
+        ob.location = s['pos'][i]
         ob.rotation_euler = (math.pi / 2 + tile['tilt'][0], tile['tilt'][1], 0)
-        ob.color = (*col[i], 1)
-        body = 'x' if same[i] else tile['glyph']
+        ob.color = (*s['col'][i], 1)
+        body = 'x' if s['same'][i] else tile['glyph']
         if ob.data.body != body:
             ob.data.body = body
-    R = Matrix.Rotation(spin, 4, 'Z')
+    R = Matrix.Rotation(s['spin'], 4, 'Z')
     for d in dust:
         d['ob'].location = R @ d['p']
         d['ob'].rotation_euler = (math.pi / 2, 0, 0)
-        d['ob'].color = (*(c * d['b'] for c in DEEP), 1)
-    atom_rig.rotation_euler = (BETA, spin, 0)
-    s = max(logo_on, 0.0001)
-    atom_rig.scale = (s, s, s)
+        d['ob'].color = (*(c * d['b'] * s['dust'] for c in DEEP), 1)
+        d['ob'].hide_render = s['dust'] < 0.02
+    atom_rig.rotation_euler = (BETA, s['spin'], 0)
+    k = max(s['logo'], 0.0001)
+    atom_rig.scale = (k, k, k)
     for r in rings:
-        r.hide_render = logo_on < 0.01
-    fs.scale = (s, s, s)
-    fs.hide_render = logo_on < 0.01
-    ss = max(screen_on, 0.0001)
+        r.hide_render = s['logo'] < 0.01
+    fs.scale = (k, k, k)
+    fs.hide_render = s['logo'] < 0.01
+    fs.color = (*(min(1.0, c * s['pulse']) for c in SOFT), 1)
+    ss = max(s['screen'], 0.0001)
     screen.scale = (ss, 1, ss)
     screen.location = (0, 0, SCREEN_Z * (1 - ss))
-    screen.hide_render = screen_on < 0.01
-    place_camera(cam_yaw, 0.0)
+    screen.hide_render = s['screen'] < 0.01
+    place_camera(s['yaw'], 0.0)
 
 
 # --------------------------------------------- pantalla del monitor -> JSON
-# Donde cae la pantalla en el cuadro (0-1, origen arriba a la izquierda).
-apply(131)
+# Donde cae la pantalla en el cuadro (0-1, origen arriba a la izquierda) y
+# la linea de tiempo que usa src/seq/sequence.js.
+apply(HOLD)
 bpy.context.view_layer.update()
 corners = [Vector((-SCREEN_W / 2, 0, SCREEN_Z - SCREEN_H / 2)), Vector((SCREEN_W / 2, 0, SCREEN_Z + SCREEN_H / 2))]
 proj = [world_to_camera_view(scene, cam, c) for c in corners]
@@ -464,10 +506,13 @@ rect = {
     'y': round(1 - proj[1].y, 4),
     'w': round(proj[1].x - proj[0].x, 4),
     'h': round(proj[1].y - proj[0].y, 4),
-    'screenFrom': 126,
-    'screenTo': 136,
-    'hold': 131,
-    'frames': 180,
+    'screenFrom': HOLD - 5,
+    'screenTo': HOLD + 5,
+    'hold': HOLD,
+    'frames': TOTAL,
+    'intro': list(INTRO),
+    'loop': list(LOOP),
+    'segments': [[f0, f1] for f0, f1, *_ in SEGMENTS],
 }
 with open(SCREEN_JSON, 'w', encoding='utf-8') as fh:
     json.dump(rect, fh)

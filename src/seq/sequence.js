@@ -1,4 +1,4 @@
-// El modelo de la home: 180 cuadros renderizados en Blender
+// El modelo de la home: cuadros renderizados en Blender
 // (scripts/blender/orbita.py) que se dibujan en un lienzo con el scroll.
 //
 // Donde se dibuja: cada seccion reserva un hueco ([data-slot]). En
@@ -7,23 +7,24 @@
 // enciende en el otro (con un leve cambio de escala), asi nunca pasa por
 // encima del texto.
 //
-// Que cuadro: lo decide la posicion del scroll. Al inicio y al final el
-// logo gira solo (dos loops de 24 cuadros). En los casos el codigo forma
-// un monitor y en su pantalla se dibuja la captura del caso.
-//
-// Con "reducir movimiento" el modelo sigue cambiando solo cuando la
-// persona hace scroll: sin giros automaticos ni viajes, solo fundidos.
+// Que cuadro: al cargar, el logo se arma desde el codigo disperso (intro)
+// y luego gira sin parar, con el codigo corriendo por las orbitas. Al bajar,
+// el scroll decide la transformacion (plantilla, layout, monitor) y entre
+// dos cuadros se dibuja una mezcla, para que el cambio sea continuo. En los
+// casos el codigo forma un monitor con la captura del caso en su pantalla.
+// La linea de tiempo viene de screen.json (la escribe el script de Blender).
 import { initScroll } from '@/lib/scroll';
-import { motionAllowed } from '@/lib/capability';
 import { homeCases } from '@/data/content';
 import screen from './screen.json';
 
 const FRAMES = screen.frames;
-const HOLD = screen.hold ?? 131;
-const LOOP_A = 0;
-const LOOP_B = 156;
-const LOOP_LEN = 24;
-const LOOP_FPS = 12;
+const HOLD = screen.hold;
+const [INTRO_0, INTRO_1] = screen.intro;
+const [LOOP_0, LOOP_1] = screen.loop;
+const LOOP_LEN = LOOP_1 - LOOP_0 + 1;
+const SEG = screen.segments;
+const INTRO_FPS = 24;
+const LOOP_FPS = 20;
 
 const smooth = (x) => {
   const t = Math.min(1, Math.max(0, x));
@@ -34,7 +35,6 @@ const lerp = (a, b, t) => a + (b - a) * t;
 export async function startSequence(root) {
   const { gsap } = await initScroll();
   const mobile = window.matchMedia('(max-width: 899px)').matches;
-  const calm = !motionAllowed();
   // 720 px en escritorio, 480 en celular (los huecos miden menos).
   const dir = `/seq/${mobile ? 480 : 720}`;
 
@@ -68,7 +68,7 @@ export async function startSequence(root) {
       order.push(i);
     }
   };
-  for (let i = 0; i < LOOP_LEN; i++) push(LOOP_A + i);
+  for (let i = INTRO_0; i <= LOOP_1; i++) push(i);
   for (let i = 0; i < FRAMES; i += 6) push(i);
   push(HOLD);
   for (let i = 0; i < FRAMES; i++) push(i);
@@ -148,21 +148,41 @@ export async function startSequence(root) {
   }
   measure();
 
-  // Cuadro segun el scroll (y el reloj, en los dos loops).
+  // Reloj del intro y del loop. El intro arranca cuando sus cuadros ya
+  // cargaron (o a los 2.5 s, con lo que haya); si la persona ya bajo, se omite.
+  let introStart = null;
+  let introDone = false;
+  let loopStart = 0;
+  const introReady = () => images.slice(INTRO_0, LOOP_0 + 2).every(Boolean);
+  function idle(time) {
+    if (!introDone) {
+      if (introStart === null && (introReady() || time > 2.5)) introStart = time;
+      if (introStart === null) return INTRO_0;
+      const f = INTRO_0 + (time - introStart) * INTRO_FPS;
+      if (f < INTRO_1) return f;
+      introDone = true;
+      loopStart = time;
+    }
+    return LOOP_0 + (((time - loopStart) * LOOP_FPS) % LOOP_LEN);
+  }
+
+  // Cuadro (con fraccion) segun el scroll y el reloj.
   function frameAt(y, time) {
     const m = marks;
-    const seg = ([a, b], f0, f1) => Math.round(lerp(f0, f1, Math.min(1, Math.max(0, (y - a) / (b - a)))));
-    const loop = (base) => (calm ? base : base + (Math.floor(time * LOOP_FPS) % LOOP_LEN));
-    if (y < m.t1[0]) return loop(LOOP_A);
-    if (y <= m.t1[1]) return seg(m.t1, 24, 59);
-    if (y < m.t2[0]) return 59;
-    if (y <= m.t2[1]) return seg(m.t2, 60, 95);
-    if (y < m.t3[0]) return 95;
-    if (y <= m.t3[1]) return seg(m.t3, 96, HOLD);
+    const seg = ([a, b], [f0, f1]) => lerp(f0, f1, Math.min(1, Math.max(0, (y - a) / (b - a))));
+    if (y < m.t1[0]) return idle(time);
+    introDone = true;
+    if (y <= m.t1[1]) return seg(m.t1, SEG[0]);
+    if (y < m.t2[0]) return SEG[0][1];
+    if (y <= m.t2[1]) return seg(m.t2, SEG[1]);
+    if (y < m.t3[0]) return SEG[1][1];
+    if (y <= m.t3[1]) return seg(m.t3, SEG[2]);
     if (y < m.t4[0]) return HOLD;
-    if (y <= m.t4[1]) return seg(m.t4, HOLD + 1, 155);
-    return loop(LOOP_B);
+    if (y <= m.t4[1]) return seg(m.t4, SEG[3]);
+    return LOOP_0 + (((time - loopStart) * LOOP_FPS) % LOOP_LEN);
   }
+  // El cuadro siguiente; el ultimo del loop sigue con el primero.
+  const nextOf = (i) => (i === LOOP_1 ? LOOP_0 : Math.min(FRAMES - 1, i + 1));
 
   // Huecos con tamano, en orden de la pagina. Cada uno puede recortar
   // arriba y abajo el cuadro (data-crop) para usar mejor un hueco ancho.
@@ -191,7 +211,7 @@ export async function startSequence(root) {
     const a = rects[i - 1];
     const b = rects[i];
     const t = (c - a.cy) / (b.cy - a.cy);
-    if (calm || mobile || Math.abs(b.x - a.x) > W * 0.25) {
+    if (mobile || Math.abs(b.x - a.x) > W * 0.25) {
       const k = smooth((t - 0.32) / 0.36);
       const grow = (r, s) => ({ ...r, x: r.x + (r.w * (1 - s)) / 2, y: r.y + (r.h * (1 - s)) / 2, w: r.w * s, h: r.h * s });
       return [
@@ -216,8 +236,8 @@ export async function startSequence(root) {
 
   // Caso que se esta leyendo (para el monitor fijo de escritorio).
   function caseMix() {
-    // El caso cambia cuando su texto entra al ultimo cuarto de la pantalla.
-    const c = H * 0.75;
+    // El caso cambia cuando su texto pasa la mitad de la pantalla.
+    const c = H * 0.58;
     // Se toma el texto del caso (parte alta del paso), no su centro: la
     // pantalla cambia cuando empiezas a leer el siguiente.
     const marksY = steps.map((el) => {
@@ -235,43 +255,53 @@ export async function startSequence(root) {
   }
 
   // ---------------------------------------------------------- dibujo
-  let lastKey = '';
+  // Parallax con el mouse (solo escritorio): el modelo sigue apenas al
+  // puntero, con inercia.
+  const pointer = { x: 0, y: 0, cx: 0, cy: 0 };
+  const fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  const onMove = (e) => {
+    pointer.x = (e.clientX / W - 0.5) * 2;
+    pointer.y = (e.clientY / H - 0.5) * 2;
+  };
+  if (fine) window.addEventListener('pointermove', onMove, { passive: true });
+
   let shown = false;
   const half = (screen.screenTo - screen.screenFrom) / 2;
-  let lastY = -1;
-  let lastF = -1;
   function draw(time) {
-    const y = window.scrollY;
-    const f = frameAt(y, time);
-    // Sin scroll, sin cambio de cuadro y sin nada nuevo cargado: nada que hacer.
-    if (!dirty && y === lastY && f === lastF) return;
-    lastY = y;
-    lastF = f;
-    const places = placements();
-    const key = `${f}|${places.map((p) => `${p.x | 0},${p.y | 0},${p.w | 0},${p.alpha.toFixed(2)}`).join(';')}`;
-    if (!dirty && key === lastKey) return;
+    const ff = frameAt(window.scrollY, time);
+    const f = Math.floor(ff);
+    const frac = ff - f;
     const img = nearestLoaded(f);
-    if (!img) {
-      lastF = -1;
-      return;
-    }
-    lastKey = key;
-    dirty = false;
+    if (!img) return;
+    const next = frac > 0.02 ? images[nextOf(f)] : null;
+    const places = placements();
+
+    pointer.cx += (pointer.x - pointer.cx) * 0.06;
+    pointer.cy += (pointer.y - pointer.cy) * 0.06;
+    // Mientras el logo gira, flota apenas.
+    const bob = f <= LOOP_1 || f > SEG[3][1] - 1 ? Math.sin(time * 1.4) * 4 : 0;
 
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, W, H);
-    const screenOn = smooth(1 - Math.abs(f - HOLD) / half);
+    const screenOn = smooth(1 - Math.abs(ff - HOLD) / half);
     const n = img.naturalWidth;
     for (const p of places) {
       const band = 1 - 2 * p.crop;
+      const shift = Math.min(14, p.w * 0.03);
+      const x = p.x + pointer.cx * shift;
+      const y = p.y + pointer.cy * shift * 0.7 + bob;
       ctx.globalAlpha = p.alpha;
-      ctx.drawImage(img, 0, p.crop * n, n, band * n, p.x, p.y, p.w, p.h);
+      ctx.drawImage(img, 0, p.crop * n, n, band * n, x, y, p.w, p.h);
+      if (next) {
+        ctx.globalAlpha = p.alpha * frac;
+        ctx.drawImage(next, 0, p.crop * n, n, band * n, x, y, p.w, p.h);
+      }
 
       // Pantalla del monitor: la captura del caso correspondiente.
       const kind = p.el?.dataset.slot;
       if (screenOn <= 0 || (kind !== 'd' && kind !== 'case')) continue;
-      const sx = p.x + screen.x * p.w;
-      const sy = p.y + ((screen.y - p.crop) / band) * p.h;
+      const sx = x + screen.x * p.w;
+      const sy = y + ((screen.y - p.crop) / band) * p.h;
       const sw = screen.w * p.w;
       const sh = (screen.h / band) * p.h;
       const mix = kind === 'case' ? [[Number(p.el.dataset.case), 1]] : caseMix();
@@ -296,7 +326,6 @@ export async function startSequence(root) {
   const onResize = () => {
     resize();
     dirty = true;
-    lastY = -1;
     if (!mobile || window.innerWidth !== lastW) measure();
     lastW = window.innerWidth;
   };
@@ -311,6 +340,7 @@ export async function startSequence(root) {
     gsap.ticker.remove(tick);
     clearInterval(remeasure);
     window.removeEventListener('resize', onResize);
+    window.removeEventListener('pointermove', onMove);
     document.removeEventListener('visibilitychange', onVisibility);
     canvas.remove();
     document.documentElement.classList.remove('seq-on');

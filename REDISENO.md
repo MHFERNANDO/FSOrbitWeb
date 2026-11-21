@@ -77,3 +77,10 @@ Las 20 URLs anteriores conservan su dirección; no hizo falta ningún 301 nuevo.
 - Celular: el modelo es más grande en el inicio y hace de monitor en cada caso, con la captura de ese caso en su pantalla.
 - "Reducir movimiento": el modelo se muestra igual, pero solo cambia al hacer scroll (sin giros automáticos ni viajes, solo fundidos).
 - Revisión: `node scripts/sweep-home.mjs http://localhost:4180 <carpeta>` recorre la home en escritorio, celular y con movimiento reducido.
+
+## Intro y movimiento continuo (20 de noviembre)
+
+- 210 cuadros: intro (0–29, el código disperso se arma como el logo), loop (30–77, el logo gira y el código corre por las órbitas en sentidos opuestos, "FS" late), y las cuatro transformaciones.
+- El intro y el giro se reproducen solos siempre, también con "reducir movimiento" (pedido del cliente). Entre dos cuadros se dibuja una mezcla, para que el scroll se sienta continuo. En escritorio el modelo sigue apenas al mouse.
+- Los cuadros se piden después del evento `load`. Lighthouse móvil: LCP 2.4 s con throttling real (devtools); la estimación simulada varía entre 2.7 y 3.8 s porque cuenta las descargas de los cuadros.
+- `node scripts/hero-timelapse.mjs http://localhost:4180 <carpeta>` captura el inicio a lo largo del tiempo para comprobar el intro y el giro.

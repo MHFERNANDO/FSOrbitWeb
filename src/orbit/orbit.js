@@ -434,7 +434,19 @@ export async function startOrbit(root) {
     return out;
   }
 
+  const head = document.querySelector('.site-head');
   function placements() {
+    const out = placementsRaw();
+    if (!mobile) return out;
+    const top = head ? head.getBoundingClientRect().bottom : 64;
+    const bottom = H - 96;
+    for (const p of out) {
+      const vis = Math.min(smooth((p.y + p.h * 0.75 - top) / (p.h * 0.5)), smooth((bottom - p.y - p.h * 0.25) / (p.h * 0.5)));
+      p.alpha *= vis;
+    }
+    return out.filter((p) => p.alpha > 0.01);
+  }
+  function placementsRaw() {
     const rects = slotRects();
     if (!rects.length) return [];
     const c = H * 0.5;
@@ -449,12 +461,24 @@ export async function startOrbit(root) {
     if (!mobile && shapeOf(a.el) === 4 && shapeOf(b.el) === 4) {
       // Tres tramos: se deshace en particulas, solo las particulas viajan,
       // y al llegar se vuelve a armar.
-      const sc = Math.min(smooth((t - 0.05) / 0.22), smooth((0.95 - t) / 0.22));
-      const m = smooth((t - 0.27) / 0.46);
+      // El modelo se queda quieto en pantalla mientras se deshace (la pagina
+      // sigue subiendo por detras), viaja como particulas y espera quieto a
+      // que el hueco siguiente llegue hasta el mientras se rearma.
+      const D = b.cy - a.cy;
+      const T0 = 0.1, T1 = 0.36, T2 = 0.62, T3 = 0.9;
+      const y0 = c - T0 * D;
+      const y1 = c + (1 - T3) * D;
+      let cy;
+      if (t < T0) cy = a.cy;
+      else if (t < T1) cy = y0;
+      else if (t < T2) cy = lerp(y0, y1, smooth((t - T1) / (T2 - T1)));
+      else if (t < T3) cy = y1;
+      else cy = b.cy;
+      const sc = Math.min(smooth((t - T0) / (T1 - T0 - 0.04)), smooth((T3 - t) / (T3 - T2 - 0.04)));
+      const m = smooth((t - T1) / (T2 - T1));
       const g = 1 + 0.35 * sc;
       const w = lerp(a.w, b.w, m) * g;
       const cx = lerp(a.x + a.w / 2, b.x + b.w / 2, m);
-      const cy = lerp(a.y + a.h / 2, b.y + b.h / 2, m);
       return [{ el: m < 0.5 ? a.el : b.el, x: cx - w / 2, y: cy - w / 2, w, h: w, alpha: 1, scatter: sc, zoom: g }];
     }
     // Solo los huecos de las escenas (inicio a casos) se deslizan; el resto

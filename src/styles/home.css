@@ -477,3 +477,11 @@ html.seq .slot--end {
     border-radius: 6px;
   }
 }
+
+/* Escritorio: mas recorrido entre servicios y preguntas para que se vea al
+   logo deshacerse en particulas, viajar y rearmarse. */
+@media (min-width: 900px) {
+  html.seq #servicios + .rule > .section {
+    padding-top: calc(var(--section-y) * 0.5 + 30vh);
+  }
+}

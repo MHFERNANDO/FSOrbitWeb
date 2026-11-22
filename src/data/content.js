@@ -182,7 +182,7 @@ export const projects = [
     img: 'LabDieselPreview',
     ...IMG_SIZE.LabDieselPreview,
     alt: 'Sitio web de Laboratorio Diesel MG, laboratorio de inyección diésel en Cuenca',
-    url: 'https://laboratorio-diesel-mg.vercel.app/',
+    url: 'https://www.laboratoriodieselmg.com/',
   },
   {
     slug: 'gravity-studio',

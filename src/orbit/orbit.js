@@ -444,7 +444,21 @@ export async function startOrbit(root) {
     const a = rects[i - 1];
     const b = rects[i];
     const t = (c - a.cy) / (b.cy - a.cy);
-    if (mobile || Math.abs(b.x - a.x) > W * 0.25 || (shapeOf(a.el) === 4 && shapeOf(b.el) === 4)) {
+    // Entre dos huecos del logo (servicios, preguntas, cierre): el logo se
+    // deshace en particulas que viajan al otro hueco y alli lo vuelven a armar.
+    if (!mobile && shapeOf(a.el) === 4 && shapeOf(b.el) === 4) {
+      const k = smooth((t - 0.15) / 0.7);
+      const sc = Math.sin(k * Math.PI);
+      const g = 1 + 0.8 * sc;
+      const w = lerp(a.w, b.w, k) * g;
+      const cx = lerp(a.x + a.w / 2, b.x + b.w / 2, k);
+      const cy = lerp(a.y + a.h / 2, b.y + b.h / 2, k);
+      return [{ el: k < 0.5 ? a.el : b.el, x: cx - w / 2, y: cy - w / 2, w, h: w, alpha: 1, scatter: sc, zoom: g }];
+    }
+    // Solo los huecos de las escenas (inicio a casos) se deslizan; el resto
+    // (casos a planes, por ejemplo) se funde, para no cruzar las tarjetas.
+    const scenes = shapeOf(a.el) < 3 && shapeOf(b.el) < 4;
+    if (mobile || !scenes || Math.abs(b.x - a.x) > W * 0.25) {
       const k = smooth((t - 0.32) / 0.36);
       const grow = (r, s) => ({ ...r, x: r.x + (r.w * (1 - s)) / 2, y: r.y + (r.h * (1 - s)) / 2, w: r.w * s, h: r.h * s });
       return [
@@ -521,7 +535,7 @@ export async function startOrbit(root) {
     return out;
   }
 
-  function placeBlocks(p, time, intro) {
+  function placeBlocks(p, time, intro, scatter = 0) {
     const i0 = Math.min(3, Math.floor(p));
     const t = p - i0;
     const from = shapePose(i0, time);
@@ -541,6 +555,14 @@ export async function startOrbit(root) {
       vA.z += spin[i][2] * arc * 2 + arc * 0.4;
 
       vS.set(lerp(a.s[0], b.s[0], lt), lerp(a.s[1], b.s[1], lt), lerp(a.s[2], b.s[2], lt));
+
+      // Viaje entre huecos del logo: cada bloque se abre en una nube.
+      if (scatter > 0) {
+        vA.x += spin[i][0] * scatter * 3.2;
+        vA.y += (spin[i][1] + (seeds[i] - 0.5)) * scatter * 3.2;
+        vA.z += spin[i][2] * scatter * 1.5;
+        vS.multiplyScalar(1 - 0.55 * scatter);
+      }
 
       // Intro: los bloques llegan en espiral desde afuera.
       const il = smooth((intro - seeds[i] * 0.45) / 0.55);
@@ -607,11 +629,11 @@ export async function startOrbit(root) {
     // Pesos de cada forma: logo (orbitas, FS) y monitor (pantalla).
     const ringIn = smooth((intro - 0.35) / 0.65);
     const pulse = 1 + 0.12 * Math.sin(time * 2.4);
-    const applyShape = (S) => {
-      placeBlocks(S, time, intro);
+    const applyShape = (S, sc = 0) => {
+      placeBlocks(S, time, intro, sc);
       const a = Math.max(0, 1 - S * 1.6) + Math.max(0, 1 - (4 - S) * 1.6);
-      ringGroup.scale.setScalar(Math.max(0.0001, a * (0.6 + 0.4 * ringIn)));
-      fs.scale.setScalar(Math.max(0.0001, a * ringIn) * pulse);
+      ringGroup.scale.setScalar(Math.max(0.0001, a * (0.6 + 0.4 * ringIn) * (1 - sc)));
+      fs.scale.setScalar(Math.max(0.0001, a * ringIn * (1 - sc)) * pulse);
       return [a, Math.max(0, 1 - Math.abs(S - 3) * 2.2)];
     };
     // Celular: cada hueco muestra su forma ya armada y el paso entre huecos
@@ -638,17 +660,20 @@ export async function startOrbit(root) {
     renderer.setScissorTest(true);
     for (const p of places) {
       if (mobile) [wA, wD] = applyShape(shapeOf(p.el));
+      else if (p.scatter) [wA, wD] = applyShape(P, p.scatter);
       blockUniforms.uFade.value = p.alpha;
       for (const m of ringMats) m.opacity = m.userData.base * p.alpha * ringIn * (0.85 + 0.15 * Math.sin(time * 2));
       fsMat.opacity = wA * p.alpha * ringIn;
-      dustMat.opacity = 0.55 * p.alpha * intro;
+      const sc = p.scatter || 0;
+      dust.scale.setScalar(1 + 0.7 * sc);
+      dustMat.opacity = (0.55 + 0.45 * sc) * p.alpha * intro;
       backing.opacity = wD * 0.95 * p.alpha;
       screenA.opacity = wD * p.alpha * fadeCase;
       screenB.opacity = wD * p.alpha * (1 - fadeCase);
 
       const aspect = p.w / p.h;
       const halfH = aspect >= 1 ? HALF : HALF / aspect;
-      const dist = halfH / TAN;
+      const dist = (halfH / TAN) * (p.zoom || 1);
       const calmD = 1 - 0.75 * wD;
       const yaw = (0.2 * Math.sin(time * 0.21) + pointer.cx * 0.18) * calmD;
       const pitch = (0.07 * Math.sin(time * 0.17) - pointer.cy * 0.1) * calmD;

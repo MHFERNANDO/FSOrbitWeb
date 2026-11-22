@@ -407,6 +407,127 @@ export async function startOrbit(root) {
   }
   measure();
 
+  // ------------------------------------------- pausas de scroll (escritorio)
+  // Al salir de cada hueco la pagina se queda quieta HOLD px de scroll
+  // mientras el modelo se deshace en particulas; despues la pagina sigue y
+  // las particulas viajan al hueco siguiente, donde se rearman. La pausa se
+  // hace desplazando main y el pie hacia abajo lo mismo que avanza el scroll.
+  const HOLD = 320;
+  const foot = document.querySelector('body > footer, footer');
+  const spacer = document.createElement('div');
+  spacer.setAttribute('aria-hidden', 'true');
+  if (!mobile) document.body.appendChild(spacer);
+  let pins = [];
+  let infos = [];
+  let lastTr = -1;
+  const setTr = (v) => {
+    if (v === lastTr) return;
+    lastTr = v;
+    const tf = v ? `translate3d(0, ${v}px, 0)` : '';
+    if (page !== document) page.style.transform = tf;
+    if (foot) foot.style.transform = tf;
+  };
+  const trAt = (y) => pins.reduce((acc, p) => acc + Math.min(HOLD, Math.max(0, y - p.V)), 0);
+  // Centro de un hueco en pantalla con la pagina en el scroll natural Y
+  // (sin pausas), teniendo en cuenta columnas fijas (sticky).
+  const cyAt = (inf, Y) =>
+    inf.docCy !== undefined
+      ? inf.docCy - Y
+      : Math.min(Math.max(inf.stNat, Y + inf.top), inf.contBottom - inf.stH) + inf.off - Y;
+  const solve = (inf, target, maxY) => {
+    let lo = 0;
+    let hi = maxY;
+    if (cyAt(inf, 0) <= target) return 0;
+    for (let n = 0; n < 40; n++) {
+      const mid = (lo + hi) / 2;
+      if (cyAt(inf, mid) > target) lo = mid;
+      else hi = mid;
+    }
+    return hi;
+  };
+  function measurePins() {
+    if (mobile || page === document) return;
+    const prev = lastTr;
+    setTr(0);
+    const sy = window.scrollY;
+    const vh = window.innerHeight;
+    infos = [];
+    for (const el of slots) {
+      const r0 = el.getBoundingClientRect();
+      if (!r0.width || !r0.height) continue;
+      let st = el.parentElement;
+      let stick = null;
+      while (st && st !== page) {
+        if (getComputedStyle(st).position === 'sticky') {
+          stick = st;
+          break;
+        }
+        st = st.parentElement;
+      }
+      if (stick) {
+        const top = parseFloat(getComputedStyle(stick).top) || 0;
+        stick.style.position = 'static';
+        const sr = stick.getBoundingClientRect();
+        const r = el.getBoundingClientRect();
+        const pr = stick.parentElement.getBoundingClientRect();
+        stick.style.position = '';
+        infos.push({ el, stNat: sr.top + sy, stH: sr.height, contBottom: pr.bottom + sy, top, off: r.top - sr.top + r.height / 2 });
+      } else {
+        infos.push({ el, docCy: r0.top + sy + r0.height / 2 });
+      }
+    }
+    const maxY = document.documentElement.scrollHeight;
+    const out = [];
+    let lastA = -Infinity;
+    for (let i = 0; i < infos.length - 1; i++) {
+      let Y = Math.max(solve(infos[i], vh * 0.42, maxY), lastA + 40);
+      let A = solve(infos[i + 1], vh * 0.6, maxY);
+      if (A < Y + vh * 0.3) A = Y + vh * 0.3;
+      lastA = A;
+      out.push({ a: infos[i], b: infos[i + 1], Y, A, V: Y + i * HOLD });
+    }
+    pins = out;
+    spacer.style.height = `${pins.length * HOLD}px`;
+    lastTr = -1;
+    setTr(prev < 0 ? 0 : prev);
+  }
+  measurePins();
+
+  const squareOf = (el) => {
+    const r = el.getBoundingClientRect();
+    const w = Math.min(r.width, r.height);
+    return { el, x: r.left + (r.width - w) / 2, y: r.top + (r.height - w) / 2, w, h: w };
+  };
+  function desktopPlacements() {
+    const y = window.scrollY;
+    setTr(trAt(y));
+    if (!pins.length) return infos.length ? [{ ...squareOf(infos[0].el), alpha: 1 }] : [];
+    let k = -1;
+    for (let i = 0; i < pins.length; i++) if (y >= pins[i].V) k = i;
+    if (k < 0) return [{ ...squareOf(pins[0].a.el), alpha: 1 }];
+    const p = pins[k];
+    const grow = (r, g) => ({ ...r, x: r.x - (r.w * (g - 1)) / 2, y: r.y - (r.h * (g - 1)) / 2, w: r.w * g, h: r.h * g });
+    if (y < p.V + HOLD) {
+      // Pausa: la pagina quieta, el modelo se deshace en particulas.
+      const sc = smooth((y - p.V) / HOLD);
+      const g = 1 + 0.35 * sc;
+      return [{ ...grow(squareOf(p.a.el), g), alpha: 1, scatter: sc, zoom: g }];
+    }
+    const nat = y - trAt(y);
+    const t = Math.min(1, Math.max(0, (nat - p.Y) / (p.A - p.Y)));
+    if (t >= 1) return [{ ...squareOf(p.b.el), alpha: 1 }];
+    // Viaje: solo particulas; al final se rearman en el hueco nuevo.
+    const a = squareOf(p.a.el);
+    const b = squareOf(p.b.el);
+    const m = smooth(t / 0.75);
+    const sc = 1 - smooth((t - 0.72) / 0.28);
+    const g = 1 + 0.35 * sc;
+    const w = lerp(a.w, b.w, m);
+    const cx = lerp(a.x + a.w / 2, b.x + b.w / 2, m);
+    const cy = lerp(a.y + a.h / 2, b.y + b.h / 2, m);
+    return [{ ...grow({ el: t < 0.4 ? a.el : b.el, x: cx - w / 2, y: cy - w / 2, w, h: w }, g), alpha: 1, scatter: sc, zoom: g }];
+  }
+
   // Forma (0-4) segun el scroll.
   function targetP(y) {
     const m = marks;
@@ -441,7 +562,9 @@ export async function startOrbit(root) {
     const top = head ? head.getBoundingClientRect().bottom : 64;
     const bottom = H - 96;
     for (const p of out) {
-      const vis = Math.min(smooth((p.y + p.h * 0.75 - top) / (p.h * 0.5)), smooth((bottom - p.y - p.h * 0.25) / (p.h * 0.5)));
+      // Del todo visible con el hueco entero a la vista; invisible cuando la
+      // mitad del hueco ya quedo bajo la cabecera o la barra.
+      const vis = Math.min(smooth((p.y + p.h * 0.5 - top) / (p.h * 0.5)), smooth((bottom - p.y - p.h * 0.5) / (p.h * 0.5)));
       p.alpha *= vis;
     }
     return out.filter((p) => p.alpha > 0.01);
@@ -632,7 +755,7 @@ export async function startOrbit(root) {
     // Escritorio: la forma sigue al scroll con inercia. Celular: la forma es
     // la del hueco que esta a la vista, y el cambio se reproduce solo (~1 s)
     // al llegar, para que nunca quede detenido a mitad de camino.
-    const places = placements();
+    const places = mobile ? placements() : desktopPlacements();
     if (mobile) {
       const main = places.reduce((m, pl) => (pl.alpha > (m?.alpha ?? -1) ? pl : m), null);
       const target = shapeOf(main?.el);
@@ -663,11 +786,11 @@ export async function startOrbit(root) {
       const a = Math.max(0, 1 - S * 1.6) + Math.max(0, 1 - (4 - S) * 1.6);
       ringGroup.scale.setScalar(Math.max(0.0001, a * (0.6 + 0.4 * ringIn) * (1 - sc)));
       fs.scale.setScalar(Math.max(0.0001, a * ringIn * (1 - sc)) * pulse);
-      return [a, Math.max(0, 1 - Math.abs(S - 3) * 2.2)];
+      return [a, Math.max(0, 1 - Math.abs(S - 3) * 2.2) * (1 - sc)];
     };
     // Celular: cada hueco muestra su forma ya armada y el paso entre huecos
     // es un fundido; escritorio: una sola forma que sigue al scroll.
-    let [wA, wD] = mobile ? [0, 0] : applyShape(P);
+    let [wA, wD] = [0, 0];
 
     pointer.cx += (pointer.x - pointer.cx) * 0.05;
     pointer.cy += (pointer.y - pointer.cy) * 0.05;
@@ -688,8 +811,7 @@ export async function startOrbit(root) {
     renderer.clear();
     renderer.setScissorTest(true);
     for (const p of places) {
-      if (mobile) [wA, wD] = applyShape(shapeOf(p.el));
-      else if (p.scatter) [wA, wD] = applyShape(P, p.scatter);
+      [wA, wD] = applyShape(shapeOf(p.el), p.scatter || 0);
       blockUniforms.uFade.value = p.alpha;
       for (const m of ringMats) m.opacity = m.userData.base * p.alpha * ringIn * (0.85 + 0.15 * Math.sin(time * 2));
       fsMat.opacity = wA * p.alpha * ringIn;
@@ -740,16 +862,24 @@ export async function startOrbit(root) {
   let lastW = window.innerWidth;
   const onResize = () => {
     resize();
-    if (!mobile || window.innerWidth !== lastW) measure();
+    if (!mobile || window.innerWidth !== lastW) {
+      measure();
+      measurePins();
+    }
     lastW = window.innerWidth;
   };
   window.addEventListener('resize', onResize);
-  const remeasure = setInterval(measure, 1500);
+  const remeasure = setInterval(() => {
+    measure();
+    measurePins();
+  }, 1500);
   const onVisibility = () => (document.hidden ? gsap.ticker.remove(tick) : gsap.ticker.add(tick));
   document.addEventListener('visibilitychange', onVisibility);
 
   function dispose() {
     gsap.ticker.remove(tick);
+    setTr(0);
+    spacer.remove();
     clearInterval(remeasure);
     window.removeEventListener('resize', onResize);
     window.removeEventListener('pointermove', onMove);

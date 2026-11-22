@@ -379,19 +379,8 @@ html.seq .slot--end {
   }
 }
 @media (min-width: 900px) {
-  html.seq .scene--pin {
-    height: 210vh;
-    height: 210svh;
-    padding-block: 0;
-  }
-  html.seq .scene--pin .scene-pin {
-    position: sticky;
-    top: 0;
-    display: grid;
-    align-items: center;
-    height: 100vh;
-    height: 100svh;
-  }
+  /* Sin escenas fijas: la pausa de scroll del modelo (orbit.js) hace ese
+     papel y una escena sticky no convive con el desplazamiento de la pausa. */
   html.seq .slot--small {
     aspect-ratio: 2.2;
     max-height: 240px;
@@ -478,10 +467,11 @@ html.seq .slot--end {
   }
 }
 
-/* Escritorio: mas recorrido entre servicios y preguntas para que se vea al
-   logo deshacerse en particulas, viajar y rearmarse. */
+/* Escritorio con modelo: las columnas de servicios y preguntas no quedan
+   fijas; durante las pausas de scroll la pagina se desplaza con transform y
+   una columna sticky se moveria sola. */
 @media (min-width: 900px) {
-  html.seq #servicios + .rule > .section {
-    padding-top: calc(var(--section-y) * 0.5 + 30vh);
+  html.seq main .split > .sticky {
+    position: static;
   }
 }

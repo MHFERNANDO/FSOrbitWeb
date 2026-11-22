@@ -272,7 +272,10 @@ html.seq-on .orbit-figure {
 }
 /* ---------------------------------------------------------------- 5. Cierre */
 .scene-5 {
-  padding-block: var(--section-y);
+  padding-block: var(--section-y) calc(var(--section-y) * 0.5);
+}
+#servicios .section {
+  padding-top: calc(var(--section-y) * 0.5);
 }
 .plans-head {
   padding-bottom: clamp(32px, 5vw, 64px);

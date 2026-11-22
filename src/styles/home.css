@@ -477,3 +477,12 @@ html.seq .slot--end {
     border-radius: 6px;
   }
 }
+
+/* Celular: el lienzo va sobre el contenido (debajo de la cabecera y la barra
+   de WhatsApp) para que la barra de particulas del borde derecho se vea
+   tambien sobre las bandas de color. No recibe toques. */
+@media (max-width: 899px) {
+  .seq-canvas {
+    z-index: 10;
+  }
+}

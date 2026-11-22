@@ -263,7 +263,11 @@ export async function startOrbit(root) {
   const logoGroup = new Group();
   const monGroup = new Group();
   const rotC = new Group();
-  scene.add(logoGroup, monGroup, rotC);
+  // En celular el modelo se dibuja en toda la pantalla: rig lo lleva al
+  // hueco que corresponde (en escritorio queda quieto, sin efecto).
+  const rig = new Group();
+  scene.add(rig);
+  rig.add(logoGroup, monGroup, rotC);
 
   // ---------------------------------------------------------- bloques
   const blockGeo = new RoundedBoxGeometry(1, 1, 1, 3, 0.08);
@@ -327,7 +331,7 @@ export async function startOrbit(root) {
   // "FS" en el centro.
   const fsMat = new MeshBasicMaterial({ map: makeFsTexture(), transparent: true, blending: AdditiveBlending, depthTest: false });
   const fs = new Mesh(new PlaneGeometry(0.78, 0.39), fsMat);
-  scene.add(fs);
+  rig.add(fs);
 
   // Particulas de luz alrededor, a la deriva (dan profundidad).
   const DUST = mobile ? 70 : 140;
@@ -349,7 +353,7 @@ export async function startOrbit(root) {
     depthWrite: false,
   });
   const dust = new Points(dustGeo, dustMat);
-  scene.add(dust);
+  rig.add(dust);
 
   // Pantalla del monitor: dos capas para fundir de un caso al otro.
   const loader = new TextureLoader();
@@ -685,6 +689,7 @@ export async function startOrbit(root) {
   const m4 = new Matrix4();
   const ident = new Matrix4();
   const qA = new Quaternion();
+  const ident4 = new Quaternion();
   const qB = new Quaternion();
   const qT = new Quaternion();
   const eul = new Euler();
@@ -788,6 +793,128 @@ export async function startOrbit(root) {
     glowAttr.needsUpdate = true;
   }
 
+  // ------------------------------------------------------------ celular
+  // Cada hueco muestra su forma armada. Al salir el hueco de la vista, los
+  // bloques se vuelven particulas que forman una barra fina en el borde
+  // derecho (sin pasar sobre el texto); la barra queda mientras se lee la
+  // seccion y, al llegar el hueco siguiente, sus particulas arman la nueva
+  // forma. Todo depende de la posicion de los huecos: sigue al scroll.
+  const vC = new Vector3();
+  let lastEl = null;
+  function renderMobile(time, intro, ringIn, pulse) {
+    const top = head ? head.getBoundingClientRect().bottom : 64;
+    const bottom = H - 96;
+    let best = null;
+    let bestIn = 0;
+    const rectOf = (el) => {
+      const r = el.getBoundingClientRect();
+      if (!r.width || !r.height) return null;
+      const w = Math.min(r.width, r.height);
+      return { el, x: r.left + (r.width - w) / 2, y: r.top + (r.height - w) / 2, w };
+    };
+    for (const el of slots) {
+      const R = rectOf(el);
+      if (!R) continue;
+      const cy = R.y + R.w / 2;
+      const vin = Math.min(smooth((cy - top) / (R.w * 0.5)), smooth((bottom - cy) / (R.w * 0.5)));
+      if (vin > bestIn) {
+        bestIn = vin;
+        best = R;
+      }
+    }
+    if (best) lastEl = best.el;
+    const T = best || (lastEl && rectOf(lastEl));
+    if (!T) return;
+    const beta = 1 - bestIn;
+    const S = shapeOf(T.el);
+
+    // Mundo = pantalla: k unidades por pixel en el plano z = 0.
+    const k = (2 * HALF) / W;
+    const halfH = (HALF * H) / W;
+    camera.aspect = W / H;
+    camera.position.set(0, 0, halfH / TAN);
+    camera.lookAt(0, 0, 0);
+    camera.updateProjectionMatrix();
+    const sc = T.w / W;
+    rig.position.set((T.x + T.w / 2 - W / 2) * k, (H / 2 - (T.y + T.w / 2)) * k, 0);
+    rig.rotation.set(0.07 * Math.sin(time * 0.17), 0.2 * Math.sin(time * 0.21) * (S === 3 ? 0.25 : 1), 0);
+    rig.scale.setScalar(sc);
+    rig.updateMatrix();
+    rig.updateMatrixWorld();
+    qB.setFromRotationMatrix(m4.extractRotation(rig.matrix));
+
+    // Barra: en el borde derecho, entre la cabecera y la barra de WhatsApp.
+    const span = bottom - top;
+    const barTop = top + span * 0.2;
+    const barBot = bottom - span * 0.2;
+    const bx = (W - 9 - W / 2) * k;
+    const dot = 3.2 * k;
+    const pose = shapePose(S, time);
+    for (let i = 0; i < K; i++) {
+      const b = pose[i];
+      toWorld(b, vA);
+      vS.set(b.s[0], b.s[1], b.s[2]);
+      // Intro: los bloques llegan en espiral (solo al cargar).
+      const il = smooth((intro - seeds[i] * 0.45) / 0.55);
+      if (il < 1) {
+        const ang = seeds[i] * Math.PI * 2 + (1 - il) * 2.4;
+        const r = 3.4 + seeds[i] * 1.6;
+        vF.set(Math.cos(ang) * r, (seeds[i] - 0.5) * 3, Math.sin(ang) * r - 1);
+        vA.lerp(vF, 1 - il);
+        vS.lerp(vF.set(0.14, 0.14, 0.14), 1 - il);
+      }
+      vA.applyMatrix4(rig.matrix);
+      vS.multiplyScalar(sc);
+      qA.setFromRotationMatrix(m4.extractRotation(b.group ? b.group.matrix : ident));
+      qT.copy(qB).multiply(qA);
+
+      // Hacia la barra, cada particula con su propio retraso.
+      const lt = smooth((beta * 1.35 - seeds[i] * 0.35) / 1.0);
+      if (lt > 0) {
+        const u = ((i + 0.5) / K + time * 0.015) % 1;
+        vC.set(bx, (H / 2 - (barTop + (barBot - barTop) * u)) * k, 0);
+        const arc = Math.sin(lt * Math.PI);
+        vA.lerp(vC, lt);
+        vA.x += arc * spin[i][0] * 0.6;
+        vA.y += arc * spin[i][1] * 0.6;
+        vS.lerp(vF.set(dot, dot, dot), lt);
+        qT.slerp(ident4, lt);
+      }
+      m4.compose(vA, qT, vS);
+      blocks.setMatrixAt(i, m4);
+      col.setRGB(lerp(b.c[0], CYAN[0], lt), lerp(b.c[1], CYAN[1], lt), lerp(b.c[2], CYAN[2], lt));
+      blocks.setColorAt(i, col);
+      glowAttr.array[i] = lerp(b.g * (0.6 + 0.4 * il), 1.8, lt);
+    }
+    blocks.instanceMatrix.needsUpdate = true;
+    blocks.instanceColor.needsUpdate = true;
+    glowAttr.needsUpdate = true;
+
+    const show = 1 - smooth((beta - 0.05) / 0.5);
+    const wA = S === 0 || S === 4 ? 1 : 0;
+    const wD = S === 3 ? 1 : 0;
+    ringGroup.scale.setScalar(Math.max(0.0001, wA * (0.6 + 0.4 * ringIn) * show));
+    fs.scale.setScalar(Math.max(0.0001, wA * ringIn * show) * pulse);
+    fs.quaternion.copy(camera.quaternion);
+    blockUniforms.uFade.value = 1;
+    for (const m of ringMats) m.opacity = m.userData.base * ringIn * show * (0.85 + 0.15 * Math.sin(time * 2));
+    fsMat.opacity = wA * ringIn * show;
+    dust.scale.setScalar(1);
+    dustMat.opacity = 0.55 * intro * show;
+    backing.opacity = wD * 0.95 * show;
+    screenA.opacity = wD * show * fadeCase;
+    screenB.opacity = wD * show * (1 - fadeCase);
+
+    renderer.setScissorTest(false);
+    renderer.setViewport(0, 0, W, H);
+    renderer.clear();
+    renderer.render(scene, camera);
+    if (!shown) {
+      shown = true;
+      document.documentElement.classList.add('seq-on');
+    }
+  }
+
   function frame(time, deltaMs) {
     const dt = Math.min(0.1, deltaMs / 1000 || 0.016);
 
@@ -798,7 +925,7 @@ export async function startOrbit(root) {
     // Escritorio: la forma sigue al scroll con inercia. Celular: la forma es
     // la del hueco que esta a la vista, y el cambio se reproduce solo (~1 s)
     // al llegar, para que nunca quede detenido a mitad de camino.
-    const places = mobile ? placements() : desktopPlacements(dt);
+    const places = mobile ? [] : desktopPlacements(dt);
     if (mobile) {
       const main = places.reduce((m, pl) => (pl.alpha > (m?.alpha ?? -1) ? pl : m), null);
       const target = shapeOf(main?.el);
@@ -849,6 +976,11 @@ export async function startOrbit(root) {
       fadeCase = 0;
     }
     fadeCase = Math.min(1, fadeCase + dt / 0.6);
+
+    if (mobile) {
+      renderMobile(time, intro, ringIn, pulse);
+      return;
+    }
 
     renderer.setScissorTest(false);
     renderer.clear();

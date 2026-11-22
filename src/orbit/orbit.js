@@ -750,7 +750,7 @@ export async function startOrbit(root) {
         const r = 0.5 + seeds[(i + 7) % K] * 1.1;
         vF.set(Math.cos(ang) * r, (seeds[(i + 3) % K] - 0.5) * 1.8, Math.sin(ang) * r * 0.6);
         vA.lerp(vF, scatter);
-        vS.lerp(vF.set(0.045, 0.045, 0.045), scatter);
+        vS.lerp(vF.set(0.055, 0.055, 0.055), scatter);
       }
 
       // Intro: los bloques llegan en espiral desde afuera.
@@ -776,6 +776,12 @@ export async function startOrbit(root) {
       col.setRGB(lerp(a.c[0], b.c[0], lt), lerp(a.c[1], b.c[1], lt), lerp(a.c[2], b.c[2], lt));
       blocks.setColorAt(i, col);
       glowAttr.array[i] = lerp(a.g, b.g, lt) * (0.6 + 0.4 * il);
+      // Como particulas: todas cian y encendidas, para que la nube se lea.
+      if (scatter > 0) {
+        col.setRGB(lerp(col.r, CYAN[0], scatter), lerp(col.g, CYAN[1], scatter), lerp(col.b, CYAN[2], scatter));
+        blocks.setColorAt(i, col);
+        glowAttr.array[i] = lerp(glowAttr.array[i], 1.8, scatter);
+      }
     }
     blocks.instanceMatrix.needsUpdate = true;
     blocks.instanceColor.needsUpdate = true;

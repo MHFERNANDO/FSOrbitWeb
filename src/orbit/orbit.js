@@ -43,7 +43,7 @@ import {
   WebGLRenderer,
 } from 'three';
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
-import { initScroll } from '@/lib/scroll';
+import { initScroll, setScrollHook } from '@/lib/scroll';
 import { projects } from '@/data/content';
 
 const FOV = 30;
@@ -230,7 +230,7 @@ function fill(pieces, anchor) {
 // ---------------------------------------------------------------------------
 
 export async function startOrbit(root) {
-  const { gsap } = await initScroll();
+  const { gsap, lenis } = await initScroll();
   const mobile = window.matchMedia('(max-width: 899px)').matches;
   let seedState = 7;
   const rand = () => {
@@ -408,28 +408,13 @@ export async function startOrbit(root) {
   measure();
 
   // ------------------------------------------- pausas de scroll (escritorio)
-  // Al salir de cada hueco la pagina se queda quieta HOLD px de scroll
-  // mientras el modelo se deshace en particulas; despues la pagina sigue y
-  // las particulas viajan al hueco siguiente, donde se rearman. La pausa se
-  // hace desplazando main y el pie hacia abajo lo mismo que avanza el scroll.
-  const HOLD = 320;
-  const foot = document.querySelector('body > footer, footer');
-  const spacer = document.createElement('div');
-  spacer.setAttribute('aria-hidden', 'true');
-  if (!mobile) document.body.appendChild(spacer);
+  // Del monitor de los casos en adelante, al salir de cada hueco la rueda
+  // queda retenida HOLD px: la pagina no se mueve mientras el modelo se
+  // deshace en particulas. Despues la pagina sigue normal, las particulas
+  // viajan al hueco siguiente y alli se rearman. La pagina nunca se desplaza
+  // por codigo durante la pausa, asi que no hay saltos.
+  const HOLD = 360;
   let pins = [];
-  let infos = [];
-  let lastTr = -1;
-  const setTr = (v) => {
-    if (v === lastTr) return;
-    lastTr = v;
-    const tf = v ? `translate3d(0, ${v}px, 0)` : '';
-    if (page !== document) page.style.transform = tf;
-    if (foot) foot.style.transform = tf;
-  };
-  const trAt = (y) => pins.reduce((acc, p) => acc + Math.min(HOLD, Math.max(0, y - p.V)), 0);
-  // Centro de un hueco en pantalla con la pagina en el scroll natural Y
-  // (sin pausas), teniendo en cuenta columnas fijas (sticky).
   const cyAt = (inf, Y) =>
     inf.docCy !== undefined
       ? inf.docCy - Y
@@ -447,12 +432,13 @@ export async function startOrbit(root) {
   };
   function measurePins() {
     if (mobile || page === document) return;
-    const prev = lastTr;
-    setTr(0);
     const sy = window.scrollY;
     const vh = window.innerHeight;
-    infos = [];
+    const infos = [];
+    let started = false;
     for (const el of slots) {
+      if (el.dataset.slot === 'd') started = true;
+      if (!started) continue;
       const r0 = el.getBoundingClientRect();
       if (!r0.width || !r0.height) continue;
       let st = el.parentElement;
@@ -480,52 +466,103 @@ export async function startOrbit(root) {
     const out = [];
     let lastA = -Infinity;
     for (let i = 0; i < infos.length - 1; i++) {
-      let Y = Math.max(solve(infos[i], vh * 0.42, maxY), lastA + 40);
+      const Y = Math.max(solve(infos[i], vh * 0.42, maxY), lastA + 40);
       let A = solve(infos[i + 1], vh * 0.6, maxY);
       if (A < Y + vh * 0.3) A = Y + vh * 0.3;
       lastA = A;
-      out.push({ a: infos[i], b: infos[i + 1], Y, A, V: Y + i * HOLD });
+      const old = pins[i];
+      out.push({ a: infos[i], b: infos[i + 1], Y, A, prog: old?.prog ?? 0, shown: old?.shown ?? 0 });
     }
     pins = out;
-    spacer.style.height = `${pins.length * HOLD}px`;
-    lastTr = -1;
-    setTr(prev < 0 ? 0 : prev);
   }
   measurePins();
+
+  // La rueda: al cruzar el punto de una pausa, el gesto se convierte en
+  // avance de la transformacion en vez de scroll (y al reves al subir).
+  // Devuelve true si el gesto quedo retenido.
+  function absorb(dy, cur, jumpTo) {
+    if (!dy || !pins.length) return false;
+    if (dy > 0) {
+      for (const p of pins) {
+        if (p.prog < 1 && cur <= p.Y + 1 && cur + dy >= p.Y - 0.5) {
+          const used = Math.max(0, cur + dy - Math.max(cur, p.Y));
+          if (cur < p.Y - 1) jumpTo(p.Y);
+          p.prog = Math.min(1, p.prog + used / HOLD);
+          return true;
+        }
+      }
+    } else {
+      for (let i = pins.length - 1; i >= 0; i--) {
+        const p = pins[i];
+        if (p.prog > 0 && cur >= p.Y - 1 && cur + dy <= p.Y + 0.5) {
+          const used = Math.max(0, Math.min(cur, p.Y) - (cur + dy));
+          if (cur > p.Y + 1) jumpTo(p.Y);
+          p.prog = Math.max(0, p.prog - used / HOLD);
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+  let onWheel = null;
+  if (!mobile && lenis) {
+    // Con scroll suave (Lenis) el gancho decide antes de mover la pagina.
+    setScrollHook((data) => {
+      if (!absorb(data.deltaY, lenis.targetScroll, (y) => lenis.scrollTo(y))) return true;
+      if (data.event?.cancelable) data.event.preventDefault();
+      return false;
+    });
+  } else if (!mobile) {
+    // Scroll nativo (movimiento reducido): misma logica sobre la rueda.
+    onWheel = (e) => {
+      if (e.ctrlKey) return;
+      const dy = e.deltaY * (e.deltaMode === 1 ? 40 : e.deltaMode === 2 ? window.innerHeight : 1);
+      if (absorb(dy, window.scrollY, (y) => window.scrollTo(0, y))) e.preventDefault();
+    };
+    window.addEventListener('wheel', onWheel, { passive: false });
+  }
 
   const squareOf = (el) => {
     const r = el.getBoundingClientRect();
     const w = Math.min(r.width, r.height);
     return { el, x: r.left + (r.width - w) / 2, y: r.top + (r.height - w) / 2, w, h: w };
   };
-  function desktopPlacements() {
+  const grow = (r, g) => ({ ...r, x: r.x - (r.w * (g - 1)) / 2, y: r.y - (r.h * (g - 1)) / 2, w: r.w * g, h: r.h * g });
+  function desktopPlacements(dt) {
     const y = window.scrollY;
-    setTr(trAt(y));
-    if (!pins.length) return infos.length ? [{ ...squareOf(infos[0].el), alpha: 1 }] : [];
+    const target = lenis ? lenis.targetScroll : y;
+    for (const p of pins) {
+      // Si se llego por otro camino (barra, teclado, enlaces), la pausa
+      // queda resuelta segun de que lado esta la pagina.
+      if (y > p.Y + 2 && target > p.Y + 2) p.prog = 1;
+      else if (y < p.Y - 2 && target < p.Y - 2) p.prog = 0;
+      p.shown += (p.prog - p.shown) * (1 - Math.exp(-dt * 9));
+      if (Math.abs(p.prog - p.shown) < 0.002) p.shown = p.prog;
+    }
     let k = -1;
-    for (let i = 0; i < pins.length; i++) if (y >= pins[i].V) k = i;
-    if (k < 0) return [{ ...squareOf(pins[0].a.el), alpha: 1 }];
+    for (let i = 0; i < pins.length; i++) if (y >= pins[i].Y - 2 && pins[i].shown > 0.001) k = i;
+    // Antes de la primera pausa: el recorrido de siempre (inicio a casos).
+    if (k < 0) return placements().map((pl) => ({ ...pl, shape: P }));
     const p = pins[k];
-    const grow = (r, g) => ({ ...r, x: r.x - (r.w * (g - 1)) / 2, y: r.y - (r.h * (g - 1)) / 2, w: r.w * g, h: r.h * g });
-    if (y < p.V + HOLD) {
-      // Pausa: la pagina quieta, el modelo se deshace en particulas.
-      const sc = smooth((y - p.V) / HOLD);
+    if (p.shown < 0.999 || y <= p.Y + 2) {
+      const sc = smooth(p.shown);
       const g = 1 + 0.35 * sc;
       return [{ ...grow(squareOf(p.a.el), g), alpha: 1, scatter: sc, zoom: g }];
     }
-    const nat = y - trAt(y);
-    const t = Math.min(1, Math.max(0, (nat - p.Y) / (p.A - p.Y)));
+    const t = Math.min(1, Math.max(0, (y - p.Y) / (p.A - p.Y)));
     if (t >= 1) return [{ ...squareOf(p.b.el), alpha: 1 }];
-    // Viaje: solo particulas; al final se rearman en el hueco nuevo.
-    const a = squareOf(p.a.el);
-    const b = squareOf(p.b.el);
+    // Las particulas salen del punto de la pantalla donde se deshizo el
+    // modelo (no se van con la pagina) y van hacia el hueco siguiente.
+    const ra = squareOf(p.a.el);
+    ra.y = cyAt(p.a, p.Y) - ra.h / 2;
+    const rb = squareOf(p.b.el);
     const m = smooth(t / 0.75);
     const sc = 1 - smooth((t - 0.72) / 0.28);
     const g = 1 + 0.35 * sc;
-    const w = lerp(a.w, b.w, m);
-    const cx = lerp(a.x + a.w / 2, b.x + b.w / 2, m);
-    const cy = lerp(a.y + a.h / 2, b.y + b.h / 2, m);
-    return [{ ...grow({ el: t < 0.4 ? a.el : b.el, x: cx - w / 2, y: cy - w / 2, w, h: w }, g), alpha: 1, scatter: sc, zoom: g }];
+    const w = lerp(ra.w, rb.w, m);
+    const cx = lerp(ra.x + ra.w / 2, rb.x + rb.w / 2, m);
+    const cy = lerp(ra.y + ra.h / 2, rb.y + rb.h / 2, m);
+    return [{ ...grow({ el: rb.el, x: cx - w / 2, y: cy - w / 2, w, h: w }, g), alpha: 1, scatter: sc, zoom: g }];
   }
 
   // Forma (0-4) segun el scroll.
@@ -755,7 +792,7 @@ export async function startOrbit(root) {
     // Escritorio: la forma sigue al scroll con inercia. Celular: la forma es
     // la del hueco que esta a la vista, y el cambio se reproduce solo (~1 s)
     // al llegar, para que nunca quede detenido a mitad de camino.
-    const places = mobile ? placements() : desktopPlacements();
+    const places = mobile ? placements() : desktopPlacements(dt);
     if (mobile) {
       const main = places.reduce((m, pl) => (pl.alpha > (m?.alpha ?? -1) ? pl : m), null);
       const target = shapeOf(main?.el);
@@ -811,7 +848,7 @@ export async function startOrbit(root) {
     renderer.clear();
     renderer.setScissorTest(true);
     for (const p of places) {
-      [wA, wD] = applyShape(shapeOf(p.el), p.scatter || 0);
+      [wA, wD] = applyShape(p.shape ?? shapeOf(p.el), p.scatter || 0);
       blockUniforms.uFade.value = p.alpha;
       for (const m of ringMats) m.opacity = m.userData.base * p.alpha * ringIn * (0.85 + 0.15 * Math.sin(time * 2));
       fsMat.opacity = wA * p.alpha * ringIn;
@@ -878,8 +915,8 @@ export async function startOrbit(root) {
 
   function dispose() {
     gsap.ticker.remove(tick);
-    setTr(0);
-    spacer.remove();
+    setScrollHook(null);
+    if (onWheel) window.removeEventListener('wheel', onWheel);
     clearInterval(remeasure);
     window.removeEventListener('resize', onResize);
     window.removeEventListener('pointermove', onMove);

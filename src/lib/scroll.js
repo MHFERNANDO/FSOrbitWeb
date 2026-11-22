@@ -6,6 +6,13 @@ import { motionAllowed } from './capability.js';
 
 let ready = null;
 let api = null;
+// Gancho opcional sobre cada gesto de scroll (rueda o tactil). Si devuelve
+// false, Lenis no mueve la pagina: lo usa el modelo de la home para pausar
+// el scroll mientras se transforma.
+let vsHook = null;
+export const setScrollHook = (fn) => {
+  vsHook = fn;
+};
 
 export function initScroll() {
   if (ready) return ready;
@@ -15,7 +22,12 @@ export function initScroll() {
     let lenis = null;
     if (motionAllowed()) {
       const { default: Lenis } = await import('lenis');
-      lenis = new Lenis({ autoRaf: false, anchors: true, lerp: 0.11 });
+      lenis = new Lenis({
+        autoRaf: false,
+        anchors: true,
+        lerp: 0.11,
+        virtualScroll: (data) => (vsHook ? vsHook(data) : true),
+      });
       lenis.on('scroll', ScrollTrigger.update);
       gsap.ticker.add((time) => lenis.raf(time * 1000));
       gsap.ticker.lagSmoothing(0);

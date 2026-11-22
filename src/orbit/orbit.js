@@ -447,13 +447,15 @@ export async function startOrbit(root) {
     // Entre dos huecos del logo (servicios, preguntas, cierre): el logo se
     // deshace en particulas que viajan al otro hueco y alli lo vuelven a armar.
     if (!mobile && shapeOf(a.el) === 4 && shapeOf(b.el) === 4) {
-      const k = smooth((t - 0.15) / 0.7);
-      const sc = Math.sin(k * Math.PI);
-      const g = 1 + 0.8 * sc;
-      const w = lerp(a.w, b.w, k) * g;
-      const cx = lerp(a.x + a.w / 2, b.x + b.w / 2, k);
-      const cy = lerp(a.y + a.h / 2, b.y + b.h / 2, k);
-      return [{ el: k < 0.5 ? a.el : b.el, x: cx - w / 2, y: cy - w / 2, w, h: w, alpha: 1, scatter: sc, zoom: g }];
+      // Tres tramos: se deshace en particulas, solo las particulas viajan,
+      // y al llegar se vuelve a armar.
+      const sc = Math.min(smooth((t - 0.05) / 0.22), smooth((0.95 - t) / 0.22));
+      const m = smooth((t - 0.27) / 0.46);
+      const g = 1 + 0.35 * sc;
+      const w = lerp(a.w, b.w, m) * g;
+      const cx = lerp(a.x + a.w / 2, b.x + b.w / 2, m);
+      const cy = lerp(a.y + a.h / 2, b.y + b.h / 2, m);
+      return [{ el: m < 0.5 ? a.el : b.el, x: cx - w / 2, y: cy - w / 2, w, h: w, alpha: 1, scatter: sc, zoom: g }];
     }
     // Solo los huecos de las escenas (inicio a casos) se deslizan; el resto
     // (casos a planes, por ejemplo) se funde, para no cruzar las tarjetas.
@@ -557,11 +559,14 @@ export async function startOrbit(root) {
       vS.set(lerp(a.s[0], b.s[0], lt), lerp(a.s[1], b.s[1], lt), lerp(a.s[2], b.s[2], lt));
 
       // Viaje entre huecos del logo: cada bloque se abre en una nube.
+      // Todos los bloques (tambien los guardados) pasan a ser particulas
+      // pequenas en una nube suelta que gira despacio.
       if (scatter > 0) {
-        vA.x += spin[i][0] * scatter * 3.2;
-        vA.y += (spin[i][1] + (seeds[i] - 0.5)) * scatter * 3.2;
-        vA.z += spin[i][2] * scatter * 1.5;
-        vS.multiplyScalar(1 - 0.55 * scatter);
+        const ang = seeds[i] * Math.PI * 2 + time * (0.4 + seeds[i] * 0.5);
+        const r = 0.5 + seeds[(i + 7) % K] * 1.1;
+        vF.set(Math.cos(ang) * r, (seeds[(i + 3) % K] - 0.5) * 1.8, Math.sin(ang) * r * 0.6);
+        vA.lerp(vF, scatter);
+        vS.lerp(vF.set(0.045, 0.045, 0.045), scatter);
       }
 
       // Intro: los bloques llegan en espiral desde afuera.

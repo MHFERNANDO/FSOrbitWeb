@@ -444,7 +444,7 @@ export async function startOrbit(root) {
     const a = rects[i - 1];
     const b = rects[i];
     const t = (c - a.cy) / (b.cy - a.cy);
-    if (mobile || Math.abs(b.x - a.x) > W * 0.25) {
+    if (mobile || Math.abs(b.x - a.x) > W * 0.25 || (shapeOf(a.el) === 4 && shapeOf(b.el) === 4)) {
       const k = smooth((t - 0.32) / 0.36);
       const grow = (r, s) => ({ ...r, x: r.x + (r.w * (1 - s)) / 2, y: r.y + (r.h * (1 - s)) / 2, w: r.w * s, h: r.h * s });
       return [
@@ -604,15 +604,19 @@ export async function startOrbit(root) {
     monGroup.updateMatrixWorld();
     dust.rotation.y = time * 0.05;
 
-    placeBlocks(P, time, intro);
-
     // Pesos de cada forma: logo (orbitas, FS) y monitor (pantalla).
-    const wA = Math.max(0, 1 - P * 1.6) + Math.max(0, 1 - (4 - P) * 1.6);
-    const wD = Math.max(0, 1 - Math.abs(P - 3) * 2.2);
     const ringIn = smooth((intro - 0.35) / 0.65);
-    ringGroup.scale.setScalar(Math.max(0.0001, wA * (0.6 + 0.4 * ringIn)));
     const pulse = 1 + 0.12 * Math.sin(time * 2.4);
-    fs.scale.setScalar(Math.max(0.0001, wA * ringIn) * pulse);
+    const applyShape = (S) => {
+      placeBlocks(S, time, intro);
+      const a = Math.max(0, 1 - S * 1.6) + Math.max(0, 1 - (4 - S) * 1.6);
+      ringGroup.scale.setScalar(Math.max(0.0001, a * (0.6 + 0.4 * ringIn)));
+      fs.scale.setScalar(Math.max(0.0001, a * ringIn) * pulse);
+      return [a, Math.max(0, 1 - Math.abs(S - 3) * 2.2)];
+    };
+    // Celular: cada hueco muestra su forma ya armada y el paso entre huecos
+    // es un fundido; escritorio: una sola forma que sigue al scroll.
+    let [wA, wD] = mobile ? [0, 0] : applyShape(P);
 
     pointer.cx += (pointer.x - pointer.cx) * 0.05;
     pointer.cy += (pointer.y - pointer.cy) * 0.05;
@@ -633,6 +637,7 @@ export async function startOrbit(root) {
     renderer.clear();
     renderer.setScissorTest(true);
     for (const p of places) {
+      if (mobile) [wA, wD] = applyShape(shapeOf(p.el));
       blockUniforms.uFade.value = p.alpha;
       for (const m of ringMats) m.opacity = m.userData.base * p.alpha * ringIn * (0.85 + 0.15 * Math.sin(time * 2));
       fsMat.opacity = wA * p.alpha * ringIn;

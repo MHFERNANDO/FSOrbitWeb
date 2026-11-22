@@ -801,6 +801,7 @@ export async function startOrbit(root) {
   // forma. Todo depende de la posicion de los huecos: sigue al scroll.
   const vC = new Vector3();
   let lastEl = null;
+  const rail = mobile ? page.querySelector('.cases-rail') : null;
   function renderMobile(time, intro, ringIn, pulse) {
     const top = head ? head.getBoundingClientRect().bottom : 64;
     const bottom = H - 96;
@@ -849,6 +850,16 @@ export async function startOrbit(root) {
     const barBot = bottom - span * 0.2;
     const bx = (W - 9 - W / 2) * k;
     const dot = 3.2 * k;
+    // La barra no pasa sobre el carrusel de casos: se reparte en el espacio
+    // libre arriba y abajo de las tarjetas, y los puntos cerca del borde de
+    // las tarjetas se achican hasta desaparecer (asi nunca saltan a la vista).
+    const rr = rail ? rail.getBoundingClientRect() : null;
+    const bTop = rr ? rr.top - 14 : Infinity;
+    const bBot = rr ? rr.bottom + 14 : -Infinity;
+    const lenA = Math.max(0, Math.min(barBot, bTop) - barTop);
+    const startB = Math.max(barTop, bBot);
+    const lenB = Math.max(0, barBot - startB);
+    const free = lenA + lenB;
     const pose = shapePose(S, time);
     for (let i = 0; i < K; i++) {
       const b = pose[i];
@@ -871,20 +882,33 @@ export async function startOrbit(root) {
       // Hacia la barra, cada particula con su propio retraso.
       const lt = smooth((beta * 1.35 - seeds[i] * 0.35) / 1.0);
       if (lt > 0) {
-        const u = ((i + 0.5) / K + time * 0.015) % 1;
-        vC.set(bx, (H / 2 - (barTop + (barBot - barTop) * u)) * k, 0);
+        // Puntos quietos; solo su brillo respira despacio.
+        const u = (i + 0.5) / K;
+        let py;
+        let fit = 1;
+        if (free > 1) {
+          const d = u * free;
+          py = d < lenA ? barTop + d : startB + (d - lenA);
+          if (rr) fit = smooth(Math.min(Math.abs(py - bTop), Math.abs(py - bBot)) / 28);
+          fit *= smooth((free - 30) / 90);
+        } else {
+          py = barTop + (barBot - barTop) * u;
+          fit = 0;
+        }
+        vC.set(bx, (H / 2 - py) * k, 0);
         const arc = Math.sin(lt * Math.PI);
         vA.lerp(vC, lt);
         vA.x += arc * spin[i][0] * 0.6;
         vA.y += arc * spin[i][1] * 0.6;
-        vS.lerp(vF.set(dot, dot, dot), lt);
+        const dd = Math.max(0.0001, dot * fit);
+        vS.lerp(vF.set(dd, dd, dd), lt);
         qT.slerp(ident4, lt);
       }
       m4.compose(vA, qT, vS);
       blocks.setMatrixAt(i, m4);
       col.setRGB(lerp(b.c[0], CYAN[0], lt), lerp(b.c[1], CYAN[1], lt), lerp(b.c[2], CYAN[2], lt));
       blocks.setColorAt(i, col);
-      glowAttr.array[i] = lerp(b.g * (0.6 + 0.4 * il), 1.8, lt);
+      glowAttr.array[i] = lerp(b.g * (0.6 + 0.4 * il), 1.5 + 0.35 * Math.sin(time * 1.3 + i * 0.7), lt);
     }
     blocks.instanceMatrix.needsUpdate = true;
     blocks.instanceColor.needsUpdate = true;
